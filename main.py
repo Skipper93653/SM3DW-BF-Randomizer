@@ -488,15 +488,6 @@ def spoilerFile(StageListNew, currentDateTime):
     print('Generated spoiler file!')
 
 
-#path = Path('StageList.szs')  # Path to StageList.szs
-
-#szs = oead.Sarc(oead.yaz0.decompress(path.read_bytes()))
-#print(szs)
-
-with open("StageList.byml", "w", encoding='utf-8') as f:
-    info = oead.byml.to_text('')
-print(info)
-
 # Buttons
 run = Button(root, text='Randomize', fg='red', command=errorPopUp)
 openDIR = Button(root, text='Load RomFS directory', fg='red', command=browseDIR)
