@@ -12,7 +12,7 @@ global folderSelected
 
 root = Tk()
 root.iconbitmap('ico.ico')
-root.title('(Switch) Super Mario 3D World Randomizer')
+root.title('Super Mario 3D World (Switch) Randomizer')
 root.geometry('500x100')
 
 spoil = IntVar()
@@ -35,6 +35,8 @@ def browseDIR():
         return
     fileExist = os.path.isfile(folderSelected+'/SystemData/StageList.szs')
     print('Selected', folderSelected, fileExist)
+
+    # Check if the RomFS directory is valid.
     if fileExist:
         openDIR.configure(text='Valid directory!', fg='green')
         run.configure(fg='green', command=randomizer)
@@ -42,8 +44,9 @@ def browseDIR():
         openDIR.configure(text='Load RomFS directory', fg='red')
         run.configure(fg='red', command=errorPopUp)
 
-    if len(folderSelected) > 55:
-        dirLabel.configure(text=folderSelected[:55]+'...')
+    # Cutting off the displayed label if directory is too long.
+    if len(folderSelected) > 60:
+        dirLabel.configure(text=folderSelected[:60]+'...')
     else:
         dirLabel.configure(text=folderSelected)
 
@@ -492,7 +495,7 @@ def spoilerFile(StageListNew, currentDateTime):
 run = Button(root, text='Randomize', fg='red', command=errorPopUp)
 openDIR = Button(root, text='Load RomFS directory', fg='red', command=browseDIR)
 cred = Button(root, text='Credits', command=creditsDev)
-quitB = Button(root, text='Quit', command=quit)
+quitB = Button(root, text='Quit', command=root.destroy)
 
 # Check boxes
 spoilerCheck = Checkbutton(root, text='Generate spoiler file?', variable=spoil)
