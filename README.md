@@ -1,4 +1,4 @@
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/Skipper93653/SuperMario3DWorld-Randomizer)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Skipper93653/SM3DW-BF-Randomizer)
 
 # Super Mario 3D World (+ Bowser's Fury) Randomizer
 
@@ -9,13 +9,13 @@ Bowser's Fury and Wii U support are planned for a later time.
 
 ### Generating the randomized files
 
-Select a valid RomFS dump of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize' button, your file should be outputted in the same directory in a folder called ```romfs-datetime``` (with 'datetime' being the date and time you initiated the randomizing process).
+Select a valid RomFS dump of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize' button, your file should be outputted in the same directory in a folder called ```romfs-datetime``` (with 'datetime' being the date and time you initiated the randomizing process). All green star locks are removed except from Bowser-Castle which keeps the 170 green star lock it has in the vanilla game.
 
 ### Playing with the newly generated files
 
 ### Console
 
-If you have Atmosphere CFW - on the root of your SD card, create a folder within the ```atmosphere\contents``` folder named ```010028600EBDA000``` (The ID for Super Mario 3D World + Bowser's Fury) and copy your ```romfs-datetime``` folder into it and rename it to just 'romfs' then you're free to play!
+If you have Atmosphere CFW - on the root of your SD card, create a folder within the ```atmosphere\contents``` (or ```atmosphere\titles``` on Atmosphere CFW versions 0.9.4 and below) folder named ```010028600EBDA000``` (The ID for Super Mario 3D World + Bowser's Fury) and copy your ```romfs-datetime``` folder into it and rename it to just 'romfs' then you're free to play!
 
 ### Emulators
 
@@ -27,7 +27,12 @@ For usage with yuzu - open yuzu, right click 'Super Mario 3D World + Bowser's Fu
 
 For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, create a new folder with a name of your choice and copy the newly generated ```romfs-datetime``` into your newly created mod folder and rename it to just 'romfs' then you're free to play!
 
-## Potential future features
+## Known Issues
+
+* Stamps do not randomize with stage so the stamp screen is not fully functional.
+* Blockades have missing music.
+
+## Potential future features in no particular order
 
 * Music randomizer
 * Bowser's Fury island randomizer
@@ -39,7 +44,7 @@ For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowse
 To build this software, run ```setup.py``` which requires to have the [PyInstaller](https://github.com/pyinstaller/pyinstaller) module installed along with the [oead](https://github.com/zeldamods/oead) module which is used for working with Nintendo file formats.<br>
 ```pip install pyinstaller```<br>
 ```pip install oead```<br>
-This builds a Windows Executable in ```dist```.
+This builds an executable based on the operating system you used to compile the program (Windows, Mac OS X, and GNU/Linux) in ```dist```.
 
 ## Support
 

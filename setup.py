@@ -1,13 +1,15 @@
 import PyInstaller.__main__
-import os
+import os, shutil
 
-os.system('cmd /c "mkdir dist"')
+if not os.path.isdir('./dist'):
+    os.mkdir('./dist')
 
-os.system('cmd /c "copy ico.ico dist"')
+shutil.copy2('./ico.ico', './dist')
 
 PyInstaller.__main__.run([
     'main.py',
     '--onefile',
+    '-nrando',
     '--windowed',
     '--icon=ico.ico'
 ])
