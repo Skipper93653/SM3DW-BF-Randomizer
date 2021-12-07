@@ -12,15 +12,16 @@ global folderSelected
 
 root = Tk()
 root.iconbitmap('ico.ico')
-root.title('Super Mario 3D World (+ Bowser\'s Fury) Randomizer')
+root.title('Super Mario 3D World Randomizer')
 root.geometry('500x100')
 
 spoil = IntVar()
+music = IntVar()
 
 
 # Developer credits.
 def creditsDev():
-    showinfo("Credits", "Super Mario 3D World Randomizer Credits\n\nDeveloper:\nToby Bailey - (Skipper93653)\n\nSpecial Thanks:\nNintendo for creating the game.\nMembers of the ZeldaMods Discord server for oead help.\nAll used third party Python module developers.")
+    showinfo("Credits", "Super Mario 3D World Randomizer Credits\n\nDeveloper:\nToby Bailey - (Skipper93653)\n\nSpecial Thanks:\nNintendo for creating the game.\nMembers of the ZeldaMods Discord server for oead help.\nAll used Python module developers.\nAll testers.")
 
 
 # Error when trying to execute randomizer when a valid directory has not been specified.
@@ -35,7 +36,10 @@ def browseDIR():
     folderSelected = askdirectory()
     if not folderSelected:
         return
-    fileExist = os.path.isfile(folderSelected+'/SystemData/StageList.szs')
+    if music.get() == 1:
+        fileExist = os.path.isfile(folderSelected + '/SystemData/StageList.szs') and os.path.isdir(folderSelected + '/SoundData/stream')
+    else:
+        fileExist = os.path.isfile(folderSelected+'/SystemData/StageList.szs')
     print('Selected', folderSelected, fileExist)
 
     # Check if the RomFS directory is valid.
@@ -71,6 +75,7 @@ def randomizer():
     os.makedirs(rPath)
     os.mkdir('./tmp-'+currentDateTime)
 
+    # Copy StageList.szs and grab the BYML, convert to YML, open it as a list.
     shutil.copy2(oPath+'StageList.szs', rPath)
 
     with open(rPath+"StageList.szs", "rb") as f:
@@ -88,7 +93,7 @@ def randomizer():
         StageListNew = [line for line in new.readlines()]  # Open the YML as new and make a list from it.
 
     stageNo = 1
-    stageID_history = [62, 63, 64, 65, 66]  # The unused Toad Houses in World 5
+    stageID_history = [34, 62, 63, 64, 65, 66, 81, 97, 115]  # The unused Toad Houses
 
     # 154 different stages in total.
     while stageNo <= 154:
@@ -110,9 +115,15 @@ def randomizer():
         stageID_history.append(stageID)  # Appends the generated stageID to the stageID_history list to help avoid generating the same number more than once when looping.
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 1] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 1]  # DoubleMarioNum
         # Only have Bowser-Castle keep it's Star Lock of 170.
-        if StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n'))] == '  - CourseId: 114\n':
+        if stageNo == 114:
             print('Reached Bowser-Castle slot! Placing 170 star lock!')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 4] = '    GreenStarLock: 170\n'
+        elif stageNo == 127:
+            print('Reached Star-9 slot! Placing 210 star lock!')
+            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 4] = '    GreenStarLock: 210\n'
+        elif stageNo == 137:
+            print('Reached Mushroom-7 slot! Placing 240 star lock!')
+            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 4] = '    GreenStarLock: 240\n'
         else:
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 4] = '    GreenStarLock: 0\n'  # GreenStarLock - gets rid of all star locks by setting it to 0.
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 5] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 5]  # GreenStarNum
@@ -123,7 +134,7 @@ def randomizer():
             print('Reached castle slot! Copying original StageType of this slot.')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo) + '\n')) + 10]  # Makes sure all castle slots are the same slots when the levels are randomized.
         else:
-            # Making sure Captain Toad stages, Mystery Houses, Toad Houses, Stamp Houses, Roulettes, Blockades, and Golden Express have the correct StageType.
+            # Making sure Captain Toad stages, Mystery Houses, Toad Houses, Stamp Houses, Roulettes, Blockades, and Golden Express have the correct StageType depending on the slot they are on after they are randomized.
             if 'KinopioBrigade' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
                 print('Captain Toad StageType fixed!')
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオ探検隊\n'  # StageType for Captain Toad levels.
@@ -134,33 +145,69 @@ def randomizer():
                 print('Stamp House StageType fixed!')
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 妖精の家\n'  # StageType for Stamp Houses.
             elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
-                print('Roulette StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゴールデンエクスプレス\n'  # StageType for Roulettes (カジノ部屋) is not used because they don't appear on the world map immediately which can cause progression issues. So the golden express is used instead.
+                # If a Roulette with Golden Express StageType is on the first level of a world, it causes a softlock. We avoid this by using the Toad House StageType.
+                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 38 or stageNo == 50 or stageNo == 70 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
+                    print('Roulette StageType fixed with Toad House StageType!')
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオの家\n'  # StageType for Toad House
+                # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType.
+                elif stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130:
+                    print('Roulette StageType fixed with Roulette StageType!')
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: カジノ部屋\n'  # StageType for Roulettes.
+                # Any other slot gives a roulette the golden express StageType.
+                else:
+                    print('Roulette StageType fixed with Golden Express StageType!')
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゴールデンエクスプレス\n'  # StageType for Roulettes (カジノ部屋) is not used because they don't appear on the world map immediately which can cause progression issues. So the golden express is used instead.
             elif 'GoldenExpressStage' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
-                print('Golden Express StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゴールデンエクスプレス\n'  # StageType for golden express.
+                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 38 or stageNo == 50 or stageNo == 70 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
+                    print('Golden Express StageType fixed with Toad House!')
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオの家\n'  # StageType for Toad House.
+                else:
+                    print('Golden Express StageType fixed!')
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゴールデンエクスプレス\n'  # StageType for golden express.
             elif 'MysteryHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
                 print('Mystery House StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ミステリーハウス\n'  # StageType for MysteryHouses
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ミステリーハウス\n'  # StageType for MysteryHouses.
             elif 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+                # If it is a boss blockade...
                 if StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] == '    StageName: GateKeeperTentackLv1Stage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] == '    StageName: GateKeeperTentackLv2Stage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage\n':
-                    print('Boss blockade StageType adjusted to standard course StageType.')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 通常\n'
+                    # If boss blockade is randomized onto a boss blockade slot, keep boss blockade StageType.
+                    if stageNo == 37 or stageNo == 85 or stageNo == 117 or stageNo == 118:
+                        print('Boss blockade StageType fixed with boss blockade StageType.')
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゲートキーパー[GPあり]\n'  # StageType for Boss Blockades.
+                    # Any other slot.
+                    else:
+                        print('Boss blockade StageType adjusted to standard course StageType.')
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 通常\n'
+                # If it is a normal boss blockade...
                 else:
-                    print('Blockade StageType adjusted to Mystery House StageType.')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ミステリーハウス\n'  # StageType for MysteryHouses
+                    if stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 22 or stageNo == 48 or stageNo == 49 or stageNo == 68 or stageNo == 69 or stageNo == 83 or stageNo == 84 or stageNo == 99 or stageNo == 100 or stageNo == 101:
+                        print('Blockade StageType fixed with blockade StageType.')
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゲートキーパー\n'  # StageType for Blockades.
+                    else:
+                        print('Blockade StageType adjusted to Mystery House StageType.')
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ミステリーハウス\n'  # StageType for MysteryHouses.
             # Fix certain stages having a StageType which breaks certain things.
             elif ('KinopioBrigade' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: キノピオ探検隊\n') or ('KinopioHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: キノピオの家\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 隠しキノピオの家\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 隠し土管')) or ('FairyHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 妖精の家\n') or ('RouletteRoomZone' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: カジノ部屋\n') or ('GoldenExpressStage' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゴールデンエクスプレス\n')) or ('GateKeeper' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゲートキーパー[GPあり]\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゲートキーパー\n')) or ('MysteryHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ミステリーハウス\n'):
                 print('Non-\'special\' level with \'special\' StageType fixed!')
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 通常\n'  # StageType for normal levels.
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 9] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 9]  # StageTimer
-        if stageNo == 61:
+
+        # Check whether stageNo is one before an unused stage slot and if it is, set stageNo to the next used stage slot.
+        if stageNo == 33:
+            stageNo = 35
+        elif stageNo == 61:
             stageNo = 67
+        elif stageNo == 80:
+            stageNo = 82
+        elif stageNo == 96:
+            stageNo = 98
+        elif stageNo == 114:
+            stageNo = 116
         else:
             stageNo += 1
-    print('First 5 numbers in the list are unused World 5 Toad House slots:', stageID_history)
+    print('First 9 numbers in the list are unused World 5 Toad House slots:', stageID_history)
 
-    #  Test code to print duplicate numbers in the stageID_history list, should not print anything if everything went perfectly.
+    # Test code to print duplicate numbers in the stageID_history list, should not print anything if everything went perfectly.
     print('Duplicate StageIDs:')
     for i in range(0, len(stageID_history)):
         for j in range(i + 1, len(stageID_history)):
@@ -189,12 +236,65 @@ def randomizer():
 
     shutil.rmtree('./tmp-'+currentDateTime)  # Delete temporary folder.
 
+    if music.get() == 1:
+        musicRandomizer(currentDateTime)
+    else:
+        print('Not randomizing music.')
+
     if spoil.get() == 1:
         spoilerFile(StageListNew, currentDateTime)
     else:
         print('Not generating spoiler file.')
 
     quitB.configure(command=quit)
+
+
+# Music randomizer
+def musicRandomizer(currentDateTime):
+    global folderSelected
+    print('Randomizing music...')
+
+    # Creating variables for the directorties we are working with.
+    mPath = os.path.join(folderSelected, 'SoundData/stream/')
+    rPath = os.path.join('./romfs-'+currentDateTime, 'SoundData/stream/')
+    os.makedirs(rPath)
+
+    # Making a list comprising of the names of every file in the directory
+    mList = os.listdir(mPath)
+
+    # Creating a music index variable and randomized number history variable in a similar to the level randomizer.
+    musicPos = 0
+    musicRando_history = []
+
+    # Loop for music randomization
+    while musicPos < len(mList):
+        musicRando = randint(0, len(mList)-1)
+
+        # The same loop used in the level randomizer to avoid repeating numbers.
+        while musicRando in musicRando_history or os.path.isdir(rPath+mList[musicRando]):
+            print('Duplicate number '+str(musicRando)+'! Regenerating...')
+            musicRando = randint(0, len(mList)-1)
+
+        print('Generated unique number ' + str(musicRando) + '!')
+        musicRando_history.append(musicRando)
+
+        # Renaming music file to randomized music file using the list.
+        shutil.copy2(mPath+mList[musicPos], rPath+mList[musicRando])
+        print('Renamed', mList[musicPos], 'to', mList[musicRando])
+
+        musicPos += 1
+
+    print(musicRando_history)
+
+    # Test code to print duplicate numbers in the stageID_history list, should not print anything if everything went perfectly.
+    print('Duplicate music:')
+    for i in range(0, len(musicRando_history)):
+        for j in range(i + 1, len(musicRando_history)):
+            if musicRando_history[i] == musicRando_history[j]:
+                print(musicRando_history[j])
+    print('\nIf no indication of duplicate numbers are above, success!')
+
+    print('Music randomizer procedure complete!')
 
 
 # Spoiler file generation
@@ -245,7 +345,7 @@ def spoilerFile(StageListNew, currentDateTime):
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Double Cherry Pass (2-5)\n')
         # Stamp House
         elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FairyHouseBlueStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FairyHouseInsideStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FairyHouseLavaStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FairyHouseNightStage\n':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Stamp House\n')
+            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sprixie House\n')
         # World 2 continued
         elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: MysteryHouseEnemyStage\n':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Melee (2-Mystery House)\n')
@@ -521,7 +621,7 @@ def spoilerFile(StageListNew, currentDateTime):
         s = s.read()  # Reading the spoiler file.
 
     # Making sure levels have the correct names.
-    rep = s.replace('11-6', 'Flower-6').replace('11-7', 'Flower-7').replace('11-8', 'Flower-8').replace('11-9', 'Flower-9').replace('11-10', 'Flower-10').replace('11-11', 'Flower-11').replace('11-12', 'Flower-12').replace('12-1', 'Crown-Crown').replace('1-9', '1-Castle').replace('4-9', '4-Castle').replace('5-12', '5-Castle').replace('7-11', 'Castle-Castle').replace('8-13', 'Bowser-Castle').replace('2-9', '2-Tank').replace('6-11', '6-Tank').replace('3-11', '3-Train').replace('8-12', 'Bowser-Train').replace('1-6', '1-Toad House 1').replace('1-7', '1-Toad House 2').replace('2-6', '2-Toad House').replace('3-8', '3-Toad House 1').replace('3-12', '3-Toad House 2').replace('4-6', '4-Toad House').replace('5-9', '5-Toad House 1').replace('5-13', '5-Toad House 2').replace('5-14', '5-Toad House 3').replace('5-15', '5-Toad House 4').replace('5-16', '5-Toad House 5').replace('5-17', '5-Toad House 6').replace('6-8', '6-Toad House 1').replace('6-12', '6-Toad House 2').replace('7-8', 'Castle-Toad House 1').replace('7-12', 'Castle-Toad House 2').replace('8-8', 'Bowser-Toad House 1').replace('8-9', 'Bowser-Toad House 2').replace('8-14', 'Bowser-Toad House 3').replace('2-7', '2-Stamp House').replace('3-9', '3-Stamp House').replace('4-7', '4-Stamp House').replace('5-10', '5-Stamp House').replace('6-9', '6-Stamp House').replace('7-9', 'Castle-Stamp House').replace('8-10', 'Bowser-Stamp House').replace('9-10', 'Star-Stamp House').replace('12-2', 'Crown-Stamp House').replace('1-8', '1-Captain Toad').replace('3-10', '3-Captain Toad').replace('5-11', '5-Captain Toad').replace('7-10', 'Castle-Captain Toad').replace('9-11', 'Star-Captain Toad').replace('12-3', 'Crown-Captain Toad').replace('1-10', 'Lucky House').replace('2-10', 'Lucky House').replace('3-13', 'Lucky House').replace('4-10', 'Lucky House').replace('5-18', 'Lucky House').replace('6-13', 'Lucky House').replace('7-13', 'Lucky House').replace('8-15', 'Lucky House').replace('9-12', 'Lucky House').replace('1-11', '1-A').replace('2-11', '2-A').replace('3-14', '3-A').replace('4-11', '4-A').replace('5-19', '5-A').replace('6-14', '6-A').replace('7-14', 'Castle-A').replace('8-16', 'Bowser-A').replace('3-15', '3-B').replace('4-12', '4-B').replace('5-20', '5-B').replace('6-15', '6-B').replace('7-15', 'Castle-B').replace('8-17', 'Bowser-B').replace('6-16', '6-C').replace('7-16', 'Castle-C').replace('5-8', 'Coin Express').replace('2-8', '2-Mystery House').replace('4-8', '4-Mystery House').replace('6-10', '6-Mystery House').replace('8-11', 'Bowser-Mystery House').replace('10-8', 'Mushroom-Mystery House').replace('12-4', 'Crown-Mystery House').replace('7-', 'Castle-').replace('8-', 'Bowser-').replace('9-', 'Star-').replace('10-', 'Mushroom-').replace('11-', 'Flower-').replace('12-', 'Crown-')
+    rep = s.replace('11-6', 'Flower-6').replace('11-7', 'Flower-7').replace('11-8', 'Flower-8').replace('11-9', 'Flower-9').replace('11-10', 'Flower-10').replace('11-11', 'Flower-11').replace('11-12', 'Flower-12').replace('12-1', 'Crown-Crown').replace('1-9', '1-Castle').replace('4-9', '4-Castle').replace('5-12', '5-Castle').replace('7-11', 'Castle-Castle').replace('8-13', 'Bowser-Castle').replace('2-9', '2-Tank').replace('6-11', '6-Tank').replace('3-11', '3-Train').replace('8-12', 'Bowser-Train').replace('1-6', '1-Toad House 1').replace('1-7', '1-Toad House 2').replace('2-6', '2-Toad House').replace('3-8', '3-Toad House 1').replace('3-12', '3-Toad House 2 (Unused)').replace('4-6', '4-Toad House').replace('5-9', '5-Toad House 1').replace('5-13', '5-Toad House 2 (Unused)').replace('5-14', '5-Toad House 3 (Unused)').replace('5-15', '5-Toad House 4 (Unused)').replace('5-16', '5-Toad House 5 (Unused)').replace('5-17', '5-Toad House 6 (Unused)').replace('6-8', '6-Toad House 1').replace('6-12', '6-Toad House 2 (Unused)').replace('7-8', 'Castle-Toad House 1').replace('7-12', 'Castle-Toad House 2 (Unused)').replace('8-8', 'Bowser-Toad House 1').replace('8-9', 'Bowser-Toad House 2').replace('8-14', 'Bowser-Toad House 3 (Unused)').replace('2-7', '2-Sprixie House').replace('3-9', '3-Sprixie House').replace('4-7', '4-Sprixie House').replace('5-10', '5-Sprixie House').replace('6-9', '6-Sprixie House').replace('7-9', 'Castle-Sprixie House').replace('8-10', 'Bowser-Sprixie House').replace('9-10', 'Star-Sprixie House').replace('12-2', 'Crown-Sprixie House').replace('1-8', '1-Captain Toad').replace('3-10', '3-Captain Toad').replace('5-11', '5-Captain Toad').replace('7-10', 'Castle-Captain Toad').replace('9-11', 'Star-Captain Toad').replace('12-3', 'Crown-Captain Toad').replace('1-10', 'Lucky House').replace('2-10', 'Lucky House').replace('3-13', 'Lucky House').replace('4-10', 'Lucky House').replace('5-18', 'Lucky House').replace('6-13', 'Lucky House').replace('7-13', 'Lucky House').replace('8-15', 'Lucky House').replace('9-12', 'Lucky House').replace('1-11', '1-A').replace('2-11', '2-A').replace('3-14', '3-A').replace('4-11', '4-A').replace('5-19', '5-A').replace('6-14', '6-A').replace('7-14', 'Castle-A').replace('8-16', 'Bowser-A').replace('3-15', '3-B').replace('4-12', '4-B').replace('5-20', '5-B').replace('6-15', '6-B').replace('7-15', 'Castle-B').replace('8-17', 'Bowser-B').replace('6-16', '6-C').replace('7-16', 'Castle-C').replace('5-8', 'Coin Express').replace('2-8', '2-Mystery House').replace('4-8', '4-Mystery House').replace('6-10', '6-Mystery House').replace('8-11', 'Bowser-Mystery House').replace('10-8', 'Mushroom-Mystery House').replace('12-4', 'Crown-Mystery House').replace('7-', 'Castle-').replace('8-', 'Bowser-').replace('9-', 'Star-').replace('10-', 'Mushroom-').replace('11-', 'Flower-').replace('12-', 'Crown-')
 
     with open('./romfs-'+currentDateTime+'/'+currentDateTime+'-spoiler.txt', 'w', encoding='utf-8') as s:
         s.write(rep)  # Writing the corrected level slots back to the file.
@@ -537,10 +637,11 @@ quitB = Button(root, text='Quit', command=root.destroy)
 
 # Check boxes
 spoilerCheck = Checkbutton(root, text='Generate spoiler file?', variable=spoil)
+musicCheck = Checkbutton(root, text='Randomize music?', variable=music)
 
 # Labels
 dirLabel = Label(root, text='Load directory')
-noticeLabel = Label(root, text='The Wii U version of Super Mario 3D World is unsupported at this time.')
+noticeLabel = Label(root, text='The Wii U version of Super Mario 3D World and Bowser\'s Fury are unsupported at this time.')
 
 # Place buttons
 cred.place(relx=0.35, rely=0.99, anchor=S)
@@ -550,6 +651,7 @@ quitB.place(relx=0.65, rely=0.99, anchor=S)
 
 # Place check boxes
 spoilerCheck.place(relx=0.01, rely=0.45, anchor=W)
+musicCheck.place(relx=0.4, rely=0.45, anchor=CENTER)
 
 # Place labels
 dirLabel.place(relx=0.01, rely=0.2, anchor=W)

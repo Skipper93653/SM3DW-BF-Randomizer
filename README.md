@@ -9,7 +9,7 @@ Bowser's Fury and Wii U support are planned for a later time.
 
 ### Generating the randomized files
 
-Select a valid RomFS dump of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize' button, your file should be outputted in the same directory in a folder called ```romfs-datetime``` (with 'datetime' being the date and time you initiated the randomizing process). All green star locks are removed except from Bowser-Castle which keeps the 170 green star lock it has in the vanilla game.
+Select a valid RomFS dump of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize' button, this should generate a folder called ```romfs-datetime``` (with 'datetime' being the date and time you initiated the randomizing process). All green star locks are removed except from the levels with star locks from Bowser-Castle onwards and all collectables and gold goal poles for World Crown.
 
 ### Playing with the newly generated files
 
@@ -31,10 +31,13 @@ For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowse
 
 * Stamps do not randomize with stage so the stamp screen is not fully functional.
 * Blockades have missing music.
+* Sometimes the course list screen freezes the game.
+* Some stage numbers are glitched.
+* Warp Pipes which should take you to the next world do not work and just kick you out of the stage.
+* Sometimes, with randomized music, the music may sometimes cut out abruptly.
 
 ## Potential future features in no particular order
 
-* Music randomizer
 * Bowser's Fury island randomizer
 * Seed input
 * Wii U support
