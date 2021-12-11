@@ -38,6 +38,8 @@ For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowse
 
 ## Potential future features in no particular order
 
+* A different music randomizer method.
+* Randomized levels show the correct diorama on the world map.
 * Bowser's Fury island randomizer
 * Seed input
 * Wii U support

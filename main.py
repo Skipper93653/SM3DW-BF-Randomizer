@@ -57,6 +57,10 @@ def browseDIR():
         dirLabel.configure(text=folderSelected)
 
 
+def finish():
+    showinfo('Randomizer', 'Randomization complete!')
+
+
 # Level randomizer
 def randomizer():
     global folderSelected
@@ -69,6 +73,7 @@ def randomizer():
     currentDate = now.strftime('%d-%m-%y')
     currentDateTime = currentDate+'-'+currentTime
 
+    # SystemData Path
     oPath = os.path.join(folderSelected, 'SystemData/')  # Original game path
     rPath = os.path.join('./romfs-'+currentDateTime, 'SystemData/')  # Randomizer path
 
@@ -246,6 +251,7 @@ def randomizer():
     else:
         print('Not generating spoiler file.')
 
+    finish()
     quitB.configure(command=quit)
 
 
