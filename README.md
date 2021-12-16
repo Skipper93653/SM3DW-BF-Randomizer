@@ -53,7 +53,7 @@ This builds an executable based on the operating system you used to compile the 
 
 ## Support
 
-If you need help with the randomizer in anyway, be sure to try and get in touch with me via my [Discord](https://discord.gg/NCKtWuJUcC).
+If you need help with the randomizer in any way, be sure to try and get in touch with me via my [Discord](https://discord.gg/NCKtWuJUcC).
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
