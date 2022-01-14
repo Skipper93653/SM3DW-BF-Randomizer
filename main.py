@@ -355,18 +355,6 @@ def randomizer():
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 通常\n'  # StageType for normal levels.
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 9] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 9]  # StageTimer
 
-        # Stamp Fix
-        CourseIdo = '- {CourseId: ' + str(stageNo)
-        CourseIdn = '- {CourseId: ' + str(stageID)
-        if 'IllustItemNum: 0' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 6]:
-            # Enumerate the StampList for easy replacement of CourseIds.
-            for i, elem in enumerate(StampListo):
-                if CourseIdo in elem:
-                    if i not in stamp_history:
-                        StampListn[i] = CourseIdn + elem[elem.index(','):]
-                        stamp_history.append(i)
-                        break
-
         StageName = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]
         StageNameOld = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]
         StageID = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 7]
