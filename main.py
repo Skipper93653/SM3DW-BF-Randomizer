@@ -257,7 +257,6 @@ def randomizer():
     stageNo = 1
     worldNo = 1
     stageID_history = []
-    stamp_history = []
     w1_history = []
     w2_history = []
     w3_history = []
@@ -291,7 +290,7 @@ def randomizer():
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 3] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 3]  # GhostId
         # Only have Bowser-Castle keep it's Star Lock of 170.
         if stageNo == 114 or stageNo == 127 or stageNo == 137:
-            print('Reached split path, Bowser-Castle, or post-game locked stage slot! Placing star lock!')
+            print('Reached Bowser-Castle or post-game locked stage slot! Placing star lock!')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 4] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo) + '\n')) + 4]
         else:
             print('Removing star lock...')
@@ -350,7 +349,7 @@ def randomizer():
                 print('Gimmick stage StageType fixed!')
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: DRC専用\n'
             # Fix certain stages having a StageType which breaks certain things.
-            elif ('KinopioBrigade' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: キノピオ探検隊\n') or ('KinopioHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: キノピオの家\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 隠しキノピオの家\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 隠し土管')) or ('FairyHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 妖精の家\n') or ('RouletteRoomZone' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: カジノ部屋\n') or ('GoldenExpressStage' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゴールデンエクスプレス\n')) or ('GateKeeper' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゲートキーパー[GPあり]\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゲートキーパー\n')) or ('MysteryHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ミステリーハウス\n') or (('TouchAndMike' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] or 'KarakuriCastle' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]) and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: DRC専用\n'):
+            elif ('KinopioBrigade' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: キノピオ探検隊\n') or ('KinopioHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: キノピオの家\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 隠しキノピオの家\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 隠し土管')) or ('FairyHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 妖精の家\n') or ('RouletteRoomZone' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: カジノ部屋\n') or ('GoldenExpressStage' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゴールデンエクスプレス\n')) or ('GateKeeper' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゲートキーパー[GPあり]\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゲートキーパー\n')) or ('MysteryHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ミステリーハウス\n') or (('TouchAndMike' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] or 'KarakuriCastle' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]) and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: DRC専用\n') or ('EnemyExpress' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: クッパ城[列車通常]\n'):
                 print('Non-\'special\' level with \'special\' StageType fixed!')
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 通常\n'  # StageType for normal levels.
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 9] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 9]  # StageTimer
@@ -358,7 +357,6 @@ def randomizer():
         StageName = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]
         StageNameOld = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]
         StageID = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 7]
-        StageID = 'StageID: '+StageID[StageID.index(':')+2:]
 
         # These are placed into the world map files for the model names.
         # New
@@ -490,11 +488,15 @@ def randomizer():
             for i, elem in enumerate(CourseSelectW8ZoneMapo):
                 if StageNameOld in elem:
                     if i not in w8_history:
-                        if StageID in CourseSelectW8ZoneMapo[i+4]:
+                        if ('    StageId: 101\n' in StageID) or ('    StageId: 100\n' in StageID):
+                            if StageID[StageID.index(':')+2:].rstrip('\n') in CourseSelectW8ZoneMapo[i+4]:
+                                CourseSelectW8ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
+                                w8_history.append(i)
+                            else:
+                                print('Fixing Bowser-A and Bowser-B.')
+                        else:
                             CourseSelectW8ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
                             w8_history.append(i)
-                        else:
-                            print('Fixing Bowser-A and Bowser-B.')
                     else:
                         print('Duplicate Miniature Model. Not overwriting...')
         elif worldNo >= 9:

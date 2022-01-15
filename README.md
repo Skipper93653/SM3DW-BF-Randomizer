@@ -42,6 +42,7 @@ For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowse
 * Seed input
 * Wii U support
 * Character statistics randomizer
+* Progress bar.
 
 ## Building
 
