@@ -314,8 +314,8 @@ def randomizer():
                 print('Stamp House StageType fixed!')
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 妖精の家\n'  # StageType for Stamp Houses.
             elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
-                # If a Roulette with Golden Express StageType is on the first level of a world, it causes a softlock. We avoid this by using the Toad House StageType.
-                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
+                # If a Roulette with Golden Express StageType is on the first level of a world or World 3's and 6's Boss Blockades, it causes a softlock. We avoid this by using the Toad House StageType.
+                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
                     print('Roulette StageType fixed with Toad House StageType!')
                     StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオの家\n'  # StageType for Toad House
                 # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType.
@@ -327,7 +327,7 @@ def randomizer():
                     print('Roulette StageType fixed with Golden Express StageType!')
                     StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゴールデンエクスプレス\n'  # StageType for Roulettes (カジノ部屋) is not used because they don't appear on the world map immediately which can cause progression issues. So the golden express is used instead.
             elif 'GoldenExpressStage' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
-                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
+                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
                     print('Golden Express StageType fixed with Toad House!')
                     StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオの家\n'  # StageType for Toad House.
                 else:

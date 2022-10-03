@@ -13,7 +13,7 @@ Select a valid RomFS dump (the root of the RomFS directory - contains folders su
 
 ### Playing with the newly generated files
 
-### Console
+### Console (UNSUPPORTED)
 
 If you have Atmosphere CFW - on the root of your SD card, create a folder within the ```atmosphere\contents``` (or ```atmosphere\titles``` on Atmosphere CFW versions 0.9.4 and below) folder named ```010028600EBDA000``` (The ID for Super Mario 3D World + Bowser's Fury) and copy your ```romfs-datetime``` folder into it and rename it to just 'romfs' then you're free to play!
 
@@ -23,7 +23,7 @@ If you have Atmosphere CFW - on the root of your SD card, create a folder within
 
 For usage with yuzu - open yuzu, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mod Data Location', this should open a new window within the mod folder. From there, create a new folder with a name of your choice and copy the newly generated ```romfs-datetime``` into your newly created mod folder and rename it to just 'romfs'. To check whether it is enabled in yuzu, right click 'Super Mario 3D World + Bowser's Fury' and click 'Properties'. Go to the 'Add-Ons' tab and tick your mod folder if it isn't already. Disable other mods that may cause confliction with the randomizer and then you're free to play!
 
-#### [Ryujinx](https://ryujinx.org)
+#### [Ryujinx](https://ryujinx.org) (UNSUPPORTED)
 
 For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, create a new folder with a name of your choice and copy the newly generated ```romfs-datetime``` into your newly created mod folder and rename it to just 'romfs' then you're free to play!
 
@@ -37,12 +37,14 @@ For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowse
 
 ## Potential future features in no particular order
 
-* A different music randomizer method.
+* Console support
+* Ryujinx support
+* A different music randomizer method
 * Bowser's Fury island randomizer
 * Seed input
 * Wii U support
 * Character statistics randomizer
-* Progress bar.
+* Progress bar
 
 ## Building
 
