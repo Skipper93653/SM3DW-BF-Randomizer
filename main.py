@@ -1,262 +1,267 @@
 # coding=utf-8
-from random import *
-from datetime import *
-from tkinter import *
-from tkinter.filedialog import askdirectory
-from tkinter.messagebox import showinfo
-from oead import *
-import os, shutil
-
-# Global variables
-global folderSelected
-
-root = Tk()
-root.iconbitmap('ico.ico')
-root.title('Super Mario 3D World Randomizer')
-root.geometry('500x105')
-
-spoil = IntVar()
-music = IntVar()
-stat = IntVar()
-lang = IntVar()
-
-
-# Developer credits.
-def creditsDev():
-    showinfo("Credits", "Super Mario 3D World Randomizer Credits\n\nDeveloper:\nToby Bailey - (Skipper93653)\n\nSpecial Thanks:\nNintendo for creating the game.\nMembers of the ZeldaMods Discord server for oead help.\nAll used Python module developers.\nAll testers.")
-
-
-# Error when trying to execute randomizer when a valid directory has not been specified.
-def errorPopUp():
-    showinfo('Error', 'An invalid RomFS directory has been specified.\nPlease select a valid Super Mario 3D World + Bowser\'s Fury RomFS directory.')
-
-
-# Search for correct RomFS directory.
-def browseDIR():
-    global folderSelected
-
-    folderSelected = askdirectory()
-    if not folderSelected:
-        return
-    if music.get() == 1:
-        fileExist = os.path.isfile(folderSelected + '/SystemData/StageList.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW1Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW2Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW3Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW4Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW5Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW6Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW7Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW8Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectS1Zone.szs') and os.path.isdir(folderSelected + '/SoundData/stream') and os.path.isdir(folderSelected + '/SoundData/streamSe')
-    elif stat.get() == 1:
-        fileExist = os.path.isfile(folderSelected + '/SystemData/StageList.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW1Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW2Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW3Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW4Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW5Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW6Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW7Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW8Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectS1Zone.szs') and os.path.isdir(folderSelected + '/ObjectData/')
-    elif lang.get() == 1:
-        fileExist = os.path.isfile(folderSelected + '/SystemData/StageList.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW1Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW2Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW3Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW4Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW5Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW6Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW7Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW8Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectS1Zone.szs') and os.path.isdir(folderSelected + '/LocalizedData/')
-    else:
-        fileExist = os.path.isfile(folderSelected+'/SystemData/StageList.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW1Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW2Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW3Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW4Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW5Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW6Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW7Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectW8Zone.szs') and os.path.isfile(folderSelected+'/StageData/CourseSelectS1Zone.szs')
-    print('Selected', folderSelected, fileExist)
-
-    # Check if the RomFS directory is valid.
-    if fileExist:
-        openDIR.configure(text='Valid directory!', fg='green')
-        run.configure(fg='green', command=randomizer)
-    else:
-        openDIR.configure(text='Load RomFS directory', fg='red')
-        run.configure(fg='red', command=errorPopUp)
-
-    # Cutting off the displayed label if directory is too long.
-    if len(folderSelected) > 55:
-        if fileExist:
-            dirLabel.configure(text=folderSelected[:61]+'...')
-        else:
-            dirLabel.configure(text=folderSelected[:55] + '...')
-    else:
-        dirLabel.configure(text=folderSelected)
-
-
-# The pop-up window when the randomizer finishes.
-def finish():
-    print('Randomizer complete!')
-    showinfo('Randomizer', 'Randomization complete!')
-
-
-# Checking your list for duplicates.
-def duplicateCheck(rlist):
-    # Test code to print duplicate numbers in the list, should not print anything if everything went perfectly.
-    print('Duplicates in list:')
-    for i in range(0, len(rlist)):
-        for j in range(i + 1, len(rlist)):
-            if rlist[i] == rlist[j]:
-                print(rlist[j])
-    print('\nIf no indication of duplicate numbers are above, success!')
+import os  # For OS files
+import shutil  # For OS files
+import time  # For time calculations
+import dearpygui.dearpygui as dpg  # User interface
+import numpy as np  # Random number generation
+from oead import *  # For common Nintendo EAD/EPD file formats
 
 
 # Level randomizer
 def randomizer():
-    global folderSelected
+    dpg.configure_item("randoinit", enabled=False, label="Randomizing...")
+    user_data = [dpg.get_value('dirtext'), dpg.get_value('rdirtext')]
 
-    quitB.configure(command=None)
-
-    # Getting date and time.
-    now = datetime.now()
-    currentTime = now.strftime('%H.%M.%S')
-    currentDate = now.strftime('%d-%m-%y')
-    currentDateTime = currentDate+'-'+currentTime
+    # Setting up the random number generation with a seed
+    if len(str(dpg.get_value("seed"))) == 0:
+        seedRNG = time.time_ns()  # If no seed is entered, then it defaults to time since epoch.
+    else:
+        try:
+            seedRNG = int(dpg.get_value("seed"))  # Try to cast the input as an integer.
+        except ValueError:
+            seedRNG = 0
+            for i in str(dpg.get_value("seed")):
+                seedRNG += ord(i)
+    rng = np.random.default_rng(seedRNG)
 
     # SystemData Path
-    oPath = os.path.join(folderSelected, 'SystemData/')  # Original game path
-    rPath = os.path.join('./romfs-'+currentDateTime, 'SystemData/')  # Randomizer path
-
-    os.makedirs(rPath)
-    os.mkdir('./tmp-'+currentDateTime)
+    oPath = os.path.join(user_data[0], 'SystemData\\')  # Original game path
 
     # Open StageList.szs and grab the BYML, convert to YML, open it as a list.
     with open(oPath+"StageList.szs", "rb") as f:
         archive = Sarc(yaz0.decompress(f.read()))  # Decompress and load SARC
+    endianness = archive.get_endianness()
     doc = byml.to_text(byml.from_binary(archive.get_file("StageList.byml").data))  # Load BYML file
+    StageListNew = doc.split('\n')
+    StageListNew.pop()
+    StageListOld = StageListNew
 
-    with open('./tmp-'+currentDateTime+'/StageList.yml', 'w', encoding='utf-8') as s:
-        s.write(doc)  # Create a YML
+    if os.path.isfile(user_data[0]+'\\StageData\\CourseSelectW1ZoneMap1.szs'):  # Only the Wii U version contains a
+        # separate Map and Design file in StageData, Switch version has them merged.
+        wiiu = True  # This variable is used to determine whether the files are from the Wii U version or not
+    else:
+        wiiu = False
 
-    with open('./tmp-'+currentDateTime+'/StageList.yml', 'r', encoding='utf-8') as old:
-        StageListOld = [line for line in old.readlines()]  # Open the YML as old and make a list.
-
-    with open('./tmp-'+currentDateTime+'/StageList.yml', 'r', encoding='utf-8') as new:
-        StageListNew = [line for line in new.readlines()]  # Open the YML as new and make a list from it.
-
-    sPath = os.path.join(folderSelected, 'StageData/')
-    srPath = os.path.join('./romfs-' + currentDateTime, 'StageData/')
-
+    sPath = os.path.join(user_data[0], 'StageData\\')
+    if not wiiu:
+        rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\romfs\\SystemData\\')  # Randomizer path
+        srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\romfs\\StageData\\')
+    else:
+        rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\content\\SystemData\\')  # Randomizer path
+        srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\content\\StageData\\')
+    os.makedirs(rPath)
     os.makedirs(srPath)
 
-    with open(sPath + 'CourseSelectW1Zone.szs', 'rb') as f:
-        w1archive = Sarc(yaz0.decompress(f.read()))
-    w1archive1 = w1archive.get_file('DofParam_obj10.bagldof').data
-    w1archive2 = w1archive.get_file('DofParam_obj9.bagldof').data
-    w1archive3 = w1archive.get_file('DofParam_obj11.bagldof').data
-    w1archive4 = w1archive.get_file('CourseSelectW1ZoneDesign.byml').data
-    w1archive5 = w1archive.get_file('DofParam_obj6.bagldof').data
-    w1archive6 = byml.to_text(byml.from_binary(w1archive.get_file('CourseSelectW1ZoneMap.byml').data))
-    w1archive7 = w1archive.get_file('DofParam_obj12.bagldof').data
-    w1archive8 = w1archive.get_file('CameraParam.byml').data
-    w1archive9 = w1archive.get_file('DofParam_obj7.bagldof').data
-    w1archive10 = w1archive.get_file('CourseSelectW1ZoneSound.byml').data
-    w1archive11 = w1archive.get_file('DofParam_obj8.bagldof').data
-    CourseSelectW1ZoneMapn = w1archive6.split('\n')
-    CourseSelectW1ZoneMapn.pop()
-    CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn
+    # Open each world map file and convert the map BYML into a readable format.
+    if not wiiu:
+        with open(sPath + 'CourseSelectW1Zone.szs', 'rb') as f:
+            w1archive = Sarc(yaz0.decompress(f.read()))
+        w1archive1 = w1archive.get_file('DofParam_obj10.bagldof').data
+        w1archive2 = w1archive.get_file('DofParam_obj9.bagldof').data
+        w1archive3 = w1archive.get_file('DofParam_obj11.bagldof').data
+        w1archive4 = w1archive.get_file('CourseSelectW1ZoneDesign.byml').data
+        w1archive5 = w1archive.get_file('DofParam_obj6.bagldof').data
+        w1archive6 = byml.to_text(byml.from_binary(w1archive.get_file('CourseSelectW1ZoneMap.byml').data))
+        w1archive7 = w1archive.get_file('DofParam_obj12.bagldof').data
+        w1archive8 = w1archive.get_file('CameraParam.byml').data
+        w1archive9 = w1archive.get_file('DofParam_obj7.bagldof').data
+        w1archive10 = w1archive.get_file('CourseSelectW1ZoneSound.byml').data
+        w1archive11 = w1archive.get_file('DofParam_obj8.bagldof').data
+        CourseSelectW1ZoneMapn = w1archive6.split('\n')
+        CourseSelectW1ZoneMapn.pop()
+        CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn
 
-    with open(sPath + 'CourseSelectW2Zone.szs', 'rb') as f:
-        w2archive = Sarc(yaz0.decompress(f.read()))
-    w2archive1 = w2archive.get_file('DofParam_obj4.bagldof').data
-    w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
-    w2archive3 = w2archive.get_file('DofParam_obj9.bagldof').data
-    w2archive4 = w2archive.get_file('DofParam_obj5.bagldof').data
-    w2archive5 = w2archive.get_file('CourseSelectW2ZoneSound.byml').data
-    w2archive6 = w2archive.get_file('DofParam_obj6.bagldof').data
-    w2archive7 = w2archive.get_file('CameraParam.byml').data
-    w2archive8 = w2archive.get_file('DofParam_obj7.bagldof').data
-    w2archive9 = w2archive.get_file('DofParam_obj3.bagldof').data
-    w2archive10 = w2archive.get_file('CourseSelectW2ZoneDesign.byml').data
-    w2archive11 = w2archive.get_file('DofParam_obj8.bagldof').data
-    CourseSelectW2ZoneMapn = w2archive2.split('\n')
-    CourseSelectW2ZoneMapn.pop()
-    CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn
+        with open(sPath + 'CourseSelectW2Zone.szs', 'rb') as f:
+            w2archive = Sarc(yaz0.decompress(f.read()))
+        w2archive1 = w2archive.get_file('DofParam_obj4.bagldof').data
+        w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
+        w2archive3 = w2archive.get_file('DofParam_obj9.bagldof').data
+        w2archive4 = w2archive.get_file('DofParam_obj5.bagldof').data
+        w2archive5 = w2archive.get_file('CourseSelectW2ZoneSound.byml').data
+        w2archive6 = w2archive.get_file('DofParam_obj6.bagldof').data
+        w2archive7 = w2archive.get_file('CameraParam.byml').data
+        w2archive8 = w2archive.get_file('DofParam_obj7.bagldof').data
+        w2archive9 = w2archive.get_file('DofParam_obj3.bagldof').data
+        w2archive10 = w2archive.get_file('CourseSelectW2ZoneDesign.byml').data
+        w2archive11 = w2archive.get_file('DofParam_obj8.bagldof').data
+        CourseSelectW2ZoneMapn = w2archive2.split('\n')
+        CourseSelectW2ZoneMapn.pop()
+        CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn
 
-    with open(sPath + 'CourseSelectW3Zone.szs', 'rb') as f:
-        w3archive = Sarc(yaz0.decompress(f.read()))
-    w3archive1 = w3archive.get_file('CourseSelectW3ZoneDesign.byml').data
-    w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
-    w3archive3 = w3archive.get_file('CameraParam.byml').data
-    w3archive4 = w3archive.get_file('DofParam_obj27.bagldof').data
-    w3archive5 = w3archive.get_file('CourseSelectW3ZoneSound.byml').data
-    w3archive6 = w3archive.get_file('DofParam_obj28.bagldof').data
-    CourseSelectW3ZoneMapn = w3archive2.split('\n')
-    CourseSelectW3ZoneMapn.pop()
-    CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn
+        with open(sPath + 'CourseSelectW3Zone.szs', 'rb') as f:
+            w3archive = Sarc(yaz0.decompress(f.read()))
+        w3archive1 = w3archive.get_file('CourseSelectW3ZoneDesign.byml').data
+        w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
+        w3archive3 = w3archive.get_file('CameraParam.byml').data
+        w3archive4 = w3archive.get_file('DofParam_obj27.bagldof').data
+        w3archive5 = w3archive.get_file('CourseSelectW3ZoneSound.byml').data
+        w3archive6 = w3archive.get_file('DofParam_obj28.bagldof').data
+        CourseSelectW3ZoneMapn = w3archive2.split('\n')
+        CourseSelectW3ZoneMapn.pop()
+        CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn
 
-    with open(sPath + 'CourseSelectW4Zone.szs', 'rb') as f:
-        w4archive = Sarc(yaz0.decompress(f.read()))
-    w4archive1 = w4archive.get_file('DofParam_obj4.bagldof').data
-    w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
-    w4archive3 = w4archive.get_file('DofParam_obj5.bagldof').data
-    w4archive4 = w4archive.get_file('CourseSelectW4ZoneSound.byml').data
-    w4archive5 = w4archive.get_file('DofParam_obj6.bagldof').data
-    w4archive6 = w4archive.get_file('CameraParam.byml').data
-    w4archive7 = w4archive.get_file('CourseSelectW4ZoneDesign.byml').data
-    CourseSelectW4ZoneMapn = w4archive2.split('\n')
-    CourseSelectW4ZoneMapn.pop()
-    CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn
+        with open(sPath + 'CourseSelectW4Zone.szs', 'rb') as f:
+            w4archive = Sarc(yaz0.decompress(f.read()))
+        w4archive1 = w4archive.get_file('DofParam_obj4.bagldof').data
+        w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
+        w4archive3 = w4archive.get_file('DofParam_obj5.bagldof').data
+        w4archive4 = w4archive.get_file('CourseSelectW4ZoneSound.byml').data
+        w4archive5 = w4archive.get_file('DofParam_obj6.bagldof').data
+        w4archive6 = w4archive.get_file('CameraParam.byml').data
+        w4archive7 = w4archive.get_file('CourseSelectW4ZoneDesign.byml').data
+        CourseSelectW4ZoneMapn = w4archive2.split('\n')
+        CourseSelectW4ZoneMapn.pop()
+        CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn
 
-    with open(sPath + 'CourseSelectW5Zone.szs', 'rb') as f:
-        w5archive = Sarc(yaz0.decompress(f.read()))
-    w5archive1 = w5archive.get_file('DofParam_obj4.bagldof').data
-    w5archive2 = w5archive.get_file('CourseSelectW5ZoneDesign.byml').data
-    w5archive3 = w5archive.get_file('DofParam_obj5.bagldof').data
-    w5archive4 = w5archive.get_file('DofParam_obj6.bagldof').data
-    w5archive5 = w5archive.get_file('CameraParam.byml').data
-    w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
-    w5archive7 = w5archive.get_file('DofParam_obj3.bagldof').data
-    w5archive8 = w5archive.get_file('CourseSelectW5ZoneSound.byml').data
-    CourseSelectW5ZoneMapn = w5archive6.split('\n')
-    CourseSelectW5ZoneMapn.pop()
-    CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn
+        with open(sPath + 'CourseSelectW5Zone.szs', 'rb') as f:
+            w5archive = Sarc(yaz0.decompress(f.read()))
+        w5archive1 = w5archive.get_file('DofParam_obj4.bagldof').data
+        w5archive2 = w5archive.get_file('CourseSelectW5ZoneDesign.byml').data
+        w5archive3 = w5archive.get_file('DofParam_obj5.bagldof').data
+        w5archive4 = w5archive.get_file('DofParam_obj6.bagldof').data
+        w5archive5 = w5archive.get_file('CameraParam.byml').data
+        w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
+        w5archive7 = w5archive.get_file('DofParam_obj3.bagldof').data
+        w5archive8 = w5archive.get_file('CourseSelectW5ZoneSound.byml').data
+        CourseSelectW5ZoneMapn = w5archive6.split('\n')
+        CourseSelectW5ZoneMapn.pop()
+        CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn
 
-    with open(sPath + 'CourseSelectW6Zone.szs', 'rb') as f:
-        w6archive = Sarc(yaz0.decompress(f.read()))
-    w6archive1 = w6archive.get_file('DofParam_obj18.bagldof').data
-    w6archive2 = w6archive.get_file('DofParam_obj14.bagldof').data
-    w6archive3 = w6archive.get_file('DofParam_obj10.bagldof').data
-    w6archive4 = w6archive.get_file('DofParam_obj9.bagldof').data
-    w6archive5 = w6archive.get_file('DofParam_obj19.bagldof').data
-    w6archive6 = w6archive.get_file('DofParam_obj15.bagldof').data
-    w6archive7 = byml.to_text(byml.from_binary(w6archive.get_file('CourseSelectW6ZoneMap.byml').data))
-    w6archive8 = w6archive.get_file('DofParam_obj11.bagldof').data
-    w6archive9 = w6archive.get_file('CourseSelectW6ZoneSound.byml').data
-    w6archive10 = w6archive.get_file('DofParam_obj6.bagldof').data
-    w6archive11 = w6archive.get_file('DofParam_obj16.bagldof').data
-    w6archive12 = w6archive.get_file('CourseSelectW6ZoneDesign.byml').data
-    w6archive13 = w6archive.get_file('DofParam_obj12.bagldof').data
-    w6archive14 = w6archive.get_file('CameraParam.byml').data
-    w6archive15 = w6archive.get_file('DofParam_obj17.bagldof').data
-    w6archive16 = w6archive.get_file('DofParam_obj13.bagldof').data
-    w6archive17 = w6archive.get_file('DofParam_obj8.bagldof').data
-    CourseSelectW6ZoneMapn = w6archive7.split('\n')
-    CourseSelectW6ZoneMapn.pop()
-    CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn
+        with open(sPath + 'CourseSelectW6Zone.szs', 'rb') as f:
+            w6archive = Sarc(yaz0.decompress(f.read()))
+        w6archive1 = w6archive.get_file('DofParam_obj18.bagldof').data
+        w6archive2 = w6archive.get_file('DofParam_obj14.bagldof').data
+        w6archive3 = w6archive.get_file('DofParam_obj10.bagldof').data
+        w6archive4 = w6archive.get_file('DofParam_obj9.bagldof').data
+        w6archive5 = w6archive.get_file('DofParam_obj19.bagldof').data
+        w6archive6 = w6archive.get_file('DofParam_obj15.bagldof').data
+        w6archive7 = byml.to_text(byml.from_binary(w6archive.get_file('CourseSelectW6ZoneMap.byml').data))
+        w6archive8 = w6archive.get_file('DofParam_obj11.bagldof').data
+        w6archive9 = w6archive.get_file('CourseSelectW6ZoneSound.byml').data
+        w6archive10 = w6archive.get_file('DofParam_obj6.bagldof').data
+        w6archive11 = w6archive.get_file('DofParam_obj16.bagldof').data
+        w6archive12 = w6archive.get_file('CourseSelectW6ZoneDesign.byml').data
+        w6archive13 = w6archive.get_file('DofParam_obj12.bagldof').data
+        w6archive14 = w6archive.get_file('CameraParam.byml').data
+        w6archive15 = w6archive.get_file('DofParam_obj17.bagldof').data
+        w6archive16 = w6archive.get_file('DofParam_obj13.bagldof').data
+        w6archive17 = w6archive.get_file('DofParam_obj8.bagldof').data
+        CourseSelectW6ZoneMapn = w6archive7.split('\n')
+        CourseSelectW6ZoneMapn.pop()
+        CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn
 
-    with open(sPath + 'CourseSelectW7Zone.szs', 'rb') as f:
-        w7archive = Sarc(yaz0.decompress(f.read()))
-    w7archive1 = w7archive.get_file('CourseSelectW7ZoneDesign.byml').data
-    w7archive2 = w7archive.get_file('DofParam_obj19.bagldof').data
-    w7archive3 = w7archive.get_file('DofParam_obj22.bagldof').data
-    w7archive4 = w7archive.get_file('CameraParam.byml').data
-    w7archive5 = w7archive.get_file('DofParam_obj23.bagldof').data
-    w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
-    w7archive7 = w7archive.get_file('CourseSelectW7ZoneSound.byml').data
-    CourseSelectW7ZoneMapn = w7archive6.split('\n')
-    CourseSelectW7ZoneMapn.pop()
-    CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn
+        with open(sPath + 'CourseSelectW7Zone.szs', 'rb') as f:
+            w7archive = Sarc(yaz0.decompress(f.read()))
+        w7archive1 = w7archive.get_file('CourseSelectW7ZoneDesign.byml').data
+        w7archive2 = w7archive.get_file('DofParam_obj19.bagldof').data
+        w7archive3 = w7archive.get_file('DofParam_obj22.bagldof').data
+        w7archive4 = w7archive.get_file('CameraParam.byml').data
+        w7archive5 = w7archive.get_file('DofParam_obj23.bagldof').data
+        w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
+        w7archive7 = w7archive.get_file('CourseSelectW7ZoneSound.byml').data
+        CourseSelectW7ZoneMapn = w7archive6.split('\n')
+        CourseSelectW7ZoneMapn.pop()
+        CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn
 
-    with open(sPath + 'CourseSelectW8Zone.szs', 'rb') as f:
-        w8archive = Sarc(yaz0.decompress(f.read()))
-    w8archive1 = w8archive.get_file('DofParam_obj130.bagldof').data
-    w8archive2 = w8archive.get_file('DofParam_obj129.bagldof').data
-    w8archive3 = w8archive.get_file('DofParam_obj131.bagldof').data
-    w8archive4 = byml.to_text(byml.from_binary(w8archive.get_file('CourseSelectW8ZoneMap.byml').data))
-    w8archive5 = w8archive.get_file('CourseSelectW8ZoneSound.byml').data
-    w8archive6 = w8archive.get_file('CourseSelectW8ZoneDesign.byml').data
-    w8archive7 = w8archive.get_file('DofParam_obj132.bagldof').data
-    w8archive8 = w8archive.get_file('CameraParam.byml').data
-    w8archive9 = w8archive.get_file('DofParam_obj133.bagldof').data
-    CourseSelectW8ZoneMapn = w8archive4.split('\n')
-    CourseSelectW8ZoneMapn.pop()
-    CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn
+        with open(sPath + 'CourseSelectW8Zone.szs', 'rb') as f:
+            w8archive = Sarc(yaz0.decompress(f.read()))
+        w8archive1 = w8archive.get_file('DofParam_obj130.bagldof').data
+        w8archive2 = w8archive.get_file('DofParam_obj129.bagldof').data
+        w8archive3 = w8archive.get_file('DofParam_obj131.bagldof').data
+        w8archive4 = byml.to_text(byml.from_binary(w8archive.get_file('CourseSelectW8ZoneMap.byml').data))
+        w8archive5 = w8archive.get_file('CourseSelectW8ZoneSound.byml').data
+        w8archive6 = w8archive.get_file('CourseSelectW8ZoneDesign.byml').data
+        w8archive7 = w8archive.get_file('DofParam_obj132.bagldof').data
+        w8archive8 = w8archive.get_file('CameraParam.byml').data
+        w8archive9 = w8archive.get_file('DofParam_obj133.bagldof').data
+        CourseSelectW8ZoneMapn = w8archive4.split('\n')
+        CourseSelectW8ZoneMapn.pop()
+        CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn
 
-    with open(sPath + 'CourseSelectS1Zone.szs', 'rb') as f:
-        s1archive = Sarc(yaz0.decompress(f.read()))
-    s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
-    s1archive2 = s1archive.get_file('CameraParam.byml').data
-    s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
-    CourseSelectS1ZoneMapn = s1archive3.split('\n')
-    CourseSelectS1ZoneMapn.pop()
-    CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn
+        with open(sPath + 'CourseSelectS1Zone.szs', 'rb') as f:
+            s1archive = Sarc(yaz0.decompress(f.read()))
+        s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
+        s1archive2 = s1archive.get_file('CameraParam.byml').data
+        s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
+        CourseSelectS1ZoneMapn = s1archive3.split('\n')
+        CourseSelectS1ZoneMapn.pop()
+        CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn
+    else:
+        with open(sPath + 'CourseSelectW1ZoneMap1.szs', 'rb') as f:
+            w1archive = Sarc(yaz0.decompress(f.read()))
+        w1archive6 = byml.to_text(byml.from_binary(w1archive.get_file('CourseSelectW1ZoneMap.byml').data))
+        w1archive8 = w1archive.get_file('CameraParam.byml').data
+        CourseSelectW1ZoneMapn = w1archive6.split('\n')
+        CourseSelectW1ZoneMapn.pop()
+        CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn
 
-    stageNo = 1
+        with open(sPath + 'CourseSelectW2ZoneMap1.szs', 'rb') as f:
+            w2archive = Sarc(yaz0.decompress(f.read()))
+        w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
+        w2archive7 = w2archive.get_file('CameraParam.byml').data
+        CourseSelectW2ZoneMapn = w2archive2.split('\n')
+        CourseSelectW2ZoneMapn.pop()
+        CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn
+
+        with open(sPath + 'CourseSelectW3ZoneMap1.szs', 'rb') as f:
+            w3archive = Sarc(yaz0.decompress(f.read()))
+        w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
+        w3archive3 = w3archive.get_file('CameraParam.byml').data
+        CourseSelectW3ZoneMapn = w3archive2.split('\n')
+        CourseSelectW3ZoneMapn.pop()
+        CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn
+
+        with open(sPath + 'CourseSelectW4ZoneMap1.szs', 'rb') as f:
+            w4archive = Sarc(yaz0.decompress(f.read()))
+        w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
+        w4archive6 = w4archive.get_file('CameraParam.byml').data
+        CourseSelectW4ZoneMapn = w4archive2.split('\n')
+        CourseSelectW4ZoneMapn.pop()
+        CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn
+
+        with open(sPath + 'CourseSelectW5ZoneMap1.szs', 'rb') as f:
+            w5archive = Sarc(yaz0.decompress(f.read()))
+        w5archive5 = w5archive.get_file('CameraParam.byml').data
+        w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
+        CourseSelectW5ZoneMapn = w5archive6.split('\n')
+        CourseSelectW5ZoneMapn.pop()
+        CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn
+
+        with open(sPath + 'CourseSelectW6ZoneMap1.szs', 'rb') as f:
+            w6archive = Sarc(yaz0.decompress(f.read()))
+        w6archive7 = byml.to_text(byml.from_binary(w6archive.get_file('CourseSelectW6ZoneMap.byml').data))
+        w6archive14 = w6archive.get_file('CameraParam.byml').data
+        CourseSelectW6ZoneMapn = w6archive7.split('\n')
+        CourseSelectW6ZoneMapn.pop()
+        CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn
+
+        with open(sPath + 'CourseSelectW7ZoneMap1.szs', 'rb') as f:
+            w7archive = Sarc(yaz0.decompress(f.read()))
+        w7archive4 = w7archive.get_file('CameraParam.byml').data
+        w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
+        CourseSelectW7ZoneMapn = w7archive6.split('\n')
+        CourseSelectW7ZoneMapn.pop()
+        CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn
+
+        with open(sPath + 'CourseSelectW8ZoneMap1.szs', 'rb') as f:
+            w8archive = Sarc(yaz0.decompress(f.read()))
+        w8archive4 = byml.to_text(byml.from_binary(w8archive.get_file('CourseSelectW8ZoneMap.byml').data))
+        w8archive8 = w8archive.get_file('CameraParam.byml').data
+        CourseSelectW8ZoneMapn = w8archive4.split('\n')
+        CourseSelectW8ZoneMapn.pop()
+        CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn
+
+        with open(sPath + 'CourseSelectS1ZoneMap1.szs', 'rb') as f:
+            s1archive = Sarc(yaz0.decompress(f.read()))
+        s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
+        s1archive2 = s1archive.get_file('CameraParam.byml').data
+        s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
+        CourseSelectS1ZoneMapn = s1archive3.split('\n')
+        CourseSelectS1ZoneMapn.pop()
+        CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn
+
     worldNo = 1
-    stageID_history = []
+    currentGreenStars = 0
     w1_history = []
     w2_history = []
     w3_history = []
@@ -267,96 +272,156 @@ def randomizer():
     w8_history = []
     s1_history = []
 
-    # 154 different stages in total.
-    while stageNo <= 154:
-        stageID = randint(1, 154)
-        # This loop happens when stageID generates a previously generated stageID to avoid duplicate levels.
-        while (stageID in stageID_history) or stageID == 34 or stageID == 62 or stageID == 63 or stageID == 64 or stageID == 65 or stageID == 66 or stageID == 81 or stageID == 97 or stageID == 115:
-            print('Duplicate number '+str(stageID)+'! Regenerating...')
-            stageID = randint(1, 154)
+    # 154 different stages in total. The next two code blocks are making several checks to make sure nothing gets
+    # broken in the actual stage shuffling process
+    stageID_order = []
+    for i in range(1, 155):
+        if i != 34 or i != 62 or i != 63 or i != 64 or i != 65 or i != 66 or i != 81 or i != 97 or i != 115:
+            stageID_order.append(i)
+    rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
+    ready = False
 
-        # This loop happens when stageID generates a special level when stageNo is currently a castle stage and forces stageID to randomize again until it's not a special level (basically until it gives you a stage where it's possible to give you the golden goal pole).
-        while (stageNo == 9 or stageNo == 20 or stageNo == 33 or stageNo == 46 or stageNo == 61 or stageNo == 80 or stageNo == 96 or stageNo == 114) and (stageID == 6 or stageID == 7 or stageID == 8 or stageID == 10 or stageID == 11 or stageID == 17 or stageID == 18 or stageID == 21 or stageID == 22 or stageID == 30 or stageID == 31 or stageID == 32 or stageID == 34 or stageID == 35 or stageID == 36 or stageID == 43 or stageID == 44 or stageID == 47 or stageID == 48 or stageID == 49 or stageID == 57 or stageID == 58 or stageID == 59 or stageID == 60 or stageID == 62 or stageID == 63 or stageID == 64 or stageID == 65 or stageID == 66 or stageID == 67 or stageID == 68 or stageID == 69 or stageID == 77 or stageID == 78 or stageID == 81 or stageID == 82 or stageID == 83 or stageID == 84 or stageID == 93 or stageID == 94 or stageID == 95 or stageID == 97 or stageID == 98 or stageID == 99 or stageID == 100 or stageID == 101 or stageID == 109 or stageID == 110 or stageID == 111 or stageID == 115 or stageID == 116 or stageID == 128 or stageID == 129 or stageID == 130 or stageID == 152 or stageID == 153):
-            print('Special stage ('+str(stageID)+') on castle slot! Regenerating...')
-            stageID = randint(1, 154)
-            while (stageID in stageID_history) or stageID == 34 or stageID == 62 or stageID == 63 or stageID == 64 or stageID == 65 or stageID == 66 or stageID == 81 or stageID == 97 or stageID == 115:
-                print('Duplicate number '+str(stageID)+'! Regenerating...')
-                stageID = randint(1, 154)
+    # This loop happens when stageID generates a special level when stageNo is currently a castle stage and forces
+    # stageID to randomize again until it's not a special level (basically until it gives you a stage where it's
+    # possible to give you the golden goal pole).
+    while not ready:
+        ready = True
+        for i in stageID_order:
+            for j in rstageID_order:
+                if (i == 9 or i == 20 or i == 33 or i == 46 or i == 61 or i == 80 or i == 96 or i == 114) and (
+                        j == 6 or j == 7 or j == 8 or j == 10 or j == 11 or j == 17 or j == 18 or j == 21 or j == 22 or
+                        j == 30 or j == 31 or j == 32 or j == 35 or j == 36 or j == 43 or j == 44 or j == 47 or j == 48
+                        or j == 49 or j == 57 or j == 58 or j == 59 or j == 60 or j == 67 or j == 68 or j == 69 or
+                        j == 77 or j == 78 or j == 82 or j == 83 or j == 84 or j == 93 or j == 94 or j == 95 or j == 98
+                        or j == 99 or j == 100 or j == 101 or j == 109 or j == 110 or j == 111 or j == 116 or j == 128
+                        or j == 129 or j == 130 or j == 152 or j == 153) and (stageID_order.index(i) == np.where(rstageID_order == j)[0]):
+                    rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
+                    ready = False
 
-        print('Generated unique number '+str(stageID)+'!')
-        stageID_history.append(stageID)  # Appends the generated stageID to the stageID_history list to help avoid generating the same number more than once when looping.
-        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 1] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 1]  # DoubleMarioNum
-        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 2] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 2]  # GhostBaseTime
-        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 3] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 3]  # GhostId
-        # Only have Bowser-Castle keep it's Star Lock of 170.
-        if stageNo == 114 or stageNo == 127 or stageNo == 137:
-            print('Reached Bowser-Castle or post-game locked stage slot! Placing star lock!')
-            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 4] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo) + '\n')) + 4]
+    print('Random stage order:', rstageID_order)
+
+    for stageNo in stageID_order:
+        if stageNo == 12 or stageNo == 23 or stageNo == 38 or stageNo == 50 or stageNo == 70 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
+            worldNo += 1
+        stageID = rstageID_order[stageNo - 1]
+        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 1] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 1]  # DoubleMarioNum
+        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 2] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 2]  # GhostBaseTime
+        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 3] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 3]  # GhostId
+        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 5]  # GreenStarNum
+        currentGreenStars += int(StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5][-3:])
+        if dpg.get_value("star"):
+            # New feature implementation: option to keep Green Star Locks but change them depending on random level placements
+            print('Changing Green Star Lock!')
+            pass
         else:
-            print('Removing star lock...')
-            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 4] = '    GreenStarLock: 0\n'  # GreenStarLock - gets rid of all star locks by setting it to 0.
-        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 5] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 5]  # GreenStarNum
-        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 6] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 6]  # IllustItemNum
-        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 8]  # StageName
+            # Remove all Green Star Locks when encountered
+            if stageNo == 114:
+                print('Reached Bowser-Castle stage slot! Placing Green Star Lock!')
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 4]
+            else:
+                print('Removing Green Star Lock...')
+                # GreenStarLock - gets rid of all star locks by setting it to 0.
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
+        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 6] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 6]  # IllustItemNum
+        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 8]  # StageName
 
-        if 'クッパ城' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] and stageNo != 113:
+        if ('クッパ城' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] or '�N�b�p��' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10]) and stageNo != 113:
             print('Reached castle slot! Copying original StageType of this slot.')
-            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo) + '\n')) + 10]  # Makes sure all castle slots are the same slots when the levels are randomized.
+            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 10]  # Makes sure all castle slots are the same slots when the levels are randomized.
         else:
-            # Making sure Captain Toad stages, Mystery Houses, Toad Houses, Stamp Houses, Roulettes, Blockades, and Golden Express have the correct StageType depending on the slot they are on after they are randomized.
-            if 'KinopioBrigade' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+            # Making sure Gimmick stages, Captain Toad stages, Mystery Houses, Toad Houses, Stamp Houses, Roulettes, Blockades, and Golden Express have the correct StageType depending on the slot they are on after they are randomized.
+            if 'KinopioBrigade' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Captain Toad StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオ探検隊\n'  # StageType for Captain Toad levels.
-            elif 'KinopioHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+                if not wiiu:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオ探検隊'  # StageType for Captain Toad levels.
+                else:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�T����'
+            elif 'KinopioHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Toad House StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオの家\n'  # StageType for Toad Houses.
-            elif 'FairyHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+                if not wiiu:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
+                else:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
+            elif 'FairyHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Stamp House StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 妖精の家\n'  # StageType for Stamp Houses.
-            elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+                if not wiiu:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 妖精の家'  # StageType for Stamp Houses.
+                else:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �d���̉�'
+            elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 # If a Roulette with Golden Express StageType is on the first level of a world or World 3's and 6's Boss Blockades, it causes a softlock. We avoid this by using the Toad House StageType.
                 if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
                     print('Roulette StageType fixed with Toad House StageType!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオの家\n'  # StageType for Toad House
+                    if not wiiu:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
                 # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType.
                 elif stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130:
                     print('Roulette StageType fixed with Roulette StageType!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: カジノ部屋\n'  # StageType for Roulettes.
+                    if not wiiu:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: カジノ部屋'  # StageType for Roulettes.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �J�W�m����'
                 # Any other slot gives a roulette the golden express StageType.
                 else:
                     print('Roulette StageType fixed with Golden Express StageType!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゴールデンエクスプレス\n'  # StageType for Roulettes (カジノ部屋) is not used because they don't appear on the world map immediately which can cause progression issues. So the golden express is used instead.
-            elif 'GoldenExpressStage' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+                    if not wiiu:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゴールデンエクスプレス'  # StageType for Roulettes (カジノ部屋) is not used because they don't appear on the world map immediately which can cause progression issues. So the golden express is used instead.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �S�[���f���G�N�X�v���X'
+            elif 'GoldenExpressStage' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
                     print('Golden Express StageType fixed with Toad House!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: キノピオの家\n'  # StageType for Toad House.
+                    if not wiiu:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
                 else:
                     print('Golden Express StageType fixed!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゴールデンエクスプレス\n'  # StageType for golden express.
-            elif 'MysteryHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+                    if not wiiu:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゴールデンエクスプレス'  # StageType for golden express.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �S�[���f���G�N�X�v���X'
+            elif 'MysteryHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Mystery House StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ミステリーハウス\n'  # StageType for MysteryHouses.
-            elif 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+                if not wiiu:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ミステリーハウス'  # StageType for MysteryHouses.
+                else:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �~�X�e���[�n�E�X'
+            elif 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 # If it is a boss blockade...
-                if StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] == '    StageName: GateKeeperTentackLv1Stage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] == '    StageName: GateKeeperTentackLv2Stage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage\n':
+                if StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv2Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage':
                     print('Boss Blockade StageType fixed!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゲートキーパー[GPあり]\n'  # StageType for Boss Blockades.
+                    if not wiiu:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー[GPあり]'  # StageType for Boss Blockades.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �Q�[�g�L�[�p�[[GP����]'
                 # If it is a normal boss blockade...
                 else:
                     print('Blockade StageType fixed!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: ゲートキーパー\n'  # StageType for Blockades.
-            elif 'TouchAndMike' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] or 'KarakuriCastle' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]:
+                    if not wiiu:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー'  # StageType for Blockades.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �Q�[�g�L�[�p�['
+            elif 'TouchAndMike' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or 'KarakuriCastle' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Gimmick stage StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: DRC専用\n'
+                if not wiiu:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: DRC専用'
+                else:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: DRC��p'
             # Fix certain stages having a StageType which breaks certain things.
-            elif ('KinopioBrigade' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: キノピオ探検隊\n') or ('KinopioHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: キノピオの家\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 隠しキノピオの家\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 隠し土管')) or ('FairyHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: 妖精の家\n') or ('RouletteRoomZone' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: カジノ部屋\n') or ('GoldenExpressStage' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゴールデンエクスプレス\n')) or ('GateKeeper' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゲートキーパー[GPあり]\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ゲートキーパー\n')) or ('MysteryHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: ミステリーハウス\n') or (('TouchAndMike' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] or 'KarakuriCastle' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]) and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: DRC専用\n') or ('EnemyExpress' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] == '    StageType: クッパ城[列車通常]\n'):
+            elif ('KinopioBrigade' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: キノピオ探検隊') or ('KinopioHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: キノピオの家' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: 隠しキノピオの家' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: 隠し土管')) or ('FairyHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: 妖精の家') or ('RouletteRoomZone' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: カジノ部屋') or ('GoldenExpressStage' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: ゴールデンエクスプレス')) or ('GateKeeper' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: ゲートキーパー[GPあり]' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: ゲートキーパー')) or ('MysteryHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: ミステリーハウス') or (('TouchAndMike' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or 'KarakuriCastle' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]) and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: DRC専用') or ('EnemyExpress' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: クッパ城[列車通常]'):
                 print('Non-\'special\' level with \'special\' StageType fixed!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 10] = '    StageType: 通常\n'  # StageType for normal levels.
-        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 9] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID) + '\n')) + 9]  # StageTimer
+                if not wiiu:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 通常'  # StageType for normal levels.
+                else:
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �ʏ�'
+        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 9] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 9]  # StageTimer
 
-        StageName = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]
-        StageNameOld = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo) + '\n')) + 8]
-        StageID = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo) + '\n')) + 7]
+        StageName = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]
+        StageNameOld = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 8]
+        StageID = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 7]
 
         # These are placed into the world map files for the model names.
         # New
@@ -365,7 +430,7 @@ def randomizer():
         elif 'GateKeeperBoss' in StageName or 'GateKeeperTentack' in StageName:
             StageName = 'MiniatureEventGateKeeper'
         elif 'GateKeeper' in StageName:
-            StageName = 'Miniature'+StageName[StageName.index(':')+2:-9]+'\n'
+            StageName = 'Miniature'+StageName[StageName.index(':')+2:-9]+''
         elif 'KinopioHouse' in StageName:
             StageName = 'MiniatureKinopioHouse'
         elif 'FairyHouse' in StageName:
@@ -488,7 +553,7 @@ def randomizer():
             for i, elem in enumerate(CourseSelectW8ZoneMapo):
                 if StageNameOld in elem:
                     if i not in w8_history:
-                        if ('    StageId: 101\n' in StageID) or ('    StageId: 100\n' in StageID):
+                        if ('    StageId: 101' in StageID) or ('    StageId: 100' in StageID):
                             if StageID[StageID.index(':')+2:].rstrip('\n') in CourseSelectW8ZoneMapo[i+4]:
                                 CourseSelectW8ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
                                 w8_history.append(i)
@@ -511,594 +576,675 @@ def randomizer():
                     else:
                         print('Duplicate Miniature Model. Not overwriting...')
 
-        # Check whether stageNo is one before an unused stage slot and if it is, set stageNo to the next used stage slot.
-        if stageNo == 33:
-            stageNo = 35
-        elif stageNo == 61:
-            stageNo = 67
-        elif stageNo == 80:
-            stageNo = 82
-        elif stageNo == 96:
-            stageNo = 98
-        elif stageNo == 114:
-            stageNo = 116
-        else:
-            stageNo += 1
+    print('Randomized stages!')
+    dpg.configure_item("progress", default_value=0.5)
 
-        if stageNo == 12 or stageNo == 23 or stageNo == 38 or stageNo == 50 or stageNo == 70 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
-            worldNo += 1
+    doc = '\n'.join(StageListNew)
+    # Creating new SZS filers with the modified files.
+    if not wiiu:
+        writer = SarcWriter()
+        writer.set_endianness(endianness)
+        writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), False, 2)  # Adding to SARC.
+        data = writer.write()  # Write to SARC
 
-    print(stageID_history)
+        with open(rPath+"StageList.szs", "wb") as randoSZS:
+            print('Writing StageList.szs.')
+            randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
+            print('Written StageList.szs.')
 
-    duplicateCheck(stageID_history)
+        print('Writing world files:')
 
-    with open('./tmp-'+currentDateTime+'/StageList.yml', 'w', encoding='utf-8') as rando:
-        print('Writing randomized YML.')
-        rando.write(''.join([''.join(l2) for l2 in StageListNew]))  # Writing the randomized list to the YML.
+        w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
+        w1writer = SarcWriter()
+        w1writer.set_endianness(endianness)
+        w1writer.files['DofParam_obj10.bagldof'] = Bytes(w1archive1)
+        w1writer.files['DofParam_obj9.bagldof'] = Bytes(w1archive2)
+        w1writer.files['DofParam_obj11.bagldof'] = Bytes(w1archive3)
+        w1writer.files['CourseSelectW1ZoneDesign.byml'] = Bytes(w1archive4)
+        w1writer.files['DofParam_obj6.bagldof'] = Bytes(w1archive5)
+        w1writer.files['CourseSelectW1ZoneMap.byml'] = byml.to_binary(byml.from_text(w1archive6), False, 2)
+        w1writer.files['DofParam_obj12.bagldof'] = Bytes(w1archive7)
+        w1writer.files['CameraParam.byml'] = Bytes(w1archive8)
+        w1writer.files['DofParam_obj7.bagldof'] = Bytes(w1archive9)
+        w1writer.files['CourseSelectW1ZoneSound.byml'] = Bytes(w1archive10)
+        w1writer.files['DofParam_obj8.bagldof'] = Bytes(w1archive11)
+        w1data = w1writer.write()
 
-    with open('./tmp-'+currentDateTime+'/StageList.yml', 'r', encoding='utf-8') as rando:
-        print('Reading randomized YML.')
-        randoYML = rando.read()  # Reading the modified YML.
+        with open(srPath+'CourseSelectW1Zone.szs', 'wb') as w1:
+            print('Writing CourseSelectW1Zone.szs')
+            w1.write(yaz0.compress(w1data[1]))
+            print('Written CourseSelectW1Zone.szs')
 
-    randoBYML = byml.to_binary(byml.from_text(randoYML), False, 2)  # Converting YML to BYML v2.
+        w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
+        w2writer = SarcWriter()
+        w2writer.set_endianness(endianness)
+        w2writer.files['DofParam_obj4.bagldof'] = Bytes(w2archive1)
+        w2writer.files['CourseSelectW2ZoneMap.byml'] = byml.to_binary(byml.from_text(w2archive2), False, 2)
+        w2writer.files['DofParam_obj9.bagldof'] = Bytes(w2archive3)
+        w2writer.files['DofParam_obj5.bagldof'] = Bytes(w2archive4)
+        w2writer.files['CourseSelectW2ZoneSound.byml'] = Bytes(w2archive5)
+        w2writer.files['DofParam_obj6.bagldof'] = Bytes(w2archive6)
+        w2writer.files['CameraParam.byml'] = Bytes(w2archive7)
+        w2writer.files['DofParam_obj7.bagldof'] = Bytes(w2archive8)
+        w2writer.files['DofParam_obj3.bagldof'] = Bytes(w2archive9)
+        w2writer.files['CourseSelectW2ZoneDesign.byml'] = Bytes(w2archive10)
+        w2writer.files['DofParam_obj8.bagldof'] = Bytes(w2archive11)
+        w2data = w2writer.write()
 
-    writer = SarcWriter()
-    writer.files['StageList.byml'] = randoBYML  # Adding to SARC
-    data = writer.write()  # Write to SARC
+        with open(srPath+'CourseSelectW2Zone.szs', 'wb') as w2:
+            print('Writing CourseSelectW2Zone.szs')
+            w2.write(yaz0.compress(w2data[1]))
+            print('Written CourseSelectW2Zone.szs')
 
-    with open(rPath+"StageList.szs", "wb") as randoSZS:
-        print('Writing randomized YML to SZS.')
-        randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
-        print('Level randomizer procedure complete!')
+        w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
+        w3writer = SarcWriter()
+        w3writer.set_endianness(endianness)
+        w3writer.files['CourseSelectW3ZoneDesign.byml'] = Bytes(w3archive1)
+        w3writer.files['CourseSelectW3ZoneMap.byml'] = byml.to_binary(byml.from_text(w3archive2), False, 2)
+        w3writer.files['CameraParam.byml'] = Bytes(w3archive3)
+        w3writer.files['DofParam_obj27.bagldof'] = Bytes(w3archive4)
+        w3writer.files['CourseSelectW3ZoneSound.byml'] = Bytes(w3archive5)
+        w3writer.files['DofParam_obj28.bagldof'] = Bytes(w3archive6)
+        w3data = w3writer.write()
 
-    print('Writing world files:')
+        with open(srPath+'CourseSelectW3Zone.szs', 'wb') as w3:
+            print('Writing CourseSelectW3Zone.szs')
+            w3.write(yaz0.compress(w3data[1]))
+            print('Written CourseSelectW3Zone.szs')
 
-    w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
-    w1writer = SarcWriter()
-    w1writer.files['DofParam_obj10.bagldof'] = Bytes(w1archive1)
-    w1writer.files['DofParam_obj9.bagldof'] = Bytes(w1archive2)
-    w1writer.files['DofParam_obj11.bagldof'] = Bytes(w1archive3)
-    w1writer.files['CourseSelectW1ZoneDesign.byml'] = Bytes(w1archive4)
-    w1writer.files['DofParam_obj6.bagldof'] = Bytes(w1archive5)
-    w1writer.files['CourseSelectW1ZoneMap.byml'] = byml.to_binary(byml.from_text(w1archive6), False, 2)
-    w1writer.files['DofParam_obj12.bagldof'] = Bytes(w1archive7)
-    w1writer.files['CameraParam.byml'] = Bytes(w1archive8)
-    w1writer.files['DofParam_obj7.bagldof'] = Bytes(w1archive9)
-    w1writer.files['CourseSelectW1ZoneSound.byml'] = Bytes(w1archive10)
-    w1writer.files['DofParam_obj8.bagldof'] = Bytes(w1archive11)
-    w1data = w1writer.write()
+        w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
+        w4writer = SarcWriter()
+        w4writer.set_endianness(endianness)
+        w4writer.files['DofParam_obj4.bagldof'] = Bytes(w4archive1)
+        w4writer.files['CourseSelectW4ZoneMap.byml'] = byml.to_binary(byml.from_text(w4archive2), False, 2)
+        w4writer.files['DofParam_obj5.bagldof'] = Bytes(w4archive3)
+        w4writer.files['CourseSelectW4ZoneSound.byml'] = Bytes(w4archive4)
+        w4writer.files['DofParam_obj6.bagldof'] = Bytes(w4archive5)
+        w4writer.files['CameraParam.byml'] = Bytes(w4archive6)
+        w4writer.files['CourseSelectW4ZoneDesign.byml'] = Bytes(w4archive7)
+        w4data = w4writer.write()
 
-    with open(srPath+'CourseSelectW1Zone.szs', 'wb') as w1:
-        print('Writing CourseSelectW1Zone.szs')
-        w1.write(yaz0.compress(w1data[1]))
-        print('Written CourseSelectW1Zone.szs')
+        with open(srPath+'CourseSelectW4Zone.szs', 'wb') as w4:
+            print('Writing CourseSelectW4Zone.szs')
+            w4.write(yaz0.compress(w4data[1]))
+            print('Written CourseSelectW4Zone.szs')
 
-    w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
-    w2writer = SarcWriter()
-    w2writer.files['DofParam_obj4.bagldof'] = Bytes(w2archive1)
-    w2writer.files['CourseSelectW2ZoneMap.byml'] = byml.to_binary(byml.from_text(w2archive2), False, 2)
-    w2writer.files['DofParam_obj9.bagldof'] = Bytes(w2archive3)
-    w2writer.files['DofParam_obj5.bagldof'] = Bytes(w2archive4)
-    w2writer.files['CourseSelectW2ZoneSound.byml'] = Bytes(w2archive5)
-    w2writer.files['DofParam_obj6.bagldof'] = Bytes(w2archive6)
-    w2writer.files['CameraParam.byml'] = Bytes(w2archive7)
-    w2writer.files['DofParam_obj7.bagldof'] = Bytes(w2archive8)
-    w2writer.files['DofParam_obj3.bagldof'] = Bytes(w2archive9)
-    w2writer.files['CourseSelectW2ZoneDesign.byml'] = Bytes(w2archive10)
-    w2writer.files['DofParam_obj8.bagldof'] = Bytes(w2archive11)
-    w2data = w2writer.write()
+        w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
+        w5writer = SarcWriter()
+        w5writer.set_endianness(endianness)
+        w5writer.files['DofParam_obj4.bagldof'] = Bytes(w5archive1)
+        w5writer.files['CourseSelectW5ZoneDesign.byml'] = Bytes(w5archive2)
+        w5writer.files['DofParam_obj5.bagldof'] = Bytes(w5archive3)
+        w5writer.files['DofParam_obj6.bagldof'] = Bytes(w5archive4)
+        w5writer.files['CameraParam.byml'] = Bytes(w5archive5)
+        w5writer.files['CourseSelectW5ZoneMap.byml'] = byml.to_binary(byml.from_text(w5archive6), False, 2)
+        w5writer.files['DofParam_obj3.bagldof'] = Bytes(w5archive7)
+        w5writer.files['CourseSelectW5ZoneSound.byml'] = Bytes(w5archive8)
+        w5data = w5writer.write()
 
-    with open(srPath+'CourseSelectW2Zone.szs', 'wb') as w2:
-        print('Writing CourseSelectW2Zone.szs')
-        w2.write(yaz0.compress(w2data[1]))
-        print('Written CourseSelectW2Zone.szs')
+        with open(srPath+'CourseSelectW5Zone.szs', 'wb') as w5:
+            print('Writing CourseSelectW5Zone.szs')
+            w5.write(yaz0.compress(w5data[1]))
+            print('Written CourseSelectW5Zone.szs')
 
-    w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
-    w3writer = SarcWriter()
-    w3writer.files['CourseSelectW3ZoneDesign.byml'] = Bytes(w3archive1)
-    w3writer.files['CourseSelectW3ZoneMap.byml'] = byml.to_binary(byml.from_text(w3archive2), False, 2)
-    w3writer.files['CameraParam.byml'] = Bytes(w3archive3)
-    w3writer.files['DofParam_obj27.bagldof'] = Bytes(w3archive4)
-    w3writer.files['CourseSelectW3ZoneSound.byml'] = Bytes(w3archive5)
-    w3writer.files['DofParam_obj28.bagldof'] = Bytes(w3archive6)
-    w3data = w3writer.write()
+        w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
+        w6writer = SarcWriter()
+        w6writer.set_endianness(endianness)
+        w6writer.files['DofParam_obj18.bagldof'] = Bytes(w6archive1)
+        w6writer.files['DofParam_obj14.bagldof'] = Bytes(w6archive2)
+        w6writer.files['DofParam_obj10.bagldof'] = Bytes(w6archive3)
+        w6writer.files['DofParam_obj9.bagldof'] = Bytes(w6archive4)
+        w6writer.files['DofParam_obj19.bagldof'] = Bytes(w6archive5)
+        w6writer.files['DofParam_obj15.bagldof'] = Bytes(w6archive6)
+        w6writer.files['CourseSelectW6ZoneMap.byml'] = byml.to_binary(byml.from_text(w6archive7), False, 2)
+        w6writer.files['DofParam_obj11.bagldof'] = Bytes(w6archive8)
+        w6writer.files['CourseSelectW6ZoneSound.byml'] = Bytes(w6archive9)
+        w6writer.files['DofParam_obj6.bagldof'] = Bytes(w6archive10)
+        w6writer.files['DofParam_obj16.bagldof'] = Bytes(w6archive11)
+        w6writer.files['CourseSelectW6ZoneDesign.byml'] = Bytes(w6archive12)
+        w6writer.files['DofParam_obj12.bagldof'] = Bytes(w6archive13)
+        w6writer.files['CameraParam.byml'] = Bytes(w6archive14)
+        w6writer.files['DofParam_obj17.bagldof'] = Bytes(w6archive15)
+        w6writer.files['DofParam_obj13.bagldof'] = Bytes(w6archive16)
+        w6writer.files['DofParam_obj8.bagldof'] = Bytes(w6archive17)
+        w6data = w6writer.write()
 
-    with open(srPath+'CourseSelectW3Zone.szs', 'wb') as w3:
-        print('Writing CourseSelectW3Zone.szs')
-        w3.write(yaz0.compress(w3data[1]))
-        print('Written CourseSelectW3Zone.szs')
+        with open(srPath+'CourseSelectW6Zone.szs', 'wb') as w6:
+            print('Writing CourseSelectW6Zone.szs')
+            w6.write(yaz0.compress(w6data[1]))
+            print('Written CourseSelectW6Zone.szs')
 
-    w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
-    w4writer = SarcWriter()
-    w4writer.files['DofParam_obj4.bagldof'] = Bytes(w4archive1)
-    w4writer.files['CourseSelectW4ZoneMap.byml'] = byml.to_binary(byml.from_text(w4archive2), False, 2)
-    w4writer.files['DofParam_obj5.bagldof'] = Bytes(w4archive3)
-    w4writer.files['CourseSelectW4ZoneSound.byml'] = Bytes(w4archive4)
-    w4writer.files['DofParam_obj6.bagldof'] = Bytes(w4archive5)
-    w4writer.files['CameraParam.byml'] = Bytes(w4archive6)
-    w4writer.files['CourseSelectW4ZoneDesign.byml'] = Bytes(w4archive7)
-    w4data = w4writer.write()
+        w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
+        w7writer = SarcWriter()
+        w7writer.set_endianness(endianness)
+        w7writer.files['CourseSelectW7ZoneDesign.byml'] = Bytes(w7archive1)
+        w7writer.files['DofParam_obj19.bagldof'] = Bytes(w7archive2)
+        w7writer.files['DofParam_obj22.bagldof'] = Bytes(w7archive3)
+        w7writer.files['CameraParam.byml'] = Bytes(w7archive4)
+        w7writer.files['DofParam_obj23.bagldof'] = Bytes(w7archive5)
+        w7writer.files['CourseSelectW7ZoneMap.byml'] = byml.to_binary(byml.from_text(w7archive6), False, 2)
+        w7writer.files['CourseSelectW7ZoneSound.byml'] = Bytes(w7archive7)
+        w7data = w7writer.write()
 
-    with open(srPath+'CourseSelectW4Zone.szs', 'wb') as w4:
-        print('Writing CourseSelectW4Zone.szs')
-        w4.write(yaz0.compress(w4data[1]))
-        print('Written CourseSelectW4Zone.szs')
+        with open(srPath+'CourseSelectW7Zone.szs', 'wb') as w7:
+            print('Writing CourseSelectW7Zone.szs')
+            w7.write(yaz0.compress(w7data[1]))
+            print('Written CourseSelectW7Zone.szs')
 
-    w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
-    w5writer = SarcWriter()
-    w5writer.files['DofParam_obj4.bagldof'] = Bytes(w5archive1)
-    w5writer.files['CourseSelectW5ZoneDesign.byml'] = Bytes(w5archive2)
-    w5writer.files['DofParam_obj5.bagldof'] = Bytes(w5archive3)
-    w5writer.files['DofParam_obj6.bagldof'] = Bytes(w5archive4)
-    w5writer.files['CameraParam.byml'] = Bytes(w5archive5)
-    w5writer.files['CourseSelectW5ZoneMap.byml'] = byml.to_binary(byml.from_text(w5archive6), False, 2)
-    w5writer.files['DofParam_obj3.bagldof'] = Bytes(w5archive7)
-    w5writer.files['CourseSelectW5ZoneSound.byml'] = Bytes(w5archive8)
-    w5data = w5writer.write()
+        w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
+        w8writer = SarcWriter()
+        w8writer.set_endianness(endianness)
+        w8writer.files['DofParam_obj130.bagldof'] = Bytes(w8archive1)
+        w8writer.files['DofParam_obj129.bagldof'] = Bytes(w8archive2)
+        w8writer.files['DofParam_obj131.bagldof'] = Bytes(w8archive3)
+        w8writer.files['CourseSelectW8ZoneMap.byml'] = byml.to_binary(byml.from_text(w8archive4), False, 2)
+        w8writer.files['CourseSelectW8ZoneSound.byml'] = Bytes(w8archive5)
+        w8writer.files['CourseSelectW8ZoneDesign.byml'] = Bytes(w8archive6)
+        w8writer.files['DofParam_obj132.bagldof'] = Bytes(w8archive7)
+        w8writer.files['CameraParam.byml'] = Bytes(w8archive8)
+        w8writer.files['DofParam_obj133.bagldof'] = Bytes(w8archive9)
+        w8data = w8writer.write()
 
-    with open(srPath+'CourseSelectW5Zone.szs', 'wb') as w5:
-        print('Writing CourseSelectW5Zone.szs')
-        w5.write(yaz0.compress(w5data[1]))
-        print('Written CourseSelectW5Zone.szs')
+        with open(srPath+'CourseSelectW8Zone.szs', 'wb') as w8:
+            print('Writing CourseSelectW8Zone.szs')
+            w8.write(yaz0.compress(w8data[1]))
+            print('Written CourseSelectW8Zone.szs')
 
-    w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
-    w6writer = SarcWriter()
-    w6writer.files['DofParam_obj18.bagldof'] = Bytes(w6archive1)
-    w6writer.files['DofParam_obj14.bagldof'] = Bytes(w6archive2)
-    w6writer.files['DofParam_obj10.bagldof'] = Bytes(w6archive3)
-    w6writer.files['DofParam_obj9.bagldof'] = Bytes(w6archive4)
-    w6writer.files['DofParam_obj19.bagldof'] = Bytes(w6archive5)
-    w6writer.files['DofParam_obj15.bagldof'] = Bytes(w6archive6)
-    w6writer.files['CourseSelectW6ZoneMap.byml'] = byml.to_binary(byml.from_text(w6archive7), False, 2)
-    w6writer.files['DofParam_obj11.bagldof'] = Bytes(w6archive8)
-    w6writer.files['CourseSelectW6ZoneSound.byml'] = Bytes(w6archive9)
-    w6writer.files['DofParam_obj6.bagldof'] = Bytes(w6archive10)
-    w6writer.files['DofParam_obj16.bagldof'] = Bytes(w6archive11)
-    w6writer.files['CourseSelectW6ZoneDesign.byml'] = Bytes(w6archive12)
-    w6writer.files['DofParam_obj12.bagldof'] = Bytes(w6archive13)
-    w6writer.files['CameraParam.byml'] = Bytes(w6archive14)
-    w6writer.files['DofParam_obj17.bagldof'] = Bytes(w6archive15)
-    w6writer.files['DofParam_obj13.bagldof'] = Bytes(w6archive16)
-    w6writer.files['DofParam_obj8.bagldof'] = Bytes(w6archive17)
-    w6data = w6writer.write()
+        s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
+        s1writer = SarcWriter()
+        s1writer.set_endianness(endianness)
+        s1writer.files['CourseSelectS1ZoneSound.byml'] = Bytes(s1archive1)
+        s1writer.files['CameraParam.byml'] = Bytes(s1archive2)
+        s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), False, 2)
+        s1data = s1writer.write()
 
-    with open(srPath+'CourseSelectW6Zone.szs', 'wb') as w6:
-        print('Writing CourseSelectW6Zone.szs')
-        w6.write(yaz0.compress(w6data[1]))
-        print('Written CourseSelectW6Zone.szs')
+        with open(srPath+'CourseSelectS1Zone.szs', 'wb') as s1:
+            print('Writing CourseSelectS1Zone.szs')
+            s1.write(yaz0.compress(s1data[1]))
+            print('Written CourseSelectS1Zone.szs')
+    else:
+        writer = SarcWriter()
+        writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), True, 1)
+        data = writer.write()
 
-    w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
-    w7writer = SarcWriter()
-    w7writer.files['CourseSelectW7ZoneDesign.byml'] = Bytes(w7archive1)
-    w7writer.files['DofParam_obj19.bagldof'] = Bytes(w7archive2)
-    w7writer.files['DofParam_obj22.bagldof'] = Bytes(w7archive3)
-    w7writer.files['CameraParam.byml'] = Bytes(w7archive4)
-    w7writer.files['DofParam_obj23.bagldof'] = Bytes(w7archive5)
-    w7writer.files['CourseSelectW7ZoneMap.byml'] = byml.to_binary(byml.from_text(w7archive6), False, 2)
-    w7writer.files['CourseSelectW7ZoneSound.byml'] = Bytes(w7archive7)
-    w7data = w7writer.write()
+        with open(rPath + "StageList.szs", "wb") as randoSZS:
+            print('Writing StageList.szs.')
+            randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
+            print('Written StageList.szs.')
 
-    with open(srPath+'CourseSelectW7Zone.szs', 'wb') as w7:
-        print('Writing CourseSelectW7Zone.szs')
-        w7.write(yaz0.compress(w7data[1]))
-        print('Written CourseSelectW7Zone.szs')
+        print('Writing world files:')
 
-    w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
-    w8writer = SarcWriter()
-    w8writer.files['DofParam_obj130.bagldof'] = Bytes(w8archive1)
-    w8writer.files['DofParam_obj129.bagldof'] = Bytes(w8archive2)
-    w8writer.files['DofParam_obj131.bagldof'] = Bytes(w8archive3)
-    w8writer.files['CourseSelectW8ZoneMap.byml'] = byml.to_binary(byml.from_text(w8archive4), False, 2)
-    w8writer.files['CourseSelectW8ZoneSound.byml'] = Bytes(w8archive5)
-    w8writer.files['CourseSelectW8ZoneDesign.byml'] = Bytes(w8archive6)
-    w8writer.files['DofParam_obj132.bagldof'] = Bytes(w8archive7)
-    w8writer.files['CameraParam.byml'] = Bytes(w8archive8)
-    w8writer.files['DofParam_obj133.bagldof'] = Bytes(w8archive9)
-    w8data = w8writer.write()
+        w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
+        w1writer = SarcWriter()
+        w1writer.set_endianness(endianness)
+        w1writer.files['CourseSelectW1ZoneMap.byml'] = byml.to_binary(byml.from_text(w1archive6), True, 1)
+        w1writer.files['CameraParam.byml'] = Bytes(w1archive8)
+        w1data = w1writer.write()
 
-    with open(srPath+'CourseSelectW8Zone.szs', 'wb') as w8:
-        print('Writing CourseSelectW8Zone.szs')
-        w8.write(yaz0.compress(w8data[1]))
-        print('Written CourseSelectW8Zone.szs')
+        with open(srPath + 'CourseSelectW1ZoneMap1.szs', 'wb') as w1:
+            print('Writing CourseSelectW1ZoneMap1.szs')
+            w1.write(yaz0.compress(w1data[1]))
+            print('Written CourseSelectW1ZoneMap1.szs')
 
-    s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
-    s1writer = SarcWriter()
-    s1writer.files['CourseSelectS1ZoneSound.byml'] = Bytes(s1archive1)
-    s1writer.files['CameraParam.byml'] = Bytes(s1archive2)
-    s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), False, 2)
-    s1data = s1writer.write()
+        w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
+        w2writer = SarcWriter()
+        w2writer.set_endianness(endianness)
+        w2writer.files['CourseSelectW2ZoneMap.byml'] = byml.to_binary(byml.from_text(w2archive2), True, 1)
+        w2writer.files['CameraParam.byml'] = Bytes(w2archive7)
+        w2data = w2writer.write()
 
-    with open(srPath+'CourseSelectS1Zone.szs', 'wb') as s1:
-        print('Writing CourseSelectS1Zone.szs')
-        s1.write(yaz0.compress(s1data[1]))
-        print('Written CourseSelectS1Zone.szs')
+        with open(srPath + 'CourseSelectW2ZoneMap1.szs', 'wb') as w2:
+            print('Writing CourseSelectW2ZoneMap1.szs')
+            w2.write(yaz0.compress(w2data[1]))
+            print('Written CourseSelectW2ZoneMap1.szs')
+
+        w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
+        w3writer = SarcWriter()
+        w3writer.set_endianness(endianness)
+        w3writer.files['CourseSelectW3ZoneMap.byml'] = byml.to_binary(byml.from_text(w3archive2), True, 1)
+        w3writer.files['CameraParam.byml'] = Bytes(w3archive3)
+        w3data = w3writer.write()
+
+        with open(srPath + 'CourseSelectW3ZoneMap1.szs', 'wb') as w3:
+            print('Writing CourseSelectW3ZoneMap1.szs')
+            w3.write(yaz0.compress(w3data[1]))
+            print('Written CourseSelectW3ZoneMap1.szs')
+
+        w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
+        w4writer = SarcWriter()
+        w4writer.set_endianness(endianness)
+        w4writer.files['CourseSelectW4ZoneMap.byml'] = byml.to_binary(byml.from_text(w4archive2), True, 1)
+        w4writer.files['CameraParam.byml'] = Bytes(w4archive6)
+        w4data = w4writer.write()
+
+        with open(srPath + 'CourseSelectW4ZoneMap1.szs', 'wb') as w4:
+            print('Writing CourseSelectW4ZoneMap1.szs')
+            w4.write(yaz0.compress(w4data[1]))
+            print('Written CourseSelectW4ZoneMap1.szs')
+
+        w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
+        w5writer = SarcWriter()
+        w5writer.set_endianness(endianness)
+        w5writer.files['CameraParam.byml'] = Bytes(w5archive5)
+        w5writer.files['CourseSelectW5ZoneMap.byml'] = byml.to_binary(byml.from_text(w5archive6), True, 1)
+        w5data = w5writer.write()
+
+        with open(srPath + 'CourseSelectW5ZoneMap1.szs', 'wb') as w5:
+            print('Writing CourseSelectW5ZoneMap1.szs')
+            w5.write(yaz0.compress(w5data[1]))
+            print('Written CourseSelectW5ZoneMap1.szs')
+
+        w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
+        w6writer = SarcWriter()
+        w6writer.set_endianness(endianness)
+        w6writer.files['CourseSelectW6ZoneMap.byml'] = byml.to_binary(byml.from_text(w6archive7), True, 1)
+        w6writer.files['CameraParam.byml'] = Bytes(w6archive14)
+        w6data = w6writer.write()
+
+        with open(srPath + 'CourseSelectW6ZoneMap1.szs', 'wb') as w6:
+            print('Writing CourseSelectW6ZoneMap1.szs')
+            w6.write(yaz0.compress(w6data[1]))
+            print('Written CourseSelectW6ZoneMap1.szs')
+
+        w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
+        w7writer = SarcWriter()
+        w7writer.set_endianness(endianness)
+        w7writer.files['CameraParam.byml'] = Bytes(w7archive4)
+        w7writer.files['CourseSelectW7ZoneMap.byml'] = byml.to_binary(byml.from_text(w7archive6), True, 1)
+        w7data = w7writer.write()
+
+        with open(srPath + 'CourseSelectW7ZoneMap1.szs', 'wb') as w7:
+            print('Writing CourseSelectW7ZoneMap1.szs')
+            w7.write(yaz0.compress(w7data[1]))
+            print('Written CourseSelectW7ZoneMap1.szs')
+
+        w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
+        w8writer = SarcWriter()
+        w8writer.set_endianness(endianness)
+        w8writer.files['CourseSelectW8ZoneMap.byml'] = byml.to_binary(byml.from_text(w8archive4), True, 1)
+        w8writer.files['CameraParam.byml'] = Bytes(w8archive8)
+        w8data = w8writer.write()
+
+        with open(srPath + 'CourseSelectW8ZoneMap1.szs', 'wb') as w8:
+            print('Writing CourseSelectW8ZoneMap1.szs')
+            w8.write(yaz0.compress(w8data[1]))
+            print('Written CourseSelectW8ZoneMap1.szs')
+
+        s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
+        s1writer = SarcWriter()
+        s1writer.set_endianness(endianness)
+        s1writer.files['CourseSelectS1ZoneSound.byml'] = Bytes(s1archive1)
+        s1writer.files['CameraParam.byml'] = Bytes(s1archive2)
+        s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), True, 1)
+        s1data = s1writer.write()
+
+        with open(srPath + 'CourseSelectS1ZoneMap1.szs', 'wb') as s1:
+            print('Writing CourseSelectS1ZoneMap1.szs')
+            s1.write(yaz0.compress(s1data[1]))
+            print('Written CourseSelectS1ZoneMap1.szs')
 
     print('Finished writing world files.')
 
-    if music.get() == 1:
-        musicRandomizer(currentDateTime)
+    musicRandomizer(rng, seedRNG, user_data)
+    langRandomizer(rng, seedRNG, user_data)
+
+    if dpg.get_value("spoil"):
+        spoilerFile(StageListNew, seedRNG, user_data)
     else:
-        print('Not randomizing music.')
+        print('Not generating spoiler file, only generating seed text file.')
+        with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'.txt', 'w', encoding='utf-8') as s:
+            s.write('Seed: '+str(seedRNG))  # Creating a new spoiler text file.
 
-    if lang.get() == 1:
-        langRandomizer(currentDateTime)
-    else:
-        print('Not randomizing language.')
+    if wiiu:
+        with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\rules.txt', 'w', encoding='utf-8') as rules:
+            rules.write('[Definition]\ntitleIds = 0005000010145D00,0005000010145C00,0005000010106100\nname = SM3DWR-'
+                        +str(seedRNG)+'\npath = \"Super Mario 3D World/Mods/SM3DWR-'+str(seedRNG)+'\"\ndescription = '
+                        'Super Mario 3D World Randomizer\nversion = 3\nfsPriority = 100')
 
-    if spoil.get() == 1:
-        spoilerFile(StageListNew, currentDateTime)
-    else:
-        print('Not generating spoiler file.')
-
-    shutil.rmtree('./tmp-'+currentDateTime)  # Delete temporary folder.
-
-    finish()
-    quitB.configure(command=quit)
+    dpg.configure_item("progress", default_value=1)
+    dpg.configure_item("randoinit", enabled=True, label="Randomize!")
+    dpg.configure_item("popup", show=True)
 
 
 # Music randomizer
-def musicRandomizer(currentDateTime):
-    global folderSelected
+def musicRandomizer(rng, seedRNG, user_data):
     print('Randomizing music...')
 
     # Creating variables for the directories we are working with.
-    mPath = os.path.join(folderSelected, 'SoundData/stream/')
-    mPath2 = os.path.join(folderSelected, 'SoundData/streamSe/')
-    rPath = os.path.join('./romfs-'+currentDateTime, 'SoundData/stream/')
-    rPath2 = os.path.join('./romfs-' + currentDateTime, 'SoundData/streamSe/')
+    mPath = os.path.join(user_data[0], 'SoundData\\stream\\')
+    rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\romfs\\SoundData\\stream\\')
     os.makedirs(rPath)
-    os.makedirs(rPath2)
-
-    # Making a list comprising of the names of every file in the directory
-    mList = os.listdir(mPath) + os.listdir(mPath2)
+    if os.path.isdir(os.path.join(user_data[0], 'SoundData\\streamSe\\')):
+        mPath2 = os.path.join(user_data[0], 'SoundData\\streamSe\\')
+        rPath2 = os.path.join(user_data[1], 'SM3DWR-'+str(seedRNG)+'\\romfs\\SoundData\\streamSe\\')
+        os.makedirs(rPath2)
+        # Making a list comprising the names of every file in the directory
+        musicRando_order = os.listdir(mPath) + os.listdir(mPath2)
+    else:
+        # This is here for the Wii U version which doesn't have the Bowser's Fury music folder
+        musicRando_order = os.listdir(mPath)
 
     # Creating a music index variable and randomized number history variable in a similar to the level randomizer.
-    musicPos = 0
-    musicRando_history = []
+    rmusicRando_order = rng.choice(musicRando_order, size=len(musicRando_order), replace=False)
 
-    # Loop for music randomization
-    while musicPos < len(mList):
-        musicRando = randint(0, len(mList)-1)
+    if dpg.get_value("music"):
+        # Loop for music randomization
+        for music in musicRando_order:
+            rmusic = rmusicRando_order[musicRando_order.index(music)]
+            # Renaming music file to randomized music file using the list.
+            if (music == 'DemoSingleModeEnding.dspadpcm.bfstm' or music == 'SingleModeOpening.dspadpcm.bfstm') and (
+                    rmusic == 'DemoSingleModeEnding.dspadpcm.bfstm' or rmusic == 'SingleModeOpening.dspadpcm.bfstm'):
+                shutil.copy2(mPath2+music, rPath2+rmusic)
+            elif (music != 'DemoSingleModeEnding.dspadpcm.bfstm' or music != 'SingleModeOpening.dspadpcm.bfstm') and (
+                    rmusic == 'DemoSingleModeEnding.dspadpcm.bfstm' or rmusic == 'SingleModeOpening.dspadpcm.bfstm'):
+                shutil.copy2(mPath+music, rPath2+rmusic)
+            elif (music == 'DemoSingleModeEnding.dspadpcm.bfstm' or music == 'SingleModeOpening.dspadpcm.bfstm') and (
+                    rmusic != 'DemoSingleModeEnding.dspadpcm.bfstm' or rmusic != 'SingleModeOpening.dspadpcm.bfstm'):
+                shutil.copy2(mPath2+music, rPath+rmusic)
+            else:
+                shutil.copy2(mPath+music, rPath+rmusic)
+            print('Renamed', music, 'to', rmusic)
 
-        # The same loop used in the level randomizer to avoid repeating numbers.
-        while musicRando in musicRando_history or os.path.isdir(rPath+mList[musicRando]):
-            print('Duplicate number '+str(musicRando)+'! Regenerating...')
-            musicRando = randint(0, len(mList)-1)
-
-        print('Generated unique number ' + str(musicRando) + '!')
-        musicRando_history.append(musicRando)
-
-        # Renaming music file to randomized music file using the list.
-        if (mList[musicPos] == 'DemoSingleModeEnding.dspadpcm.bfstm' or mList[musicPos] == 'SingleModeOpening.dspadpcm.bfstm') and (mList[musicRando] == 'DemoSingleModeEnding.dspadpcm.bfstm' or mList[musicRando] == 'SingleModeOpening.dspadpcm.bfstm'):
-            shutil.copy2(mPath2+mList[musicPos], rPath2+mList[musicRando])
-        elif (mList[musicPos] != 'DemoSingleModeEnding.dspadpcm.bfstm' or mList[musicPos] != 'SingleModeOpening.dspadpcm.bfstm') and (mList[musicRando] == 'DemoSingleModeEnding.dspadpcm.bfstm' or mList[musicRando] == 'SingleModeOpening.dspadpcm.bfstm'):
-            shutil.copy2(mPath+mList[musicPos], rPath2+mList[musicRando])
-        elif (mList[musicPos] == 'DemoSingleModeEnding.dspadpcm.bfstm' or mList[musicPos] == 'SingleModeOpening.dspadpcm.bfstm') and (mList[musicRando] != 'DemoSingleModeEnding.dspadpcm.bfstm' or mList[musicRando] != 'SingleModeOpening.dspadpcm.bfstm'):
-            shutil.copy2(mPath2+mList[musicPos], rPath+mList[musicRando])
-        else:
-            shutil.copy2(mPath+mList[musicPos], rPath+mList[musicRando])
-        print('Renamed', mList[musicPos], 'to', mList[musicRando])
-
-        musicPos += 1
-
-    print(musicRando_history)
-
-    duplicateCheck(musicRando_history)
-
-    print('Music randomizer procedure complete!')
+        print('Music randomizer procedure complete!')
+    else:
+        print('Not changing music files.')
 
 
 # Language randomizer
-def langRandomizer(currentDateTime):
-    global folderSelected
+def langRandomizer(rng, seedRNG, user_data):
     print('Randomizing language...')
 
-    lPath = os.path.join(folderSelected, 'LocalizedData/')
-    rlPath = os.path.join('./romfs-'+currentDateTime, 'LocalizedData/')
+    lPath = os.path.join(user_data[0], 'LocalizedData\\')
+    rlPath = os.path.join(user_data[1], 'SM3DWR-'+str(seedRNG)+'\\romfs\\LocalizedData\\')
     os.makedirs(rlPath)
 
-    lList = os.listdir(lPath)
+    Lang_order = os.listdir(lPath)
+    Lang_order.pop(Lang_order.index('Common'))
+    rLang_order = rng.choice(Lang_order, size=len(Lang_order), replace=False)
 
-    langPos = 0
-    langRando_history = []
+    if dpg.get_value('lang'):
+        for lang in Lang_order:
+            rlang = rLang_order[Lang_order.index(lang)]
+            shutil.copytree(lPath+lang, rlPath+rlang)
+            print('Renamed', lang, 'to', rlang)
 
-    while langPos < len(lList):
-        langRando = randint(0, len(lList)-1)
-
-        while langRando in langRando_history or os.path.isdir(rlPath+lList[langRando]) or langRando == 1:
-            print('Duplicate number '+str(langRando)+'! Regenerating...')
-            langRando = randint(0, len(lList) - 1)
-
-        print('Generated unique number '+str(langRando)+'!')
-        langRando_history.append(langRando)
-
-        shutil.copytree(lPath+lList[langPos], rlPath+lList[langRando])
-        print('Renamed', lList[langPos], 'to', lList[langRando])
-
-        if langPos == 0:
-            langPos = 2
-        else:
-            langPos += 1
-
-    print(langRando_history)
-
-    duplicateCheck(langRando_history)
-
-    print('Language randomizer procedure complete!')
+        print('Language randomizer procedure complete!')
+    else:
+        print('Not changing language files.')
 
 
 # Spoiler file generation
-def spoilerFile(StageListNew, currentDateTime):
+def spoilerFile(StageListNew, seedRNG, user_data):
     print('Generating spoiler file...')
     levelIndex = 1
     worldIndex = 1
     overallIndex = 1
-    stageID_Name = ['Level Slot, Level Name (Original Level Slot)\n\nWorld ' + str(worldIndex) + '\n']
+    stageID_Name = ['Seed: '+str(seedRNG)+'\n\nLevel Slot, Level Name (Original Level Slot)\n\nWorld ' + str(worldIndex)]
 
     # Appending the name of each stage to stageID_name.
     while overallIndex <= 154:
         # World 1
-        if StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: EnterCatMarioStage\n':
+        if StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EnterCatMarioStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Super Bell Hill (1-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: NokonokoCaveStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NokonokoCaveStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Koopa Troopa Cave (1-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ClimbMountainStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbMountainStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mount Beanpole (1-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: DownRiverStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DownRiverStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Plessie\'s Plunging Falls (1-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FlipCircusStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FlipCircusStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Switch Scramble Circus (1-5)\n')
         # Toad House
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioHouseLv1BlueStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioHouseLv2BlueStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioHouseLv3BlueStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioHouseLv1InsideStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioHouseLv3LavaStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioHouseLv3NightStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv1BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv2BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv1InsideStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3LavaStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3NightStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Toad House\n')
         # World 1 continued
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioBrigadeTentenStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeTentenStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Goes Forth (1-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KoopaChaseLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaChaseLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bowser\'s Highway Showdown (1-Castle)\n')
         # Lucky House (Roulette)
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: RouletteRoomZone\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RouletteRoomZone':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Lucky House\n')
         # World 1 continued
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperBullLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBullLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Chargin\' Chuck Blockade (1-A)\n')
         # World 2
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: SideWaveDesertStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SideWaveDesertStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Conkdor Canyon (2-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: TouchAndMikeStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TouchAndMikeStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Puffprod Peaks (2-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ShadowTunnelStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShadowTunnelStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Shadow-Play Alley (2-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: RotateFieldStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RotateFieldStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Really Rolling Hills (2-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: DoubleMarioFieldStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DoubleMarioFieldStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Double Cherry Pass (2-5)\n')
         # Stamp House
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FairyHouseBlueStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FairyHouseInsideStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FairyHouseLavaStage\n' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FairyHouseNightStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseBlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseInsideStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseLavaStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseNightStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sprixie House\n')
         # World 2 continued
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: MysteryHouseEnemyStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseEnemyStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Melee (2-Mystery House)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KillerTankStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KillerTankStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bowser\'s Bullet Bill Brigade (2-Tank)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperKuribonLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKuribonLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Big Galoomba Blockade (2-A)\n')
         # World 3
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: SnowBallParkStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SnowBallParkStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Snowball Park (3-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ClimbWirenetStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbWirenetStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Chainlink Charge (3-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: TeresaConveyorStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TeresaConveyorStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Shifty Boo Mansion (3-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ShortGardenStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortGardenStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Pretty Plaza Panic (3-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: DokanAquariumStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DokanAquariumStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Pipeline Lagoon (3-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: DashRidgeStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DashRidgeStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mount Must Dash (3-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: TruckWaterfallStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TruckWaterfallStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Switchboard Falls (3-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioBrigadeWaterStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeWaterStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Makes a Splash (3-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KillerExpressStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KillerExpressStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', The Bullet Bill Express (3-Train)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperKameckLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKameckLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Magikoopa Blockade (3-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperTentackLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperTentackLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', A Banquet with Hisstrocrat (3-B)\n')
         # World 4
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: CrawlerHillStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: CrawlerHillStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Ant Trooper Hill (4-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: PipePackunDenStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: PipePackunDenStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Piranha Creeper Creek (4-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ChikaChikaBoomerangStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChikaChikaBoomerangStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Beep Block Skyway (4-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: TrampolineHighlandStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TrampolineHighlandStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Big Bounce Byway (4-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GabonMountainStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GabonMountainStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spike\'s Lost City (4-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: MysteryHouseDashStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseDashStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Mad Dash (4-Mystery House)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: BossGorobonStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BossGorobonStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Lava Rock Lair (4-Castle)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperGorobonLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperGorobonLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Brolder Blockade (4-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperFireBrosLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #1 (4-B)\n')
         # World 5
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: NokonokoBeachStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NokonokoBeachStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sunshine Seaside (5-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: SwingCircusStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SwingCircusStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Tricky Trapeze Theater (5-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ShortMultiLiftStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortMultiLiftStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Backstreet Bustle (5-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: SavannaRockStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SavannaRockStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sprawling Savanna (5-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: BombCaveStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BombCaveStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bob-ombs Below (5-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: JumpFlipSweetsStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: JumpFlipSweetsStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Cakewalk Flip (5-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: SneakingLightStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SneakingLightStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Searchlight Sneak (5-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GoldenExpressStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GoldenExpressStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Coin Express (5-Train)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioBrigadeTeresaStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeTeresaStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Plays Peek-a-Boo (5-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: BossWackunFortressStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BossWackunFortressStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', King Ka-thunk\'s Castle (5-Castle)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperBullLv2Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBullLv2Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Chargin\' Chuck Blockade is Back (5-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperFireBrosLv2Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv2Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #2 (5-B)\n')
         # World 6
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: RouteDokanTourStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RouteDokanTourStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Clear Pipe Cruise (6-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: WeavingShipStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WeavingShipStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spooky Seasick Wreck (6-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KarakuriCastleStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KarakuriCastleStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Hands-On Hall (6-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: JungleCruiseStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: JungleCruiseStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Deep Jungle Drift (6-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: BlastSnowFieldStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BlastSnowFieldStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Ty-Foo Flurries (6-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ClimbFortressStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbFortressStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bullet Bill Base (6-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ChorobonTowerStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChorobonTowerStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fuzzy Time Mine (6-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: MysteryHouseBallStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseBallStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Throwdown (6-Mystery House)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: BombTankStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BombTankStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bowser\'s Bob-omb Brigade (6-Tank)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperKyupponLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKyupponLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Prince Bully Blockade (6-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperFireBrosLv3Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv3Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #3 (6-B)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Motley Bossblob\' Big Battle (6-C)\n')
         # World Castle
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: FireBrosFortressStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FireBrosFortressStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fort Fire Bros. (Castle-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: DarkFlipPanelStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DarkFlipPanelStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Switchblack Ruins (Castle-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ShortAmidaStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortAmidaStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Red-Hot Run (Castle-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: DonketsuArrowStepStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DonketsuArrowStepStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Boiling Blue Bully Belt (Castle-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ZigzagBuildingStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ZigzagBuildingStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Trick Trap Tower (Castle-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: SyumockSpotStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SyumockSpotStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Rammerhead Reef (Castle-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: RagingMagmaStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RagingMagmaStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Simmering Lava Lake (Castle-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioBrigadeConveyorStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeConveyorStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Gets Thwomped (Castle-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KoopaChaseLv2Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaChaseLv2Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bowser\'s Lava Lake Keep (Castle-Castle)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperGorobonLv2Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperGorobonLv2Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Brolder Blockade Is Back (Castle-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperKyupponLv2Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKyupponLv2Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Prince Bully Blockade Is Back (Castle-B)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperFireBrosLv4Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv4Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #4 (Castle-C)\n')
         # World Bowser
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: NeedleBridgeStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NeedleBridgeStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spiky Spike Bridge (Bowser-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: DownDesertStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DownDesertStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Plessie\'s Dune Downhill (Bowser-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GearSweetsStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GearSweetsStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Cookie Cogworks (Bowser-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: EchoRoadStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EchoRoadStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Footlight Lane (Bowser-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: WaterElevatorCaveStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WaterElevatorCaveStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Deepwater Dungeon (Bowser-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: DarknessHauntedHouseStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DarknessHauntedHouseStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', A Beam in the Dark (Bowser-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GotogotonValleyStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GotogotonValleyStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Grumblump Inferno (Bowser-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: MysteryHouseClimbStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseClimbStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Claw Climb (Bowser-Mystery House)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: EnemyExpressStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EnemyExpressStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', The Bowser Express (Bowser-Train)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KoopaLastStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaLastStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', The Great Tower of Bowser Land (Bowser-Castle)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Motley Bossblob\'s Encore (Bowser-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GateKeeperTentackLv2Stage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperTentackLv2Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Hisstocrat Returns (Bowser-B)\n')
         # World Star
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: RainbowRoadStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RainbowRoadStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Rainbow Run (Star-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GalaxyRoadStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GalaxyRoadStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Super Galaxy (Star-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: WheelCanyonStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WheelCanyonStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Rolling Ride Run (Star-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GoalPoleRunawayStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GoalPoleRunawayStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', The Great Goal Pole (Star-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: BlockLandStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BlockLandStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Super Block Land (Star-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: HexScrollStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: HexScrollStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Honeycomb Starway (Star-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: GiantUnderGroundStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GiantUnderGroundStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Gargantuan Grotto (Star-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: TerenFogStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TerenFogStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Peepa\'s Fog Bog (Star-8)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: BoxKillerStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BoxKillerStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Cosmic Cannon Cluster (Star-9)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioBrigadeRotateRoomStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeRotateRoomStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Takes a Spin (Star-Captain Toad)\n')
         # World Mushroom
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeRotateFieldStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeRotateFieldStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Night Falls on Really Rolling Hills (Mushroom-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeClimbMountainStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeClimbMountainStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spiky Mount Beanpole (Mushroom-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeJungleCruiseStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeJungleCruiseStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Deep-Black Jungle Drift (Mushroom-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeShadowTunnelStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeShadowTunnelStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Trouble in Shadow-Play Alley (Mushroom-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeKarakuriCastleStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeKarakuriCastleStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Back to Hands-On Hall (Mushroom-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeWeavingShipStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeWeavingShipStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Gigantic Seasick Wreck (Mushroom-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeDonketsuArrowStepStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeDonketsuArrowStepStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Broken Blue Bully Belt (Mushroom-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeMysteryHouseEnemyStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeMysteryHouseEnemyStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Brawl (Mushroom-Mystery House)\n')
         # World Flower
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeFlipCircusStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeFlipCircusStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Switch Shock Circus (Flower-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeChorobonTowerStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeChorobonTowerStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Floating Fuzzy Time Mine (Flower-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangePipePackunDenStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangePipePackunDenStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Piranha Creeper Creek after Dark (Flower-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeFireBrosFortressStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeFireBrosFortressStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Faster Fort Fire Bros. (Flower-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeSavannaRockStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeSavannaRockStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sprawling Savanna Rabbit Run (Flower-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeTeresaConveorStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeTeresaConveorStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Shiftier Boo Mansion (Flower-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeDokanAquariumStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeDokanAquariumStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Pipeline Boom Lagoon (Flower-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeChikaChikaBoomerangStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeChikaChikaBoomerangStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Blast Block Skyway (Flower-8)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeNokonokoBeachStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeNokonokoBeachStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Towering Sunshine Seaside (Flower-9)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeHexScrollStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeHexScrollStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Honeycomb Skyway (Flower-10)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeNeedleBridgeStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeNeedleBridgeStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spiky Spike Bridge Sneak (Flower-11)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ArrangeBossParadeStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeBossParadeStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Boss Blitz (Flower-12)\n')
         # World Crown
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: ChampionshipStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChampionshipStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Champion\'s Road (Crown-Crown)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: KinopioBrigadeInfernoStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeInfernoStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad\'s Fiery Finale (Crown-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex) + '\n')) + 8] == '    StageName: MysteryHouseMaxStage\n':
+        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseMaxStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Marathon (Crown-Mystery House)\n')
         # Increment to next world.
         if worldIndex == 1 and levelIndex == 11:
             worldIndex = 2
-            stageID_Name.append('\nWorld '+str(worldIndex)+'\n')
+            stageID_Name.append('\nWorld ' + str(worldIndex) + '\n')
             levelIndex = 1
         elif worldIndex == 2 and levelIndex == 11:
             worldIndex = 3
@@ -1144,50 +1290,116 @@ def spoilerFile(StageListNew, currentDateTime):
             levelIndex += 1
         overallIndex += 1
 
-    with open('./romfs-'+currentDateTime+'/'+currentDateTime+'-spoiler.txt', 'w', encoding='utf-8') as s:
+    with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'-spoiler.txt', 'w', encoding='utf-8') as s:
         s.write(''.join([''.join(l2) for l2 in stageID_Name]))  # Creating a new spoiler text file.
 
-    with open('./romfs-'+currentDateTime+'/'+currentDateTime+'-spoiler.txt', 'r', encoding='utf-8') as s:
+    with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'-spoiler.txt', 'r', encoding='utf-8') as s:
         s = s.read()  # Reading the spoiler file.
 
     # Making sure levels have the correct names.
     rep = s.replace('11-6', 'Flower-6').replace('11-7', 'Flower-7').replace('11-8', 'Flower-8').replace('11-9', 'Flower-9').replace('11-10', 'Flower-10').replace('11-11', 'Flower-11').replace('11-12', 'Flower-12').replace('12-1', 'Crown-Crown').replace('1-9', '1-Castle').replace('4-9', '4-Castle').replace('5-12', '5-Castle').replace('7-11', 'Castle-Castle').replace('8-13', 'Bowser-Castle').replace('2-9', '2-Tank').replace('6-11', '6-Tank').replace('3-11', '3-Train').replace('8-12', 'Bowser-Train').replace('1-6', '1-Toad House 1').replace('1-7', '1-Toad House 2').replace('2-6', '2-Toad House').replace('3-8', '3-Toad House 1').replace('3-12', '3-Toad House 2 (Unused)').replace('4-6', '4-Toad House').replace('5-9', '5-Toad House 1').replace('5-13', '5-Toad House 2 (Unused)').replace('5-14', '5-Toad House 3 (Unused)').replace('5-15', '5-Toad House 4 (Unused)').replace('5-16', '5-Toad House 5 (Unused)').replace('5-17', '5-Toad House 6 (Unused)').replace('6-8', '6-Toad House 1').replace('6-12', '6-Toad House 2 (Unused)').replace('7-8', 'Castle-Toad House 1').replace('7-12', 'Castle-Toad House 2 (Unused)').replace('8-8', 'Bowser-Toad House 1').replace('8-9', 'Bowser-Toad House 2').replace('8-14', 'Bowser-Toad House 3 (Unused)').replace('2-7', '2-Sprixie House').replace('3-9', '3-Sprixie House').replace('4-7', '4-Sprixie House').replace('5-10', '5-Sprixie House').replace('6-9', '6-Sprixie House').replace('7-9', 'Castle-Sprixie House').replace('8-10', 'Bowser-Sprixie House').replace('9-10', 'Star-Sprixie House').replace('12-2', 'Crown-Sprixie House').replace('1-8', '1-Captain Toad').replace('3-10', '3-Captain Toad').replace('5-11', '5-Captain Toad').replace('7-10', 'Castle-Captain Toad').replace('9-11', 'Star-Captain Toad').replace('12-3', 'Crown-Captain Toad').replace('1-10', 'Lucky House').replace('2-10', 'Lucky House').replace('3-13', 'Lucky House').replace('4-10', 'Lucky House').replace('5-18', 'Lucky House').replace('6-13', 'Lucky House').replace('7-13', 'Lucky House').replace('8-15', 'Lucky House').replace('9-12', 'Lucky House').replace('1-11', '1-A').replace('2-11', '2-A').replace('3-14', '3-A').replace('4-11', '4-A').replace('5-19', '5-A').replace('6-14', '6-A').replace('7-14', 'Castle-A').replace('8-16', 'Bowser-A').replace('3-15', '3-B').replace('4-12', '4-B').replace('5-20', '5-B').replace('6-15', '6-B').replace('7-15', 'Castle-B').replace('8-17', 'Bowser-B').replace('6-16', '6-C').replace('7-16', 'Castle-C').replace('5-8', 'Coin Express').replace('2-8', '2-Mystery House').replace('4-8', '4-Mystery House').replace('6-10', '6-Mystery House').replace('8-11', 'Bowser-Mystery House').replace('10-8', 'Mushroom-Mystery House').replace('12-4', 'Crown-Mystery House').replace('7-', 'Castle-').replace('8-', 'Bowser-').replace('9-', 'Star-').replace('10-', 'Mushroom-').replace('11-', 'Flower-').replace('12-', 'Crown-')
 
-    with open('./romfs-'+currentDateTime+'/'+currentDateTime+'-spoiler.txt', 'w', encoding='utf-8') as s:
+    with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'-spoiler.txt', 'w', encoding='utf-8') as s:
         s.write(rep)  # Writing the corrected level slots back to the file.
 
     print('Generated spoiler file!')
 
 
-# Buttons
-run = Button(root, text='Randomize', fg='red', command=errorPopUp)
-openDIR = Button(root, text='Load RomFS directory', fg='red', command=browseDIR)
-cred = Button(root, text='Credits', command=creditsDev)
-quitB = Button(root, text='Quit', command=root.destroy)
+# Main Program Window
+class GUI:
+    def __init__(self, p_title, p_size):
+        # DearPyGUI setup
+        dpg.create_context()
+        dpg.create_viewport(title=p_title, width=p_size[0], height=p_size[1])
+        dpg.set_viewport_small_icon("ico.ico")
+        dpg.set_viewport_large_icon("ico.ico")
 
-# Check boxes
-spoilerCheck = Checkbutton(root, text='Generate level spoiler file?', variable=spoil)
-musicCheck = Checkbutton(root, text='Randomize music?', variable=music)
-langCheck = Checkbutton(root, text='Randomize language?', variable=lang)
+        with dpg.window(tag="Main Window", label="Program"):
+            with dpg.tab_bar():  # Add tabs which the user can change between
+                with dpg.tab(tag="t1", label="Program"):  # The main, default tab
+                    dpg.add_text("Hello, welcome to the Super Mario 3D World Randomizer!")
+                    dpg.add_text(tag="dirtext", default_value="Load Directory", color=(255, 0, 0, 255))  # Selected Directory
+                    self.dir = dpg.add_button(tag="dirbutt", label="Load Input Directory", callback=lambda: dpg.show_item("dir"))  # Load Directory Button
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=self.directory)  # Directory Selector
+                    dpg.add_text(tag="rdirtext", default_value=os.getcwd())  # Selected Directory
+                    self.rdir = dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=self.rdirectory)  # Directory Selector
+                    self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="")  # Seed Input Text
+                    self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
+                    dpg.add_progress_bar(tag="progress", label="progress", default_value=0)
+                    dpg.add_text("This randomizer only effects Super Mario 3D World (Wii U and Switch), not Bowser's Fury.")
+                    self.test = dpg.add_button(tag="test", label="test", callback=lambda: dpg.configure_item("progress", default_value=1), show=False)
+                    with dpg.tooltip("dirbutt"):
+                        dpg.add_text("The directory selected must be the root directory of an unmodified dump of the "
+                                     "game:\n"
+                                     "\"0005000010106100\\content\\\" - Super Mario 3D World (JPN)\n"
+                                     "\"0005000010145C00\\content\\\" - Super Mario 3D World (USA)\n"
+                                     "\"0005000010145D00\\content\\\" - Super Mario 3D World (EUR)\n"
+                                     "\"010028600EBDA000\\romfs\\\" - Super Mario 3D World + Bowser's Fury")
+                    with dpg.tooltip("rdirbutt"):
+                        dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
+                                     "be your mods folder:\n"
+                                     "\"Cemu\\graphicsPacks\\\" - Cemu (Wii U)\n"
+                                     "\"sd:\\wiiu\\sdcafiine\\0005000010106100\\\" - SDCafiine (Wii U, JPN version)\n"
+                                     "\"sd:\\wiiu\\sdcafiine\\0005000010145C00\\\" - SDCafinne (Wii U, USA version)\n"
+                                     "\"sd:\\wiiu\\sdcafiine\\0005000010145D00\\\" - SDCafiine (Wii U, EUR version)\n"
+                                     "\"%appdata%\\yuzu\\load\\010028600EBDA000\\\" - Yuzu (Switch)\n"
+                                     "\"%appdata%\\Ryujinx\\mods\\contents\\010028600EBDA000\\\" - Ryujinx (Switch)\n"
+                                     "\"sd:\\atmosphere\\contents\\010028600EBDA000\\\"* - Atmosphère (Switch)\n\n"
+                                     "*The \"romfs\" folder inside the generated\"SM3DWR-<seed>\" folder should be "
+                                     "taken out and placed into the\nspecified atmosphere folder.")
+                    with dpg.tooltip('randoinit'):
+                        dpg.add_text('To be able to start the randomizer, select a valid input directory.', tag='randotip')
+                with dpg.tab(tag="t2", label="Misc. Settings"):  # Settings tab
+                    self.spoil = dpg.add_checkbox(tag="spoil", label="Generate spoiler file?")
+                    self.star = dpg.add_checkbox(tag="star", label="Enable Green Star lock logic?", default_value=True)
+                    self.music = dpg.add_checkbox(tag="music", label="Randomize music?")
+                    self.lang = dpg.add_checkbox(tag="lang", label="Randomize language?")
+                    with dpg.tooltip('spoil'):
+                        dpg.add_text('Generate a text file which contains the full list of levels and what they have'
+                                     'been randomized to.')
+                    with dpg.tooltip('star'):
+                        dpg.add_text('Instead of removing all but The Great Tower of Bowser Land\'s Green Star lock, '
+                                     'the randomizer\nwill calculate new Green Star requirements for each lock based on'
+                                     ' what was generated beforehand.')
+                    with dpg.tooltip('music'):
+                        dpg.add_text('Randomize the filenames for the music files.')
+                    with dpg.tooltip('lang'):
+                        dpg.add_text('Randomize the selected language. Will be the same language for everything.\n'
+                                     'This feature is more limited on the Wii U version due to region locking so\nthe '
+                                     'language pool is limited to the languages your region supports.')
+                with dpg.tab(tag="t3", label="Credits"):  # Credits tab
+                    dpg.add_text("Super Mario 3D World Randomizer credits:\n\nDeveloper:\nToby Bailey - ("
+                                 "Skipper93653)\n\nSpecial Thanks:\nNintendo for creating the game.\nMembers of the "
+                                 "ZeldaMods Discord server for oead help.\nAll used Python module developers.\nAll "
+                                 "testers.")
+        with dpg.window(label="Finished!", modal=True, tag="popup", show=False):
+            dpg.add_text("Randomization complete!")
+            dpg.add_button(label="Close", callback=lambda: dpg.configure_item("popup", show=False))
 
-# Labels
-dirLabel = Label(root, text='Load directory')
-noticeLabel = Label(root, text='Bowser\'s Fury and the Wii U version of Super Mario 3D World are unsupported at this time.')
+    def directory(self, sender, app_data):
+        dpg.set_value("dirtext", app_data['file_path_name'])  # Update directory text box with selected directory
+        if os.path.isfile(app_data['file_path_name']+'\\SystemData\\StageList.szs'):
+            dpg.set_value("dirbutt", "Valid Input Directory Loaded!")
+            dpg.configure_item('dirtext', color=(0, 255, 0, 255))
+            dpg.configure_item('randoinit', enabled=True)
+            dpg.configure_item('randotip', label='Start the randomizer!')
+        else:
+            dpg.set_value("dirbutt", "Load Input Directory")
+            dpg.configure_item('dirtext', color=(255, 0, 0, 255))
+            dpg.configure_item('randoinit', enabled=False)
+            dpg.configure_item('randotip', label='To be able to start the randomizer, select a valid input directory.')
 
-# Place buttons
-cred.place(relx=0.35, rely=0.99, anchor=S)
-openDIR.place(relx=0.99, rely=0.17, anchor=E)
-run.place(relx=0.5, rely=0.99, anchor=S)
-quitB.place(relx=0.65, rely=0.99, anchor=S)
+    def rdirectory(self, sender, app_data):
+        dpg.set_value("rdirtext", app_data['file_path_name'])
 
-# Place check boxes
-spoilerCheck.place(relx=0.01, rely=0.44, anchor=W)
-musicCheck.place(relx=0.46, rely=0.44, anchor=CENTER)
-langCheck.place(relx=0.584, rely=0.44, anchor=W)
+    def show(self):
+        dpg.setup_dearpygui()
+        dpg.show_viewport()
+        dpg.set_primary_window("Main Window", True)  # Makes it so the UI fills the window
+        dpg.start_dearpygui()
+        dpg.destroy_context()
 
-# Place labels
-dirLabel.place(relx=0.01, rely=0.17, anchor=W)
-noticeLabel.place(relx=0.01, rely=0.64, anchor=W)
 
-root.resizable(False, False)
-root.mainloop()
+interface = GUI('Super Mario 3D World Randomizer', (800, 800))  # Initialise the main window
+interface.show()  # Show the main window
