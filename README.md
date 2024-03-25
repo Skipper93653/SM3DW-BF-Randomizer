@@ -9,23 +9,23 @@ Bowser's Fury and Wii U support are planned for a later time.
 
 ### Generating the randomized files
 
-Select a valid RomFS dump (the root of the RomFS directory - contains folders such as SoundData, StageData, etc.) of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize' button and wait for the pop-up window to tell you the process has finished, this should generate a folder called ```romfs-datetime``` (with 'datetime' being the date and time you initiated the randomizing process). All green star locks are removed except from the levels with star locks from Bowser-Castle onwards and all collectables and gold goal poles for World Crown.
+Select a valid RomFS dump (the root of the RomFS directory - contains folders such as SoundData, StageData, etc.) of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize' button and wait for the pop-up window to tell you the process has finished, this should generate a folder called ```SM3DWR-seed``` (with 'seed' being the seed used by the random number generator). All green star locks are removed except from the levels with star locks from Bowser-Castle onwards and all collectables and gold goal poles for World Crown.
 
 ### Playing with the newly generated files
 
 ### Console (UNSUPPORTED)
 
-If you have Atmosphere CFW - on the root of your SD card, create a folder within the ```atmosphere\contents``` (or ```atmosphere\titles``` on Atmosphere CFW versions 0.9.4 and below) folder named ```010028600EBDA000``` (The ID for Super Mario 3D World + Bowser's Fury) and copy your ```romfs-datetime``` folder into it and rename it to just 'romfs' then you're free to play!
+If you have Atmosphere CFW - on the root of your SD card, create a folder within the ```atmosphere\contents``` (or ```atmosphere\titles``` on Atmosphere CFW versions 0.9.4 and below) folder named ```010028600EBDA000``` (The ID for Super Mario 3D World + Bowser's Fury) and copy your ```romfs``` folder (from inside the generated ```SM3DWR-seed``` folder) into it and rename it to just 'romfs' then you're free to play!
 
 ### Emulators
 
-#### [yuzu](https://yuzu-emu.org)
+#### yuzu
 
-For usage with yuzu - open yuzu, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mod Data Location', this should open a new window within the mod folder. From there, create a new folder with a name of your choice and copy the newly generated ```romfs-datetime``` into your newly created mod folder and rename it to just 'romfs'. To check whether it is enabled in yuzu, right click 'Super Mario 3D World + Bowser's Fury' and click 'Properties'. Go to the 'Add-Ons' tab and tick your mod folder if it isn't already. Disable other mods that may cause confliction with the randomizer and then you're free to play!
+For usage with yuzu - open yuzu, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mod Data Location', this should open a new window within the mod folder. From there, copy the newly generated ```SM3DWR-seed``` folder into said mod folder. To check whether it is enabled in yuzu, right click 'Super Mario 3D World + Bowser's Fury' and click 'Properties'. Go to the 'Add-Ons' tab and tick your mod folder if it isn't already. Disable other mods that may cause confliction with the randomizer, then you're free to play!
 
 #### [Ryujinx](https://ryujinx.org) (UNSUPPORTED)
 
-For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, create a new folder with a name of your choice and copy the newly generated ```romfs-datetime``` into your newly created mod folder and rename it to just 'romfs' then you're free to play!
+For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated ```SM3DWR-seed``` folder into said mod folder, then you're free to play!
 
 ## Known Issues
 
@@ -41,7 +41,6 @@ For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowse
 * Ryujinx support
 * A different music randomizer method
 * Bowser's Fury island randomizer
-* Seed input
 * Wii U support
 * Character statistics randomizer
 * Progress bar

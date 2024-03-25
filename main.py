@@ -10,6 +10,7 @@ from oead import *  # For common Nintendo EAD/EPD file formats
 # Level randomizer
 def randomizer():
     dpg.configure_item("randoinit", enabled=False, label="Randomizing...")
+    dpg.configure_item("progress", default_value=0)
     user_data = [dpg.get_value('dirtext'), dpg.get_value('rdirtext')]
 
     # Setting up the random number generation with a seed
@@ -34,7 +35,7 @@ def randomizer():
     doc = byml.to_text(byml.from_binary(archive.get_file("StageList.byml").data))  # Load BYML file
     StageListNew = doc.split('\n')
     StageListNew.pop()
-    StageListOld = StageListNew
+    StageListOld = StageListNew.copy()
 
     if os.path.isfile(user_data[0]+'\\StageData\\CourseSelectW1ZoneMap1.szs'):  # Only the Wii U version contains a
         # separate Map and Design file in StageData, Switch version has them merged.
@@ -262,6 +263,8 @@ def randomizer():
 
     worldNo = 1
     currentGreenStars = 0
+    currentGreenStarsOld = 0
+    GreenStarLockHistory = []
     w1_history = []
     w2_history = []
     w3_history = []
@@ -275,9 +278,19 @@ def randomizer():
     # 154 different stages in total. The next two code blocks are making several checks to make sure nothing gets
     # broken in the actual stage shuffling process
     stageID_order = []
-    for i in range(1, 155):
-        if i != 34 or i != 62 or i != 63 or i != 64 or i != 65 or i != 66 or i != 81 or i != 97 or i != 115:
-            stageID_order.append(i)
+    for i in range(1, 34):
+        stageID_order.append(i)
+    for i in range(35, 62):
+        stageID_order.append(i)
+    for i in range(67, 81):
+        stageID_order.append(i)
+    for i in range(82, 97):
+        stageID_order.append(i)
+    for i in range(98, 115):
+        stageID_order.append(i)
+    for i in range(116, 155):
+        stageID_order.append(i)
+    print(stageID_order)
     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
     ready = False
 
@@ -303,25 +316,24 @@ def randomizer():
     for stageNo in stageID_order:
         if stageNo == 12 or stageNo == 23 or stageNo == 38 or stageNo == 50 or stageNo == 70 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
             worldNo += 1
-        stageID = rstageID_order[stageNo - 1]
+        stageID = rstageID_order[stageID_order.index(stageNo)]
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 1] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 1]  # DoubleMarioNum
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 2] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 2]  # GhostBaseTime
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 3] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 3]  # GhostId
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 5]  # GreenStarNum
-        currentGreenStars += int(StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5][-3:])
+        currentGreenStars += int(StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
+        currentGreenStarsOld += int(StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
         if dpg.get_value("star"):
-            # New feature implementation: option to keep Green Star Locks but change them depending on random level placements
+            GreenStarLock = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4]
+            GreenStarLockValue = int(currentGreenStars * int(GreenStarLock[GreenStarLock.index(':') + 2:]) / currentGreenStarsOld)
+            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = GreenStarLock[:GreenStarLock.index(':') + 2] + str(GreenStarLockValue)
             print('Changing Green Star Lock!')
-            pass
+            if GreenStarLockValue != 0:
+                GreenStarLockHistory.append([stageNo, GreenStarLockValue])
         else:
             # Remove all Green Star Locks when encountered
-            if stageNo == 114:
-                print('Reached Bowser-Castle stage slot! Placing Green Star Lock!')
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 4]
-            else:
-                print('Removing Green Star Lock...')
-                # GreenStarLock - gets rid of all star locks by setting it to 0.
-                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
+            print('Removing Green Star Lock...')
+            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 6] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 6]  # IllustItemNum
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 8]  # StageName
 
@@ -430,7 +442,7 @@ def randomizer():
         elif 'GateKeeperBoss' in StageName or 'GateKeeperTentack' in StageName:
             StageName = 'MiniatureEventGateKeeper'
         elif 'GateKeeper' in StageName:
-            StageName = 'Miniature'+StageName[StageName.index(':')+2:-9]+''
+            StageName = 'Miniature'+StageName[StageName.index(':')+2:-8]+''
         elif 'KinopioHouse' in StageName:
             StageName = 'MiniatureKinopioHouse'
         elif 'FairyHouse' in StageName:
@@ -445,7 +457,7 @@ def randomizer():
             if 'BossParade' in StageName:
                 StageName = 'MiniatureArrangeBossParade'
             else:
-                StageName = 'Miniature'+StageName[StageName.index(':')+9:-6]
+                StageName = 'Miniature'+StageName[StageName.index(':')+9:-5]
         elif 'Boss' in StageName or 'KillerTank' in StageName or 'BombTank' in StageName or 'KillerExpress' in StageName or 'KoopaChase' in StageName or 'KoopaLast' in StageName:
             if 'KoopaLast' in StageName:
                 StageName = 'MiniatureKoopaCastleW8'
@@ -456,7 +468,7 @@ def randomizer():
         elif 'DashRidge' in StageName:
             StageName = 'MiniatureDashRidgeStage'
         else:
-            StageName = 'Miniature'+StageName[StageName.index(':')+2:-6]
+            StageName = 'Miniature'+StageName[StageName.index(':')+2:-5]
 
         # These 'old' StageNames are for checking the index of the original file so StageName can replace it.
         # Old
@@ -465,7 +477,7 @@ def randomizer():
         elif 'GateKeeperBoss' in StageNameOld or 'GateKeeperTentack' in StageNameOld:
             StageNameOld = 'MiniatureEventGateKeeper'
         elif 'GateKeeper' in StageNameOld:
-            StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+2:-9]
+            StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+2:-8]
         elif 'KinopioHouse' in StageNameOld:
             StageNameOld = 'MiniatureKinopioHouse'
         elif 'FairyHouse' in StageNameOld:
@@ -480,7 +492,7 @@ def randomizer():
             if 'BossParade' in StageNameOld:
                 StageNameOld = 'MiniatureArrangeBossParade'
             else:
-                StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+9:-6]
+                StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+9:-5]
         elif 'Boss' in StageNameOld or 'KillerTank' in StageNameOld or 'BombTank' in StageNameOld or 'KillerExpress' in StageNameOld or 'KoopaChase' in StageNameOld or 'KoopaLast' in StageNameOld:
             if 'KoopaLast' in StageNameOld:
                 StageNameOld = 'MiniatureKoopaCastleW8'
@@ -490,7 +502,7 @@ def randomizer():
         elif 'DashRidge' in StageNameOld:
             StageNameOld = 'MiniatureDashRidgeStage'
         else:
-            StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+2:-6]
+            StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+2:-5]
 
         # Enumerating the YML to replace world map models to show the randomized stage.
         if worldNo == 1:
@@ -576,6 +588,7 @@ def randomizer():
                     else:
                         print('Duplicate Miniature Model. Not overwriting...')
 
+    print('Total Green Star Count: ' + str(currentGreenStars))
     print('Randomized stages!')
     dpg.configure_item("progress", default_value=0.5)
 
@@ -889,7 +902,7 @@ def randomizer():
     langRandomizer(rng, seedRNG, user_data)
 
     if dpg.get_value("spoil"):
-        spoilerFile(StageListNew, seedRNG, user_data)
+        spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), user_data)
     else:
         print('Not generating spoiler file, only generating seed text file.')
         with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'.txt', 'w', encoding='utf-8') as s:
@@ -974,12 +987,12 @@ def langRandomizer(rng, seedRNG, user_data):
 
 
 # Spoiler file generation
-def spoilerFile(StageListNew, seedRNG, user_data):
+def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, user_data):
     print('Generating spoiler file...')
     levelIndex = 1
     worldIndex = 1
     overallIndex = 1
-    stageID_Name = ['Seed: '+str(seedRNG)+'\n\nLevel Slot, Level Name (Original Level Slot)\n\nWorld ' + str(worldIndex)]
+    stageID_Name = ['Seed: '+str(seedRNG)+'\n\nLevel Slot, Level Name (Original Level Slot)\n\nWorld ' + str(worldIndex) + '\n']
 
     # Appending the name of each stage to stageID_name.
     while overallIndex <= 154:
@@ -1120,7 +1133,7 @@ def spoilerFile(StageListNew, seedRNG, user_data):
         elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv3Stage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #3 (6-B)\n')
         elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Motley Bossblob\' Big Battle (6-C)\n')
+            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Motley Bossblob\'s Big Battle (6-C)\n')
         # World Castle
         elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FireBrosFortressStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fort Fire Bros. (Castle-1)\n')
@@ -1241,6 +1254,14 @@ def spoilerFile(StageListNew, seedRNG, user_data):
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad\'s Fiery Finale (Crown-Captain Toad)\n')
         elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseMaxStage':
             stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Marathon (Crown-Mystery House)\n')
+
+        # Denoting Green Star Lock requirements
+        if dpg.get_value("star"):
+            try:
+                stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires '+str(GreenStarLockHistory[overallIndex])+' Green Stars)\n'
+            except KeyError:
+                pass
+
         # Increment to next world.
         if worldIndex == 1 and levelIndex == 11:
             worldIndex = 2
@@ -1351,17 +1372,16 @@ class GUI:
                     with dpg.tooltip('randoinit'):
                         dpg.add_text('To be able to start the randomizer, select a valid input directory.', tag='randotip')
                 with dpg.tab(tag="t2", label="Misc. Settings"):  # Settings tab
-                    self.spoil = dpg.add_checkbox(tag="spoil", label="Generate spoiler file?")
+                    self.spoil = dpg.add_checkbox(tag="spoil", label="Generate spoiler file?", default_value=True)
                     self.star = dpg.add_checkbox(tag="star", label="Enable Green Star lock logic?", default_value=True)
                     self.music = dpg.add_checkbox(tag="music", label="Randomize music?")
                     self.lang = dpg.add_checkbox(tag="lang", label="Randomize language?")
                     with dpg.tooltip('spoil'):
-                        dpg.add_text('Generate a text file which contains the full list of levels and what they have'
+                        dpg.add_text('Generate a text file which contains the full list of levels and what they have '
                                      'been randomized to.')
                     with dpg.tooltip('star'):
-                        dpg.add_text('Instead of removing all but The Great Tower of Bowser Land\'s Green Star lock, '
-                                     'the randomizer\nwill calculate new Green Star requirements for each lock based on'
-                                     ' what was generated beforehand.')
+                        dpg.add_text('Instead of removing all Green Star locks, the randomizer will calculate new Green Star '
+                                     'requirements\nfor each lock based on what was generated beforehand.')
                     with dpg.tooltip('music'):
                         dpg.add_text('Randomize the filenames for the music files.')
                     with dpg.tooltip('lang'):
