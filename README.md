@@ -39,11 +39,9 @@ For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowse
 
 * Console support
 * Ryujinx support
-* A different music randomizer method
 * Bowser's Fury island randomizer
 * Wii U support
 * Character statistics randomizer
-* Progress bar
 
 ## Building
 

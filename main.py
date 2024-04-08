@@ -9,6 +9,7 @@ from oead import *  # For common Nintendo EAD/EPD file formats
 
 # Level randomizer
 def randomizer():
+    bar = 0  # Progress bar progress
     dpg.configure_item("randoinit", enabled=False, label="Randomizing...")
     dpg.configure_item("progress", default_value=0)
     user_data = [dpg.get_value('dirtext'), dpg.get_value('rdirtext')]
@@ -36,6 +37,8 @@ def randomizer():
     StageListNew = doc.split('\n')
     StageListNew.pop()
     StageListOld = StageListNew.copy()
+    bar += 1
+    dpg.configure_item("progress", default_value=bar/172)
 
     if os.path.isfile(user_data[0]+'\\StageData\\CourseSelectW1ZoneMap1.szs'):  # Only the Wii U version contains a
         # separate Map and Design file in StageData, Switch version has them merged.
@@ -52,6 +55,8 @@ def randomizer():
         srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\content\\StageData\\')
     os.makedirs(rPath)
     os.makedirs(srPath)
+    bar += 1
+    dpg.configure_item("progress", default_value=bar/172)
 
     # Open each world map file and convert the map BYML into a readable format.
     if not wiiu:
@@ -70,7 +75,9 @@ def randomizer():
         w1archive11 = w1archive.get_file('DofParam_obj8.bagldof').data
         CourseSelectW1ZoneMapn = w1archive6.split('\n')
         CourseSelectW1ZoneMapn.pop()
-        CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn
+        CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW2Zone.szs', 'rb') as f:
             w2archive = Sarc(yaz0.decompress(f.read()))
@@ -87,7 +94,9 @@ def randomizer():
         w2archive11 = w2archive.get_file('DofParam_obj8.bagldof').data
         CourseSelectW2ZoneMapn = w2archive2.split('\n')
         CourseSelectW2ZoneMapn.pop()
-        CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn
+        CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW3Zone.szs', 'rb') as f:
             w3archive = Sarc(yaz0.decompress(f.read()))
@@ -99,7 +108,9 @@ def randomizer():
         w3archive6 = w3archive.get_file('DofParam_obj28.bagldof').data
         CourseSelectW3ZoneMapn = w3archive2.split('\n')
         CourseSelectW3ZoneMapn.pop()
-        CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn
+        CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW4Zone.szs', 'rb') as f:
             w4archive = Sarc(yaz0.decompress(f.read()))
@@ -112,7 +123,9 @@ def randomizer():
         w4archive7 = w4archive.get_file('CourseSelectW4ZoneDesign.byml').data
         CourseSelectW4ZoneMapn = w4archive2.split('\n')
         CourseSelectW4ZoneMapn.pop()
-        CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn
+        CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW5Zone.szs', 'rb') as f:
             w5archive = Sarc(yaz0.decompress(f.read()))
@@ -126,7 +139,9 @@ def randomizer():
         w5archive8 = w5archive.get_file('CourseSelectW5ZoneSound.byml').data
         CourseSelectW5ZoneMapn = w5archive6.split('\n')
         CourseSelectW5ZoneMapn.pop()
-        CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn
+        CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW6Zone.szs', 'rb') as f:
             w6archive = Sarc(yaz0.decompress(f.read()))
@@ -149,7 +164,9 @@ def randomizer():
         w6archive17 = w6archive.get_file('DofParam_obj8.bagldof').data
         CourseSelectW6ZoneMapn = w6archive7.split('\n')
         CourseSelectW6ZoneMapn.pop()
-        CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn
+        CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW7Zone.szs', 'rb') as f:
             w7archive = Sarc(yaz0.decompress(f.read()))
@@ -162,7 +179,9 @@ def randomizer():
         w7archive7 = w7archive.get_file('CourseSelectW7ZoneSound.byml').data
         CourseSelectW7ZoneMapn = w7archive6.split('\n')
         CourseSelectW7ZoneMapn.pop()
-        CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn
+        CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW8Zone.szs', 'rb') as f:
             w8archive = Sarc(yaz0.decompress(f.read()))
@@ -177,7 +196,9 @@ def randomizer():
         w8archive9 = w8archive.get_file('DofParam_obj133.bagldof').data
         CourseSelectW8ZoneMapn = w8archive4.split('\n')
         CourseSelectW8ZoneMapn.pop()
-        CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn
+        CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectS1Zone.szs', 'rb') as f:
             s1archive = Sarc(yaz0.decompress(f.read()))
@@ -186,7 +207,9 @@ def randomizer():
         s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
         CourseSelectS1ZoneMapn = s1archive3.split('\n')
         CourseSelectS1ZoneMapn.pop()
-        CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn
+        CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
     else:
         with open(sPath + 'CourseSelectW1ZoneMap1.szs', 'rb') as f:
             w1archive = Sarc(yaz0.decompress(f.read()))
@@ -194,7 +217,9 @@ def randomizer():
         w1archive8 = w1archive.get_file('CameraParam.byml').data
         CourseSelectW1ZoneMapn = w1archive6.split('\n')
         CourseSelectW1ZoneMapn.pop()
-        CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn
+        CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW2ZoneMap1.szs', 'rb') as f:
             w2archive = Sarc(yaz0.decompress(f.read()))
@@ -202,7 +227,9 @@ def randomizer():
         w2archive7 = w2archive.get_file('CameraParam.byml').data
         CourseSelectW2ZoneMapn = w2archive2.split('\n')
         CourseSelectW2ZoneMapn.pop()
-        CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn
+        CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW3ZoneMap1.szs', 'rb') as f:
             w3archive = Sarc(yaz0.decompress(f.read()))
@@ -210,7 +237,9 @@ def randomizer():
         w3archive3 = w3archive.get_file('CameraParam.byml').data
         CourseSelectW3ZoneMapn = w3archive2.split('\n')
         CourseSelectW3ZoneMapn.pop()
-        CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn
+        CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW4ZoneMap1.szs', 'rb') as f:
             w4archive = Sarc(yaz0.decompress(f.read()))
@@ -218,7 +247,9 @@ def randomizer():
         w4archive6 = w4archive.get_file('CameraParam.byml').data
         CourseSelectW4ZoneMapn = w4archive2.split('\n')
         CourseSelectW4ZoneMapn.pop()
-        CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn
+        CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW5ZoneMap1.szs', 'rb') as f:
             w5archive = Sarc(yaz0.decompress(f.read()))
@@ -226,7 +257,9 @@ def randomizer():
         w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
         CourseSelectW5ZoneMapn = w5archive6.split('\n')
         CourseSelectW5ZoneMapn.pop()
-        CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn
+        CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW6ZoneMap1.szs', 'rb') as f:
             w6archive = Sarc(yaz0.decompress(f.read()))
@@ -234,7 +267,9 @@ def randomizer():
         w6archive14 = w6archive.get_file('CameraParam.byml').data
         CourseSelectW6ZoneMapn = w6archive7.split('\n')
         CourseSelectW6ZoneMapn.pop()
-        CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn
+        CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW7ZoneMap1.szs', 'rb') as f:
             w7archive = Sarc(yaz0.decompress(f.read()))
@@ -242,7 +277,9 @@ def randomizer():
         w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
         CourseSelectW7ZoneMapn = w7archive6.split('\n')
         CourseSelectW7ZoneMapn.pop()
-        CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn
+        CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectW8ZoneMap1.szs', 'rb') as f:
             w8archive = Sarc(yaz0.decompress(f.read()))
@@ -250,7 +287,9 @@ def randomizer():
         w8archive8 = w8archive.get_file('CameraParam.byml').data
         CourseSelectW8ZoneMapn = w8archive4.split('\n')
         CourseSelectW8ZoneMapn.pop()
-        CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn
+        CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         with open(sPath + 'CourseSelectS1ZoneMap1.szs', 'rb') as f:
             s1archive = Sarc(yaz0.decompress(f.read()))
@@ -259,8 +298,11 @@ def randomizer():
         s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
         CourseSelectS1ZoneMapn = s1archive3.split('\n')
         CourseSelectS1ZoneMapn.pop()
-        CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn
+        CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
+    # Creating base variables to be used and iterated on in the randomizer loop
     worldNo = 1
     currentGreenStars = 0
     currentGreenStarsOld = 0
@@ -293,6 +335,8 @@ def randomizer():
     print(stageID_order)
     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
     ready = False
+    bar += 1
+    dpg.configure_item("progress", default_value=bar/172)
 
     # This loop happens when stageID generates a special level when stageNo is currently a castle stage and forces
     # stageID to randomize again until it's not a special level (basically until it gives you a stage where it's
@@ -310,6 +354,8 @@ def randomizer():
                         or j == 129 or j == 130 or j == 152 or j == 153) and (stageID_order.index(i) == np.where(rstageID_order == j)[0]):
                     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
                     ready = False
+    bar += 1
+    dpg.configure_item("progress", default_value=bar/172)
 
     print('Random stage order:', rstageID_order)
 
@@ -321,9 +367,9 @@ def randomizer():
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 2] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 2]  # GhostBaseTime
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 3] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 3]  # GhostId
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 5]  # GreenStarNum
-        currentGreenStars += int(StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
         currentGreenStarsOld += int(StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
         if dpg.get_value("star"):
+            # Calculate a new green star lock based on the vanilla lock value and multiply it by the ratio of the new star count to the old star count up to that point
             GreenStarLock = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4]
             GreenStarLockValue = int(currentGreenStars * int(GreenStarLock[GreenStarLock.index(':') + 2:]) / currentGreenStarsOld)
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = GreenStarLock[:GreenStarLock.index(':') + 2] + str(GreenStarLockValue)
@@ -334,6 +380,7 @@ def randomizer():
             # Remove all Green Star Locks when encountered
             print('Removing Green Star Lock...')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
+        currentGreenStars += int(StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 6] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 6]  # IllustItemNum
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 8]  # StageName
 
@@ -362,7 +409,7 @@ def randomizer():
                     StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �d���̉�'
             elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 # If a Roulette with Golden Express StageType is on the first level of a world or World 3's and 6's Boss Blockades, it causes a softlock. We avoid this by using the Toad House StageType.
-                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
+                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 84 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
                     print('Roulette StageType fixed with Toad House StageType!')
                     if not wiiu:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
@@ -383,7 +430,7 @@ def randomizer():
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �S�[���f���G�N�X�v���X'
             elif 'GoldenExpressStage' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
-                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
+                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 84 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
                     print('Golden Express StageType fixed with Toad House!')
                     if not wiiu:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
@@ -587,10 +634,11 @@ def randomizer():
                             print('Incorrect Special World.')
                     else:
                         print('Duplicate Miniature Model. Not overwriting...')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
     print('Total Green Star Count: ' + str(currentGreenStars))
     print('Randomized stages!')
-    dpg.configure_item("progress", default_value=0.5)
 
     doc = '\n'.join(StageListNew)
     # Creating new SZS filers with the modified files.
@@ -604,6 +652,8 @@ def randomizer():
             print('Writing StageList.szs.')
             randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
             print('Written StageList.szs.')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         print('Writing world files:')
 
@@ -627,6 +677,8 @@ def randomizer():
             print('Writing CourseSelectW1Zone.szs')
             w1.write(yaz0.compress(w1data[1]))
             print('Written CourseSelectW1Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
         w2writer = SarcWriter()
@@ -648,6 +700,8 @@ def randomizer():
             print('Writing CourseSelectW2Zone.szs')
             w2.write(yaz0.compress(w2data[1]))
             print('Written CourseSelectW2Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
         w3writer = SarcWriter()
@@ -664,6 +718,8 @@ def randomizer():
             print('Writing CourseSelectW3Zone.szs')
             w3.write(yaz0.compress(w3data[1]))
             print('Written CourseSelectW3Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
         w4writer = SarcWriter()
@@ -681,6 +737,8 @@ def randomizer():
             print('Writing CourseSelectW4Zone.szs')
             w4.write(yaz0.compress(w4data[1]))
             print('Written CourseSelectW4Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
         w5writer = SarcWriter()
@@ -699,6 +757,8 @@ def randomizer():
             print('Writing CourseSelectW5Zone.szs')
             w5.write(yaz0.compress(w5data[1]))
             print('Written CourseSelectW5Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
         w6writer = SarcWriter()
@@ -726,6 +786,8 @@ def randomizer():
             print('Writing CourseSelectW6Zone.szs')
             w6.write(yaz0.compress(w6data[1]))
             print('Written CourseSelectW6Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
         w7writer = SarcWriter()
@@ -743,6 +805,8 @@ def randomizer():
             print('Writing CourseSelectW7Zone.szs')
             w7.write(yaz0.compress(w7data[1]))
             print('Written CourseSelectW7Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
         w8writer = SarcWriter()
@@ -762,6 +826,8 @@ def randomizer():
             print('Writing CourseSelectW8Zone.szs')
             w8.write(yaz0.compress(w8data[1]))
             print('Written CourseSelectW8Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
         s1writer = SarcWriter()
@@ -775,6 +841,8 @@ def randomizer():
             print('Writing CourseSelectS1Zone.szs')
             s1.write(yaz0.compress(s1data[1]))
             print('Written CourseSelectS1Zone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
     else:
         writer = SarcWriter()
         writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), True, 1)
@@ -784,6 +852,8 @@ def randomizer():
             print('Writing StageList.szs.')
             randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
             print('Written StageList.szs.')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         print('Writing world files:')
 
@@ -798,6 +868,8 @@ def randomizer():
             print('Writing CourseSelectW1ZoneMap1.szs')
             w1.write(yaz0.compress(w1data[1]))
             print('Written CourseSelectW1ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
         w2writer = SarcWriter()
@@ -810,6 +882,8 @@ def randomizer():
             print('Writing CourseSelectW2ZoneMap1.szs')
             w2.write(yaz0.compress(w2data[1]))
             print('Written CourseSelectW2ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
         w3writer = SarcWriter()
@@ -822,6 +896,8 @@ def randomizer():
             print('Writing CourseSelectW3ZoneMap1.szs')
             w3.write(yaz0.compress(w3data[1]))
             print('Written CourseSelectW3ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
         w4writer = SarcWriter()
@@ -834,6 +910,8 @@ def randomizer():
             print('Writing CourseSelectW4ZoneMap1.szs')
             w4.write(yaz0.compress(w4data[1]))
             print('Written CourseSelectW4ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
         w5writer = SarcWriter()
@@ -846,6 +924,8 @@ def randomizer():
             print('Writing CourseSelectW5ZoneMap1.szs')
             w5.write(yaz0.compress(w5data[1]))
             print('Written CourseSelectW5ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
         w6writer = SarcWriter()
@@ -858,6 +938,8 @@ def randomizer():
             print('Writing CourseSelectW6ZoneMap1.szs')
             w6.write(yaz0.compress(w6data[1]))
             print('Written CourseSelectW6ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
         w7writer = SarcWriter()
@@ -870,6 +952,8 @@ def randomizer():
             print('Writing CourseSelectW7ZoneMap1.szs')
             w7.write(yaz0.compress(w7data[1]))
             print('Written CourseSelectW7ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
         w8writer = SarcWriter()
@@ -882,6 +966,8 @@ def randomizer():
             print('Writing CourseSelectW8ZoneMap1.szs')
             w8.write(yaz0.compress(w8data[1]))
             print('Written CourseSelectW8ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
         s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
         s1writer = SarcWriter()
@@ -895,11 +981,17 @@ def randomizer():
             print('Writing CourseSelectS1ZoneMap1.szs')
             s1.write(yaz0.compress(s1data[1]))
             print('Written CourseSelectS1ZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar/172)
 
     print('Finished writing world files.')
 
     musicRandomizer(rng, seedRNG, user_data)
+    bar += 1
+    dpg.configure_item("progress", default_value=bar/172)
     langRandomizer(rng, seedRNG, user_data)
+    bar += 1
+    dpg.configure_item("progress", default_value=bar/172)
 
     if dpg.get_value("spoil"):
         spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), user_data)
@@ -907,12 +999,16 @@ def randomizer():
         print('Not generating spoiler file, only generating seed text file.')
         with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'.txt', 'w', encoding='utf-8') as s:
             s.write('Seed: '+str(seedRNG))  # Creating a new spoiler text file.
+    bar += 1
+    dpg.configure_item("progress", default_value=bar/172)
 
     if wiiu:
         with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\rules.txt', 'w', encoding='utf-8') as rules:
             rules.write('[Definition]\ntitleIds = 0005000010145D00,0005000010145C00,0005000010106100\nname = SM3DWR-'
                         +str(seedRNG)+'\npath = \"Super Mario 3D World/Mods/SM3DWR-'+str(seedRNG)+'\"\ndescription = '
                         'Super Mario 3D World Randomizer\nversion = 3\nfsPriority = 100')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar/172)
 
     dpg.configure_item("progress", default_value=1)
     dpg.configure_item("randoinit", enabled=True, label="Randomize!")
@@ -1353,9 +1449,9 @@ class GUI:
                     with dpg.tooltip("dirbutt"):
                         dpg.add_text("The directory selected must be the root directory of an unmodified dump of the "
                                      "game:\n"
-                                     "\"0005000010106100\\content\\\" - Super Mario 3D World (JPN)\n"
-                                     "\"0005000010145C00\\content\\\" - Super Mario 3D World (USA)\n"
-                                     "\"0005000010145D00\\content\\\" - Super Mario 3D World (EUR)\n"
+                                     "\"00050000(\\)10106100\\content\\\" - Super Mario 3D World (JPN)\n"
+                                     "\"00050000(\\)10145C00\\content\\\" - Super Mario 3D World (USA)\n"
+                                     "\"00050000(\\)10145D00\\content\\\" - Super Mario 3D World (EUR)\n"
                                      "\"010028600EBDA000\\romfs\\\" - Super Mario 3D World + Bowser's Fury")
                     with dpg.tooltip("rdirbutt"):
                         dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
