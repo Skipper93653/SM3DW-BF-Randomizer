@@ -1,3 +1,9 @@
 /venv/
 /SM3DWR-*/
+/main.*/
 /change.log
+/test.py
+/w8.txt
+/settings.json
+/*.byml
+/*.yml

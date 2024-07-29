@@ -1,10 +1,11 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 import os  # For OS files
 import shutil  # For OS files
 import time  # For time calculations
 import dearpygui.dearpygui as dpg  # User interface
 import numpy as np  # Random number generation
 from oead import *  # For common Nintendo EAD/EPD file formats
+import json
 
 
 # Level randomizer
@@ -12,6 +13,8 @@ def randomizer():
     bar = 0  # Progress bar progress
     dpg.configure_item("randoinit", enabled=False, label="Randomizing...")
     dpg.configure_item("progress", default_value=0)
+    dpg.hide_item('t2')
+    dpg.hide_item('t3')
     user_data = [dpg.get_value('dirtext'), dpg.get_value('rdirtext')]
 
     # Setting up the random number generation with a seed
@@ -29,22 +32,24 @@ def randomizer():
     # SystemData Path
     oPath = os.path.join(user_data[0], 'SystemData\\')  # Original game path
 
-    # Open StageList.szs and grab the BYML, convert to YML, open it as a list.
-    with open(oPath+"StageList.szs", "rb") as f:
-        archive = Sarc(yaz0.decompress(f.read()))  # Decompress and load SARC
-    endianness = archive.get_endianness()
-    doc = byml.to_text(byml.from_binary(archive.get_file("StageList.byml").data))  # Load BYML file
-    StageListNew = doc.split('\n')
-    StageListNew.pop()
-    StageListOld = StageListNew.copy()
-    bar += 1
-    dpg.configure_item("progress", default_value=bar/172)
-
     if os.path.isfile(user_data[0]+'\\StageData\\CourseSelectW1ZoneMap1.szs'):  # Only the Wii U version contains a
         # separate Map and Design file in StageData, Switch version has them merged.
         wiiu = True  # This variable is used to determine whether the files are from the Wii U version or not
     else:
         wiiu = False
+
+    # Open StageList.szs and grab the BYML, convert to YML, open it as a list.
+    with open(oPath + "StageList.szs", "rb") as f:
+        archive = Sarc(yaz0.decompress(f.read()))  # Decompress and load SARC
+    endianness = archive.get_endianness()
+    raw = archive.get_file("StageList.byml").data
+    raw_binary = byml.from_binary(raw)
+    doc = byml.to_text(raw_binary)  # Load BYML file (Wii U file breaks here)
+    StageListNew = doc.split('\n')
+    StageListNew.pop()
+    StageListOld = StageListNew.copy()
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 172)
 
     sPath = os.path.join(user_data[0], 'StageData\\')
     if not wiiu:
@@ -210,6 +215,18 @@ def randomizer():
         CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
+
+        with open(sPath + 'KoopaLastBZone.szs', 'rb') as f:
+            KoopaLastBZone = Sarc(yaz0.decompress(f.read()))
+        KoopaLastBZone1 = KoopaLastBZone.get_file('DofParam_obj0.bagldof').data
+        KoopaLastBZone2 = byml.to_text(byml.from_binary(KoopaLastBZone.get_file('KoopaLastBZoneMap.byml').data))
+        KoopaLastBZone3 = KoopaLastBZone.get_file('DofParam_obj1.bagldof').data
+        KoopaLastBZone4 = KoopaLastBZone.get_file('KoopaLastBZoneDesign.byml').data
+        KoopaLastBZone5 = KoopaLastBZone.get_file('KoopaLastBZoneSound.byml').data
+        KoopaLastBZone6 = KoopaLastBZone.get_file('CubeMapMgr.baglcube').data
+        KoopaLastBZone7 = KoopaLastBZone.get_file('CameraParam.byml').data
+        KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
+        KoopaLastBZoneMap.pop()
     else:
         with open(sPath + 'CourseSelectW1ZoneMap1.szs', 'rb') as f:
             w1archive = Sarc(yaz0.decompress(f.read()))
@@ -302,20 +319,19 @@ def randomizer():
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        with open(sPath + 'KoopaLastBZone.szs', 'rb') as f:
+            KoopaLastBZone = Sarc(yaz0.decompress(f.read()))
+        KoopaLastBZone2 = byml.to_text(byml.from_binary(KoopaLastBZone.get_file('KoopaLastBZoneMap.byml').data))
+        KoopaLastBZone7 = KoopaLastBZone.get_file('CameraParam.byml').data
+        KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
+        KoopaLastBZoneMap.pop()
+
     # Creating base variables to be used and iterated on in the randomizer loop
     worldNo = 1
     currentGreenStars = 0
     currentGreenStarsOld = 0
     GreenStarLockHistory = []
-    w1_history = []
-    w2_history = []
-    w3_history = []
-    w4_history = []
-    w5_history = []
-    w6_history = []
-    w7_history = []
-    w8_history = []
-    s1_history = []
+    GreenStarLockHistory2 = []  # Only used when the user has selected 'Fully random' for the green star lock setting
 
     # 154 different stages in total. The next two code blocks are making several checks to make sure nothing gets
     # broken in the actual stage shuffling process
@@ -366,23 +382,35 @@ def randomizer():
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 1] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 1]  # DoubleMarioNum
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 2] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 2]  # GhostBaseTime
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 3] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 3]  # GhostId
+        GreenStarLock = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4]  # GreenStarLock line
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 5]  # GreenStarNum
-        currentGreenStarsOld += int(StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
-        if dpg.get_value("star"):
-            # Calculate a new green star lock based on the vanilla lock value and multiply it by the ratio of the new star count to the old star count up to that point
-            GreenStarLock = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4]
-            GreenStarLockValue = int(currentGreenStars * int(GreenStarLock[GreenStarLock.index(':') + 2:]) / currentGreenStarsOld)
-            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = GreenStarLock[:GreenStarLock.index(':') + 2] + str(GreenStarLockValue)
-            print('Changing Green Star Lock!')
-            if GreenStarLockValue != 0:
-                GreenStarLockHistory.append([stageNo, GreenStarLockValue])
-        else:
-            # Remove all Green Star Locks when encountered
-            print('Removing Green Star Lock...')
-            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
-        currentGreenStars += int(StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 6] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 6]  # IllustItemNum
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 8]  # StageName
+        currentGreenStarsOld += int(StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
+        GreenStarLockHistory2.append([rng.choice([True, False], size=1, p=[float(dpg.get_value('pslider')), float(1 - dpg.get_value('pslider'))], replace=True), int(currentGreenStars * 0.6060809576)])  # 0.6060809576 is average
+        if stageNo == 114:
+            GreenStarLockHistory2[-1][0] = True  # Force Bowser-Castle to have a star lock when setting is on 'Fully random'
+        if dpg.get_value("star") == 'Disabled' or 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100:
+            # Remove all Green Star Locks when encountered
+            print('Removing green star lock...')
+            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
+            GreenStarLockHistory2[-1][0] = False
+        elif dpg.get_value("star") == 'Random values':
+            # Calculate a new green star lock based on the vanilla lock value and multiply it by the ratio of the new star count to the old star count up to that point
+            GreenStarLockValue = int(currentGreenStars * int(GreenStarLock[GreenStarLock.index(':') + 2:]) / currentGreenStarsOld)
+            StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = GreenStarLock[:GreenStarLock.index(':') + 2] + str(GreenStarLockValue)
+            print('Changing green star lock value!')
+            if GreenStarLockValue != 0:
+                GreenStarLockHistory.append([stageNo, GreenStarLockValue])
+        elif dpg.get_value("star") == 'Fully random':
+            # Fully new star lock
+            if GreenStarLockHistory2[-1][0]:
+                print('Adding fully custom star lock...')
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = GreenStarLock[:GreenStarLock.index(':') + 2] + str(GreenStarLockHistory2[-1][1])
+            else:
+                print('Removing green star lock...')
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
+        currentGreenStars += int(StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
 
         if ('クッパ城' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] or '�N�b�p��' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10]) and stageNo != 113:
             print('Reached castle slot! Copying original StageType of this slot.')
@@ -408,40 +436,42 @@ def randomizer():
                 else:
                     StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �d���̉�'
             elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
-                # If a Roulette with Golden Express StageType is on the first level of a world or World 3's and 6's Boss Blockades, it causes a softlock. We avoid this by using the Toad House StageType.
-                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 84 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
-                    print('Roulette StageType fixed with Toad House StageType!')
-                    if not wiiu:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
-                    else:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
                 # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType.
-                elif stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130:
+                if stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130:
                     print('Roulette StageType fixed with Roulette StageType!')
                     if not wiiu:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: カジノ部屋'  # StageType for Roulettes.
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �J�W�m����'
-                # Any other slot gives a roulette the golden express StageType.
-                else:
+                # A lucky house where the golden express usually is gets it the golden express stage type.
+                elif stageNo == 57:
                     print('Roulette StageType fixed with Golden Express StageType!')
                     if not wiiu:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゴールデンエクスプレス'  # StageType for Roulettes (カジノ部屋) is not used because they don't appear on the world map immediately which can cause progression issues. So the golden express is used instead.
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �S�[���f���G�N�X�v���X'
-            elif 'GoldenExpressStage' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
-                if stageNo == 1 or stageNo == 12 or stageNo == 23 or stageNo == 37 or stageNo == 38 or stageNo == 50 or stageNo == 57 or stageNo == 70 or stageNo == 84 or stageNo == 85 or stageNo == 86 or stageNo == 102 or stageNo == 119 or stageNo == 131 or stageNo == 139 or stageNo == 151:
-                    print('Golden Express StageType fixed with Toad House!')
+                # To avoid a lucky house from being already active on the world map path, we use the Toad House StageType.
+                else:
+                    print('Roulette StageType fixed with Toad House StageType!')
                     if not wiiu:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
-                else:
+            elif 'GoldenExpressStage' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
+                # Forcing golden express StageType when in a slot originally belonging to a roulette or the golden express itself
+                if stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 57 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130:
                     print('Golden Express StageType fixed!')
                     if not wiiu:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゴールデンエクスプレス'  # StageType for golden express.
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �S�[���f���G�N�X�v���X'
+                # Forcing Toad Houses in other scenarios (see: lucky house reasoning)
+                else:
+                    print('Golden Express StageType fixed with Toad House!')
+                    if not wiiu:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
             elif 'MysteryHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Mystery House StageType fixed!')
                 if not wiiu:
@@ -479,7 +509,6 @@ def randomizer():
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 9] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 9]  # StageTimer
 
         StageName = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]
-        StageNameOld = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 8]
         StageID = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 7]
 
         # These are placed into the world map files for the model names.
@@ -489,7 +518,7 @@ def randomizer():
         elif 'GateKeeperBoss' in StageName or 'GateKeeperTentack' in StageName:
             StageName = 'MiniatureEventGateKeeper'
         elif 'GateKeeper' in StageName:
-            StageName = 'Miniature'+StageName[StageName.index(':')+2:-8]+''
+            StageName = 'Miniature'+StageName[StageName.index(':')+2:-8]
         elif 'KinopioHouse' in StageName:
             StageName = 'MiniatureKinopioHouse'
         elif 'FairyHouse' in StageName:
@@ -517,128 +546,87 @@ def randomizer():
         else:
             StageName = 'Miniature'+StageName[StageName.index(':')+2:-5]
 
-        # These 'old' StageNames are for checking the index of the original file so StageName can replace it.
-        # Old
-        if 'RouletteRoom' in StageNameOld:
-            StageNameOld = 'MiniatureBonusRoom'
-        elif 'GateKeeperBoss' in StageNameOld or 'GateKeeperTentack' in StageNameOld:
-            StageNameOld = 'MiniatureEventGateKeeper'
-        elif 'GateKeeper' in StageNameOld:
-            StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+2:-8]
-        elif 'KinopioHouse' in StageNameOld:
-            StageNameOld = 'MiniatureKinopioHouse'
-        elif 'FairyHouse' in StageNameOld:
-            StageNameOld = 'MiniatureFairyHouse'
-        elif 'MysteryHouse' in StageNameOld:
-            StageNameOld = 'MiniatureMysteryBox'
-        elif 'KinopioBrigade' in StageNameOld:
-            StageNameOld = 'MiniatureKinopioBrigade'
-        elif 'Teresa' in StageNameOld or 'WeavingShip' in StageNameOld or 'Haunted' in StageNameOld or 'Fog' in StageNameOld:
-            StageNameOld = 'MiniatureTeresaHouse'
-        elif 'Arrange' in StageNameOld:
-            if 'BossParade' in StageNameOld:
-                StageNameOld = 'MiniatureArrangeBossParade'
-            else:
-                StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+9:-5]
-        elif 'Boss' in StageNameOld or 'KillerTank' in StageNameOld or 'BombTank' in StageNameOld or 'KillerExpress' in StageNameOld or 'KoopaChase' in StageNameOld or 'KoopaLast' in StageNameOld:
-            if 'KoopaLast' in StageNameOld:
-                StageNameOld = 'MiniatureKoopaCastleW8'
-            elif 'KoopaChaseLv2' in StageNameOld:
-                StageNameOld = 'MiniatureKoopaCastleW7'
-            # Normal castle doesn't go here unlike for the normal StageName about because it causes a crash.
-        elif 'DashRidge' in StageNameOld:
-            StageNameOld = 'MiniatureDashRidgeStage'
-        else:
-            StageNameOld = 'Miniature'+StageNameOld[StageNameOld.index(':')+2:-5]
-
         # Enumerating the YML to replace world map models to show the randomized stage.
-        if worldNo == 1:
+        if worldNo == 1 and StageID[StageID.index(':') + 2:] != '70' and StageID[StageID.index(':') + 2:] != '35':
             for i, elem in enumerate(CourseSelectW1ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in w1_history:
-                        CourseSelectW1ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                        w1_history.append(i)
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
-        elif worldNo == 2:
+                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem and '35' not in elem:
+                    if 'ModelName: Miniature' in CourseSelectW1ZoneMapo[i - 4]:
+                        CourseSelectW1ZoneMapn[i - 4] = CourseSelectW1ZoneMapo[i - 4][:CourseSelectW1ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectW1ZoneMapo[i - 6]:
+                        CourseSelectW1ZoneMapn[i - 6] = CourseSelectW1ZoneMapo[i - 6][:CourseSelectW1ZoneMapo[i - 6].index(':') + 2] + StageName
+                    if StageID[StageID.index(':')+2:] == '1':
+                        if ' Rotate: ' in CourseSelectW1ZoneMapo[i - 2]:
+                            CourseSelectW1ZoneMapn[i - 2] = CourseSelectW1ZoneMapo[i - 2][:CourseSelectW1ZoneMapo[i - 2].index(':') + 2] + '{X: 0.0, Y: -0.0, Z: 0.0}'  # Fix rotation for World 1-1
+                        elif ' Rotate: ' in CourseSelectW1ZoneMapo[i - 4]:
+                            CourseSelectW1ZoneMapn[i - 4] = CourseSelectW1ZoneMapo[i - 4][:CourseSelectW1ZoneMapo[i - 4].index(':') + 2] + '{X: 0.0, Y: -0.0,'
+                            CourseSelectW1ZoneMapn[i - 3] = CourseSelectW1ZoneMapo[i - 3][:CourseSelectW1ZoneMapo[i - 3].index(':') + 2] + '0.0}'
+        elif worldNo == 2 and StageID[StageID.index(':') + 2:] != '70':
             for i, elem in enumerate(CourseSelectW2ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in w2_history:
-                        CourseSelectW2ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                        w2_history.append(i)
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
-        elif worldNo == 3:
+                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem:
+                    if 'ModelName: Miniature' in CourseSelectW2ZoneMapo[i - 4]:
+                        CourseSelectW2ZoneMapn[i - 4] = CourseSelectW2ZoneMapo[i - 4][:CourseSelectW2ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectW2ZoneMapo[i - 6]:
+                        CourseSelectW2ZoneMapn[i - 6] = CourseSelectW2ZoneMapo[i - 6][:CourseSelectW2ZoneMapo[i - 6].index(':') + 2] + StageName
+        elif worldNo == 3 and StageID[StageID.index(':') + 2:] != '70' and StageID[StageID.index(':') + 2:] != '101':
             for i, elem in enumerate(CourseSelectW3ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in w3_history:
-                        CourseSelectW3ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                        w3_history.append(i)
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
-        elif worldNo == 4:
+                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem and '101' not in elem:
+                    if 'ModelName: Miniature' in CourseSelectW3ZoneMapo[i - 4]:
+                        CourseSelectW3ZoneMapn[i - 4] = CourseSelectW3ZoneMapo[i - 4][:CourseSelectW3ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectW3ZoneMapo[i - 6]:
+                        CourseSelectW3ZoneMapn[i - 6] = CourseSelectW3ZoneMapo[i - 6][:CourseSelectW3ZoneMapo[i - 6].index(':') + 2] + StageName
+        elif worldNo == 4 and StageID[StageID.index(':') + 2:] != '70':
             for i, elem in enumerate(CourseSelectW4ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in w4_history:
-                        CourseSelectW4ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                        w4_history.append(i)
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
-        elif worldNo == 5:
+                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem:
+                    if 'ModelName: Miniature' in CourseSelectW4ZoneMapo[i - 4]:
+                        CourseSelectW4ZoneMapn[i - 4] = CourseSelectW4ZoneMapo[i - 4][:CourseSelectW4ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectW4ZoneMapo[i - 6]:
+                        CourseSelectW4ZoneMapn[i - 6] = CourseSelectW4ZoneMapo[i - 6][:CourseSelectW4ZoneMapo[i - 6].index(':') + 2] + StageName
+        elif worldNo == 5 and StageID[StageID.index(':') + 2:] != '70':
             for i, elem in enumerate(CourseSelectW5ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in w5_history:
-                        CourseSelectW5ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                        w5_history.append(i)
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
-        elif worldNo == 6:
+                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem:
+                    if 'ModelName: Miniature' in CourseSelectW5ZoneMapo[i - 4]:
+                        CourseSelectW5ZoneMapn[i - 4] = CourseSelectW5ZoneMapo[i - 4][:CourseSelectW5ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectW5ZoneMapo[i - 6]:
+                        CourseSelectW5ZoneMapn[i - 6] = CourseSelectW5ZoneMapo[i - 6][:CourseSelectW5ZoneMapo[i - 6].index(':') + 2] + StageName
+        elif worldNo == 6 and StageID[StageID.index(':') + 2:] != '70' and StageID[StageID.index(':') + 2:] != '102':
             for i, elem in enumerate(CourseSelectW6ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in w6_history:
-                        CourseSelectW6ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                        w6_history.append(i)
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
+                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem and '102' not in elem:
+                    if 'ModelName: Miniature' in CourseSelectW6ZoneMapo[i - 4]:
+                        CourseSelectW6ZoneMapn[i - 4] = CourseSelectW6ZoneMapo[i - 4][:CourseSelectW6ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectW6ZoneMapo[i - 6]:
+                        CourseSelectW6ZoneMapn[i - 6] = CourseSelectW6ZoneMapo[i - 6][:CourseSelectW6ZoneMapo[i - 6].index(':') + 2] + StageName
         elif worldNo == 7:
             for i, elem in enumerate(CourseSelectW7ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in w7_history:
-                        CourseSelectW7ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                        w7_history.append(i)
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
-        elif worldNo == 8:
+                if StageID[StageID.index('S'):].lower() in elem.lower():
+                    if 'ModelName: Miniature' in CourseSelectW7ZoneMapo[i - 4]:
+                        CourseSelectW7ZoneMapn[i - 4] = CourseSelectW7ZoneMapo[i - 4][:CourseSelectW7ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectW7ZoneMapo[i - 6]:
+                        CourseSelectW7ZoneMapn[i - 6] = CourseSelectW7ZoneMapo[i - 6][:CourseSelectW7ZoneMapo[i - 6].index(':') + 2] + StageName
+        elif worldNo == 8 and StageID[StageID.index(':') + 2:] != '35':
             for i, elem in enumerate(CourseSelectW8ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in w8_history:
-                        if ('    StageId: 101' in StageID) or ('    StageId: 100' in StageID):
-                            if StageID[StageID.index(':')+2:].rstrip('\n') in CourseSelectW8ZoneMapo[i+4]:
-                                CourseSelectW8ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                                w8_history.append(i)
-                            else:
-                                print('Fixing Bowser-A and Bowser-B.')
-                        else:
-                            CourseSelectW8ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                            w8_history.append(i)
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
-        elif worldNo >= 9:
+                if StageID[StageID.index('S'):].lower() in elem.lower() and '35' not in elem:
+                    if 'ModelName: Miniature' in CourseSelectW8ZoneMapo[i - 4]:
+                        CourseSelectW8ZoneMapn[i - 4] = CourseSelectW8ZoneMapo[i - 4][:CourseSelectW8ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectW8ZoneMapo[i - 6]:
+                        CourseSelectW8ZoneMapn[i - 6] = CourseSelectW8ZoneMapo[i - 6][:CourseSelectW8ZoneMapo[i - 6].index(':') + 2] + StageName
+        elif worldNo >= 9 and StageID[StageID.index(':') + 2:] != '70':
             for i, elem in enumerate(CourseSelectS1ZoneMapo):
-                if StageNameOld in elem:
-                    if i not in s1_history:
-                        if 'WorldID: '+str(worldNo) in CourseSelectS1ZoneMapo[i+15]:
-                            CourseSelectS1ZoneMapn[i] = elem[:elem.index(':')+2]+StageName
-                            s1_history.append(i)
-                        else:
-                            print('Incorrect Special World.')
-                    else:
-                        print('Duplicate Miniature Model. Not overwriting...')
+                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem:
+                    if 'ModelName: Miniature' in CourseSelectS1ZoneMapo[i - 4] and CourseSelectS1ZoneMapo[i + 11][CourseSelectS1ZoneMapo[i + 11].index(':') + 2:] == str(worldNo):
+                        CourseSelectS1ZoneMapn[i - 4] = CourseSelectS1ZoneMapo[i - 4][:CourseSelectS1ZoneMapo[i - 4].index(':') + 2] + StageName
+                    elif 'ModelName: Miniature' in CourseSelectS1ZoneMapo[i - 6] and CourseSelectS1ZoneMapo[i + 15][CourseSelectS1ZoneMapo[i + 15].index(':') + 2:] == str(worldNo):
+                        CourseSelectS1ZoneMapn[i - 6] = CourseSelectS1ZoneMapo[i - 6][:CourseSelectS1ZoneMapo[i - 6].index(':') + 2] + StageName
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
     print('Total Green Star Count: ' + str(currentGreenStars))
     print('Randomized stages!')
+
+    for b in KoopaLastBZoneMap:
+        if 'GoalPoleLast' in b:
+            KoopaLastBZoneMap[KoopaLastBZoneMap.index(b)] = KoopaLastBZoneMap[KoopaLastBZoneMap.index(b)][:KoopaLastBZoneMap[KoopaLastBZoneMap.index(b)].index(':') + 2] + 'GoalPoleSuper'
+            print('Changed GoalPoleLast to GoalPoalSuper in KoopaLastBZone.')
+    KoopaLastBZone2 = '\n'.join(KoopaLastBZoneMap)
 
     doc = '\n'.join(StageListNew)
     # Creating new SZS filers with the modified files.
@@ -843,6 +831,23 @@ def randomizer():
             print('Written CourseSelectS1Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
+
+        bzwriter = SarcWriter()
+        bzwriter.set_endianness(endianness)
+        bzwriter.files['DofParam_obj0.bagldof'] = Bytes(KoopaLastBZone1)
+        bzwriter.files['KoopaLastBZoneMap.byml'] = byml.to_binary(byml.from_text(KoopaLastBZone2), False, 2)
+        bzwriter.files['DofParam_obj1.bagldof'] = Bytes(KoopaLastBZone3)
+        bzwriter.files['KoopaLastBZoneDesign.byml'] = Bytes(KoopaLastBZone4)
+        bzwriter.files['KoopaLastBZoneSound.byml'] = Bytes(KoopaLastBZone5)
+        bzwriter.files['CubeMapMgr.baglcube'] = Bytes(KoopaLastBZone6)
+        bzwriter.files['CameraParam.byml'] = Bytes(KoopaLastBZone7)
+        bzdata = bzwriter.write()
+
+        with open(srPath+'KoopaLastBZone.szs', 'wb') as bz:
+            print('Writing KoopaLastBZone.szs')
+            bz.write(yaz0.compress(bzdata[1]))
+            print('Written KoopaLastBZone.szs')
+
     else:
         writer = SarcWriter()
         writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), True, 1)
@@ -984,6 +989,17 @@ def randomizer():
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        bzwriter = SarcWriter()
+        bzwriter.set_endianness(endianness)
+        bzwriter.files['KoopaLastBZoneMap.byml'] = byml.to_binary(byml.from_text(KoopaLastBZone2), True, 1)
+        bzwriter.files['CameraParam.byml'] = Bytes(KoopaLastBZone7)
+        bzdata = bzwriter.write()
+
+        with open(srPath + 'KoopaLastBZoneMap1.szs', 'wb') as bz:
+            print('Writing KoopaLastBZoneMap1.szs')
+            bz.write(yaz0.compress(bzdata[1]))
+            print('Written KoopaLastBZoneMap1.szs')
+
     print('Finished writing world files.')
 
     musicRandomizer(rng, seedRNG, user_data)
@@ -994,7 +1010,7 @@ def randomizer():
     dpg.configure_item("progress", default_value=bar/172)
 
     if dpg.get_value("spoil"):
-        spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), user_data)
+        spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), GreenStarLockHistory2, user_data)
     else:
         print('Not generating spoiler file, only generating seed text file.')
         with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'.txt', 'w', encoding='utf-8') as s:
@@ -1012,6 +1028,21 @@ def randomizer():
 
     dpg.configure_item("progress", default_value=1)
     dpg.configure_item("randoinit", enabled=True, label="Randomize!")
+    dpg.show_item('t2')
+    dpg.show_item('t3')
+    saveSettings()
+    checkDirectory()
+    if len(str(dpg.get_value('seed'))) == 0:
+        dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Random seed)')
+    else:
+        dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Set seed)')
+    dpg.set_value('popupSpeedrun', 'Speedrunner mode: ' + str(dpg.get_value('speedrun')))
+    dpg.set_value('popupSpoil', "Generate spoiler file?: " + str(dpg.get_value('spoil')))
+    dpg.set_value('popupMusic', "Randomize music?: " + str(dpg.get_value('music')))
+    dpg.set_value('popupLang', "Randomize language?: " + str(dpg.get_value('lang')))
+    dpg.set_value('popupStar', "Green star locks: " + str(dpg.get_value('star')))
+    if str(dpg.get_value('star')) == 'Fully random':
+        dpg.set_value('popupPslider', "Green star lock probability: " + str(dpg.get_value('pslider')))
     dpg.configure_item("popup", show=True)
 
 
@@ -1083,280 +1114,291 @@ def langRandomizer(rng, seedRNG, user_data):
 
 
 # Spoiler file generation
-def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, user_data):
+def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistory2, user_data):
     print('Generating spoiler file...')
     levelIndex = 1
     worldIndex = 1
     overallIndex = 1
-    stageID_Name = ['Seed: '+str(seedRNG)+'\n\nLevel Slot, Level Name (Original Level Slot)\n\nWorld ' + str(worldIndex) + '\n']
+    overallIndex2 = 1
+    stageID_Name = ['Seed: '+str(seedRNG)+'\n\nLevel slot, Level name (Original level slot)\n\nWorld ' + str(worldIndex) + '\n']
 
     # Appending the name of each stage to stageID_name.
     while overallIndex <= 154:
-        # World 1
-        if StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EnterCatMarioStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Super Bell Hill (1-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NokonokoCaveStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Koopa Troopa Cave (1-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbMountainStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mount Beanpole (1-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DownRiverStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Plessie\'s Plunging Falls (1-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FlipCircusStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Switch Scramble Circus (1-5)\n')
-        # Toad House
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv1BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv2BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv1InsideStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3LavaStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3NightStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Toad House\n')
-        # World 1 continued
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeTentenStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Goes Forth (1-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaChaseLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bowser\'s Highway Showdown (1-Castle)\n')
-        # Lucky House (Roulette)
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RouletteRoomZone':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Lucky House\n')
-        # World 1 continued
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBullLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Chargin\' Chuck Blockade (1-A)\n')
-        # World 2
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SideWaveDesertStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Conkdor Canyon (2-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TouchAndMikeStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Puffprod Peaks (2-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShadowTunnelStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Shadow-Play Alley (2-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RotateFieldStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Really Rolling Hills (2-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DoubleMarioFieldStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Double Cherry Pass (2-5)\n')
-        # Stamp House
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseBlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseInsideStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseLavaStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseNightStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sprixie House\n')
-        # World 2 continued
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseEnemyStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Melee (2-Mystery House)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KillerTankStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bowser\'s Bullet Bill Brigade (2-Tank)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKuribonLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Big Galoomba Blockade (2-A)\n')
-        # World 3
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SnowBallParkStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Snowball Park (3-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbWirenetStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Chainlink Charge (3-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TeresaConveyorStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Shifty Boo Mansion (3-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortGardenStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Pretty Plaza Panic (3-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DokanAquariumStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Pipeline Lagoon (3-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DashRidgeStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mount Must Dash (3-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TruckWaterfallStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Switchboard Falls (3-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeWaterStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Makes a Splash (3-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KillerExpressStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', The Bullet Bill Express (3-Train)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKameckLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Magikoopa Blockade (3-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperTentackLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', A Banquet with Hisstrocrat (3-B)\n')
-        # World 4
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: CrawlerHillStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Ant Trooper Hill (4-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: PipePackunDenStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Piranha Creeper Creek (4-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChikaChikaBoomerangStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Beep Block Skyway (4-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TrampolineHighlandStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Big Bounce Byway (4-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GabonMountainStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spike\'s Lost City (4-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseDashStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Mad Dash (4-Mystery House)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BossGorobonStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Lava Rock Lair (4-Castle)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperGorobonLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Brolder Blockade (4-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #1 (4-B)\n')
-        # World 5
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NokonokoBeachStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sunshine Seaside (5-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SwingCircusStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Tricky Trapeze Theater (5-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortMultiLiftStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Backstreet Bustle (5-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SavannaRockStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sprawling Savanna (5-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BombCaveStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bob-ombs Below (5-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: JumpFlipSweetsStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Cakewalk Flip (5-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SneakingLightStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Searchlight Sneak (5-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GoldenExpressStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Coin Express (5-Train)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeTeresaStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Plays Peek-a-Boo (5-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BossWackunFortressStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', King Ka-thunk\'s Castle (5-Castle)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBullLv2Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Chargin\' Chuck Blockade is Back (5-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv2Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #2 (5-B)\n')
-        # World 6
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RouteDokanTourStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Clear Pipe Cruise (6-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WeavingShipStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spooky Seasick Wreck (6-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KarakuriCastleStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Hands-On Hall (6-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: JungleCruiseStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Deep Jungle Drift (6-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BlastSnowFieldStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Ty-Foo Flurries (6-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbFortressStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bullet Bill Base (6-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChorobonTowerStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fuzzy Time Mine (6-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseBallStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Throwdown (6-Mystery House)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BombTankStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bowser\'s Bob-omb Brigade (6-Tank)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKyupponLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Prince Bully Blockade (6-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv3Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #3 (6-B)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Motley Bossblob\'s Big Battle (6-C)\n')
-        # World Castle
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FireBrosFortressStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fort Fire Bros. (Castle-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DarkFlipPanelStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Switchblack Ruins (Castle-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortAmidaStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Red-Hot Run (Castle-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DonketsuArrowStepStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Boiling Blue Bully Belt (Castle-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ZigzagBuildingStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Trick Trap Tower (Castle-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SyumockSpotStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Rammerhead Reef (Castle-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RagingMagmaStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Simmering Lava Lake (Castle-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeConveyorStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Gets Thwomped (Castle-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaChaseLv2Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Bowser\'s Lava Lake Keep (Castle-Castle)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperGorobonLv2Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Brolder Blockade Is Back (Castle-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKyupponLv2Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Prince Bully Blockade Is Back (Castle-B)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv4Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Fire Bros. Hideout #4 (Castle-C)\n')
-        # World Bowser
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NeedleBridgeStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spiky Spike Bridge (Bowser-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DownDesertStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Plessie\'s Dune Downhill (Bowser-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GearSweetsStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Cookie Cogworks (Bowser-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EchoRoadStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Footlight Lane (Bowser-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WaterElevatorCaveStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Deepwater Dungeon (Bowser-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DarknessHauntedHouseStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', A Beam in the Dark (Bowser-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GotogotonValleyStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Grumblump Inferno (Bowser-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseClimbStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Claw Climb (Bowser-Mystery House)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EnemyExpressStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', The Bowser Express (Bowser-Train)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaLastStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', The Great Tower of Bowser Land (Bowser-Castle)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Motley Bossblob\'s Encore (Bowser-A)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperTentackLv2Stage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Hisstocrat Returns (Bowser-B)\n')
-        # World Star
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RainbowRoadStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Rainbow Run (Star-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GalaxyRoadStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Super Galaxy (Star-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WheelCanyonStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Rolling Ride Run (Star-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GoalPoleRunawayStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', The Great Goal Pole (Star-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BlockLandStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Super Block Land (Star-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: HexScrollStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Honeycomb Starway (Star-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GiantUnderGroundStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Gargantuan Grotto (Star-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TerenFogStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Peepa\'s Fog Bog (Star-8)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BoxKillerStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Cosmic Cannon Cluster (Star-9)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeRotateRoomStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad Takes a Spin (Star-Captain Toad)\n')
-        # World Mushroom
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeRotateFieldStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Night Falls on Really Rolling Hills (Mushroom-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeClimbMountainStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spiky Mount Beanpole (Mushroom-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeJungleCruiseStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Deep-Black Jungle Drift (Mushroom-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeShadowTunnelStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Trouble in Shadow-Play Alley (Mushroom-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeKarakuriCastleStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Back to Hands-On Hall (Mushroom-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeWeavingShipStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Gigantic Seasick Wreck (Mushroom-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeDonketsuArrowStepStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Broken Blue Bully Belt (Mushroom-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeMysteryHouseEnemyStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Brawl (Mushroom-Mystery House)\n')
-        # World Flower
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeFlipCircusStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Switch Shock Circus (Flower-1)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeChorobonTowerStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Floating Fuzzy Time Mine (Flower-2)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangePipePackunDenStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Piranha Creeper Creek after Dark (Flower-3)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeFireBrosFortressStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Faster Fort Fire Bros. (Flower-4)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeSavannaRockStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Sprawling Savanna Rabbit Run (Flower-5)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeTeresaConveorStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Shiftier Boo Mansion (Flower-6)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeDokanAquariumStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Pipeline Boom Lagoon (Flower-7)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeChikaChikaBoomerangStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Blast Block Skyway (Flower-8)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeNokonokoBeachStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Towering Sunshine Seaside (Flower-9)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeHexScrollStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Honeycomb Skyway (Flower-10)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeNeedleBridgeStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Spiky Spike Bridge Sneak (Flower-11)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeBossParadeStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Boss Blitz (Flower-12)\n')
-        # World Crown
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChampionshipStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Champion\'s Road (Crown-Crown)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeInfernoStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Captain Toad\'s Fiery Finale (Crown-Captain Toad)\n')
-        elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseMaxStage':
-            stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+', Mystery House Marathon (Crown-Mystery House)\n')
+        if overallIndex != 34 and overallIndex != 62 and overallIndex != 63 and overallIndex != 64 and overallIndex != 65 and overallIndex != 66 and overallIndex != 81 and overallIndex != 97 and overallIndex != 115:
+            # World 1
+            if StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EnterCatMarioStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Super Bell Hill (1-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NokonokoCaveStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Koopa Troopa Cave (1-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbMountainStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Mount Beanpole (1-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DownRiverStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Plessie\'s Plunging Falls (1-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FlipCircusStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Switch Scramble Circus (1-5)\n')
+            # Toad House
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv1BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv2BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3BlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv1InsideStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3LavaStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioHouseLv3NightStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Toad House\n')
+            # World 1 continued
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeTentenStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Captain Toad Goes Forth (1-Captain Toad)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaChaseLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Bowser\'s Highway Showdown (1-Castle)\n')
+            # Lucky House (Roulette)
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RouletteRoomZone':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Lucky House\n')
+            # World 1 continued
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBullLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Chargin\' Chuck Blockade (1-A)\n')
+            # World 2
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SideWaveDesertStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Conkdor Canyon (2-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TouchAndMikeStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Puffprod Peaks (2-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShadowTunnelStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Shadow-Play Alley (2-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RotateFieldStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Really Rolling Hills (2-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DoubleMarioFieldStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Double Cherry Pass (2-5)\n')
+            # Stamp House
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseBlueStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseInsideStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseLavaStage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FairyHouseNightStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Sprixie House\n')
+            # World 2 continued
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseEnemyStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Mystery House Melee (2-Mystery House)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KillerTankStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Bowser\'s Bullet Bill Brigade (2-Tank)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKuribonLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Big Galoomba Blockade (2-A)\n')
+            # World 3
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SnowBallParkStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Snowball Park (3-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbWirenetStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Chainlink Charge (3-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TeresaConveyorStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Shifty Boo Mansion (3-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortGardenStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Pretty Plaza Panic (3-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DokanAquariumStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Pipeline Lagoon (3-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DashRidgeStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Mount Must Dash (3-6)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TruckWaterfallStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Switchboard Falls (3-7)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeWaterStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Captain Toad Makes a Splash (3-Captain Toad)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KillerExpressStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': The Bullet Bill Express (3-Train)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKameckLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Magikoopa Blockade (3-A)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperTentackLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': A Banquet with Hisstrocrat (3-B)\n')
+            # World 4
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: CrawlerHillStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Ant Trooper Hill (4-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: PipePackunDenStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Piranha Creeper Creek (4-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChikaChikaBoomerangStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Beep Block Skyway (4-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TrampolineHighlandStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Big Bounce Byway (4-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GabonMountainStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Spike\'s Lost City (4-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseDashStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Mystery House Mad Dash (4-Mystery House)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BossGorobonStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Lava Rock Lair (4-Castle)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperGorobonLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Brolder Blockade (4-A)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Fire Bros. Hideout #1 (4-B)\n')
+            # World 5
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NokonokoBeachStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Sunshine Seaside (5-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SwingCircusStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Tricky Trapeze Theater (5-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortMultiLiftStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Backstreet Bustle (5-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SavannaRockStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Sprawling Savanna (5-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BombCaveStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Bob-ombs Below (5-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: JumpFlipSweetsStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Cakewalk Flip (5-6)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SneakingLightStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Searchlight Sneak (5-7)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GoldenExpressStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Coin Express (5-Train)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeTeresaStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Captain Toad Plays Peek-a-Boo (5-Captain Toad)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BossWackunFortressStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': King Ka-thunk\'s Castle (5-Castle)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBullLv2Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Chargin\' Chuck Blockade is Back (5-A)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv2Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Fire Bros. Hideout #2 (5-B)\n')
+            # World 6
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RouteDokanTourStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Clear Pipe Cruise (6-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WeavingShipStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Spooky Seasick Wreck (6-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KarakuriCastleStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Hands-On Hall (6-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: JungleCruiseStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Deep Jungle Drift (6-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BlastSnowFieldStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Ty-Foo Flurries (6-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ClimbFortressStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Bullet Bill Base (6-6)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChorobonTowerStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Fuzzy Time Mine (6-7)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseBallStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Mystery House Throwdown (6-Mystery House)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BombTankStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Bowser\'s Bob-omb Brigade (6-Tank)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKyupponLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Prince Bully Blockade (6-A)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv3Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Fire Bros. Hideout #3 (6-B)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Motley Bossblob\'s Big Battle (6-C)\n')
+            # World Castle
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: FireBrosFortressStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Fort Fire Bros. (Castle-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DarkFlipPanelStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Switchblack Ruins (Castle-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ShortAmidaStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Red-Hot Run (Castle-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DonketsuArrowStepStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Boiling Blue Bully Belt (Castle-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ZigzagBuildingStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Trick Trap Tower (Castle-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: SyumockSpotStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Rammerhead Reef (Castle-6)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RagingMagmaStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Simmering Lava Lake (Castle-7)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeConveyorStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Captain Toad Gets Thwomped (Castle-Captain Toad)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaChaseLv2Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Bowser\'s Lava Lake Keep (Castle-Castle)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperGorobonLv2Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Brolder Blockade Is Back (Castle-A)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperKyupponLv2Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Prince Bully Blockade Is Back (Castle-B)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperFireBrosLv4Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Fire Bros. Hideout #4 (Castle-C)\n')
+            # World Bowser
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: NeedleBridgeStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Spiky Spike Bridge (Bowser-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DownDesertStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Plessie\'s Dune Downhill (Bowser-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GearSweetsStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Cookie Cogworks (Bowser-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EchoRoadStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Footlight Lane (Bowser-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WaterElevatorCaveStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Deepwater Dungeon (Bowser-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: DarknessHauntedHouseStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': A Beam in the Dark (Bowser-6)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GotogotonValleyStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Grumblump Inferno (Bowser-7)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseClimbStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Mystery House Claw Climb (Bowser-Mystery House)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: EnemyExpressStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': The Bowser Express (Bowser-Train)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KoopaLastStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': The Great Tower of Bowser Land (Bowser-Castle)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Motley Bossblob\'s Encore (Bowser-A)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GateKeeperTentackLv2Stage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Hisstocrat Returns (Bowser-B)\n')
+            # World Star
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: RainbowRoadStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Rainbow Run (Star-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GalaxyRoadStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Super Galaxy (Star-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: WheelCanyonStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Rolling Ride Run (Star-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GoalPoleRunawayStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': The Great Goal Pole (Star-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BlockLandStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Super Block Land (Star-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: HexScrollStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Honeycomb Starway (Star-6)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: GiantUnderGroundStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Gargantuan Grotto (Star-7)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: TerenFogStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Peepa\'s Fog Bog (Star-8)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: BoxKillerStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Cosmic Cannon Cluster (Star-9)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeRotateRoomStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Captain Toad Takes a Spin (Star-Captain Toad)\n')
+            # World Mushroom
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeRotateFieldStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Night Falls on Really Rolling Hills (Mushroom-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeClimbMountainStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Spiky Mount Beanpole (Mushroom-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeJungleCruiseStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Deep-Black Jungle Drift (Mushroom-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeShadowTunnelStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Trouble in Shadow-Play Alley (Mushroom-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeKarakuriCastleStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Back to Hands-On Hall (Mushroom-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeWeavingShipStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Gigantic Seasick Wreck (Mushroom-6)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeDonketsuArrowStepStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Broken Blue Bully Belt (Mushroom-7)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeMysteryHouseEnemyStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Mystery House Brawl (Mushroom-Mystery House)\n')
+            # World Flower
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeFlipCircusStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Switch Shock Circus (Flower-1)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeChorobonTowerStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Floating Fuzzy Time Mine (Flower-2)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangePipePackunDenStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Piranha Creeper Creek after Dark (Flower-3)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeFireBrosFortressStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Faster Fort Fire Bros. (Flower-4)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeSavannaRockStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Sprawling Savanna Rabbit Run (Flower-5)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeTeresaConveorStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Shiftier Boo Mansion (Flower-6)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeDokanAquariumStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Pipeline Boom Lagoon (Flower-7)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeChikaChikaBoomerangStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Blast Block Skyway (Flower-8)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeNokonokoBeachStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Towering Sunshine Seaside (Flower-9)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeHexScrollStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Honeycomb Skyway (Flower-10)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeNeedleBridgeStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Spiky Spike Bridge Sneak (Flower-11)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ArrangeBossParadeStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Boss Blitz (Flower-12)\n')
+            # World Crown
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: ChampionshipStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Champion\'s Road (Crown-Crown)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: KinopioBrigadeInfernoStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Captain Toad\'s Fiery Finale (Crown-Captain Toad)\n')
+            elif StageListNew[(StageListNew.index('  - CourseId: ' + str(overallIndex))) + 8] == '    StageName: MysteryHouseMaxStage':
+                stageID_Name.append(str(worldIndex)+'-'+str(levelIndex)+': Mystery House Marathon (Crown-Mystery House)\n')
 
-        # Denoting Green Star Lock requirements
-        if dpg.get_value("star"):
-            try:
-                stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires '+str(GreenStarLockHistory[overallIndex])+' Green Stars)\n'
-            except KeyError:
-                pass
+            # Denoting Green Star Lock requirements
+            if dpg.get_value("star") == 'Random values':
+                try:
+                    stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires '+str(GreenStarLockHistory[overallIndex])+' Green Star(s))\n'
+                except KeyError:
+                    pass
+            elif dpg.get_value("star") == 'Fully random':
+                try:
+                    if GreenStarLockHistory2[overallIndex2 - 1][1] != 0 and GreenStarLockHistory2[overallIndex2 - 1][0] and overallIndex != 34 and overallIndex != 62 and overallIndex != 63 and overallIndex != 64 and overallIndex != 65 and overallIndex != 66 and overallIndex != 81 and overallIndex != 97 and overallIndex != 115:
+                        if int(GreenStarLockHistory2[overallIndex2 - 1][1]) > 1:
+                            stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires '+str(GreenStarLockHistory2[overallIndex2 - 1][1])+' Green Stars)\n'
+                        else:
+                            stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory2[overallIndex2 - 1][1]) + ' Green Star)\n'
+                except KeyError:
+                    pass
 
         # Increment to next world.
         if worldIndex == 1 and levelIndex == 11:
@@ -1406,6 +1448,8 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, user_data):
         else:
             levelIndex += 1
         overallIndex += 1
+        if overallIndex != 34 and overallIndex != 62 and overallIndex != 63 and overallIndex != 64 and overallIndex != 65 and overallIndex != 66 and overallIndex != 81 and overallIndex != 97 and overallIndex != 115:
+            overallIndex2 += 1
 
     with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'-spoiler.txt', 'w', encoding='utf-8') as s:
         s.write(''.join([''.join(l2) for l2 in stageID_Name]))  # Creating a new spoiler text file.
@@ -1414,7 +1458,7 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, user_data):
         s = s.read()  # Reading the spoiler file.
 
     # Making sure levels have the correct names.
-    rep = s.replace('11-6', 'Flower-6').replace('11-7', 'Flower-7').replace('11-8', 'Flower-8').replace('11-9', 'Flower-9').replace('11-10', 'Flower-10').replace('11-11', 'Flower-11').replace('11-12', 'Flower-12').replace('12-1', 'Crown-Crown').replace('1-9', '1-Castle').replace('4-9', '4-Castle').replace('5-12', '5-Castle').replace('7-11', 'Castle-Castle').replace('8-13', 'Bowser-Castle').replace('2-9', '2-Tank').replace('6-11', '6-Tank').replace('3-11', '3-Train').replace('8-12', 'Bowser-Train').replace('1-6', '1-Toad House 1').replace('1-7', '1-Toad House 2').replace('2-6', '2-Toad House').replace('3-8', '3-Toad House 1').replace('3-12', '3-Toad House 2 (Unused)').replace('4-6', '4-Toad House').replace('5-9', '5-Toad House 1').replace('5-13', '5-Toad House 2 (Unused)').replace('5-14', '5-Toad House 3 (Unused)').replace('5-15', '5-Toad House 4 (Unused)').replace('5-16', '5-Toad House 5 (Unused)').replace('5-17', '5-Toad House 6 (Unused)').replace('6-8', '6-Toad House 1').replace('6-12', '6-Toad House 2 (Unused)').replace('7-8', 'Castle-Toad House 1').replace('7-12', 'Castle-Toad House 2 (Unused)').replace('8-8', 'Bowser-Toad House 1').replace('8-9', 'Bowser-Toad House 2').replace('8-14', 'Bowser-Toad House 3 (Unused)').replace('2-7', '2-Sprixie House').replace('3-9', '3-Sprixie House').replace('4-7', '4-Sprixie House').replace('5-10', '5-Sprixie House').replace('6-9', '6-Sprixie House').replace('7-9', 'Castle-Sprixie House').replace('8-10', 'Bowser-Sprixie House').replace('9-10', 'Star-Sprixie House').replace('12-2', 'Crown-Sprixie House').replace('1-8', '1-Captain Toad').replace('3-10', '3-Captain Toad').replace('5-11', '5-Captain Toad').replace('7-10', 'Castle-Captain Toad').replace('9-11', 'Star-Captain Toad').replace('12-3', 'Crown-Captain Toad').replace('1-10', 'Lucky House').replace('2-10', 'Lucky House').replace('3-13', 'Lucky House').replace('4-10', 'Lucky House').replace('5-18', 'Lucky House').replace('6-13', 'Lucky House').replace('7-13', 'Lucky House').replace('8-15', 'Lucky House').replace('9-12', 'Lucky House').replace('1-11', '1-A').replace('2-11', '2-A').replace('3-14', '3-A').replace('4-11', '4-A').replace('5-19', '5-A').replace('6-14', '6-A').replace('7-14', 'Castle-A').replace('8-16', 'Bowser-A').replace('3-15', '3-B').replace('4-12', '4-B').replace('5-20', '5-B').replace('6-15', '6-B').replace('7-15', 'Castle-B').replace('8-17', 'Bowser-B').replace('6-16', '6-C').replace('7-16', 'Castle-C').replace('5-8', 'Coin Express').replace('2-8', '2-Mystery House').replace('4-8', '4-Mystery House').replace('6-10', '6-Mystery House').replace('8-11', 'Bowser-Mystery House').replace('10-8', 'Mushroom-Mystery House').replace('12-4', 'Crown-Mystery House').replace('7-', 'Castle-').replace('8-', 'Bowser-').replace('9-', 'Star-').replace('10-', 'Mushroom-').replace('11-', 'Flower-').replace('12-', 'Crown-')
+    rep = s.replace('11-6', 'Flower-6').replace('11-7', 'Flower-7').replace('11-8', 'Flower-8').replace('11-9', 'Flower-9').replace('11-10', 'Flower-10').replace('11-11', 'Flower-11').replace('11-12', 'Flower-12').replace('12-1', 'Crown-Crown').replace('1-9', '1-Castle').replace('4-9', '4-Castle').replace('5-12', '5-Castle').replace('7-11', 'Castle-Castle').replace('8-13', 'Bowser-Castle').replace('2-9', '2-Tank').replace('6-11', '6-Tank').replace('3-11', '3-Train').replace('8-12', 'Bowser-Train').replace('1-6', '1-Toad House 1').replace('1-7', '1-Toad House 2').replace('2-6', '2-Toad House').replace('3-8', '3-Toad House').replace('3-12', '3-Toad House 2 (Unused)').replace('4-6', '4-Toad House').replace('5-9', '5-Toad House').replace('5-13', '5-Toad House 2 (Unused)').replace('5-14', '5-Toad House 3 (Unused)').replace('5-15', '5-Toad House 4 (Unused)').replace('5-16', '5-Toad House 5 (Unused)').replace('5-17', '5-Toad House 6 (Unused)').replace('6-8', '6-Toad House').replace('6-12', '6-Toad House 2 (Unused)').replace('7-8', 'Castle-Toad House').replace('7-12', 'Castle-Toad House 2 (Unused)').replace('8-8', 'Bowser-Toad House 1').replace('8-9', 'Bowser-Toad House 2').replace('8-14', 'Bowser-Toad House 3 (Unused)').replace('2-7', '2-Sprixie House').replace('3-9', '3-Sprixie House').replace('4-7', '4-Sprixie House').replace('5-10', '5-Sprixie House').replace('6-9', '6-Sprixie House').replace('7-9', 'Castle-Sprixie House').replace('8-10', 'Bowser-Sprixie House').replace('9-10', 'Star-Sprixie House').replace('12-2', 'Crown-Sprixie House').replace('1-8', '1-Captain Toad').replace('3-10', '3-Captain Toad').replace('5-11', '5-Captain Toad').replace('7-10', 'Castle-Captain Toad').replace('9-11', 'Star-Captain Toad').replace('12-3', 'Crown-Captain Toad').replace('1-10', 'Lucky House').replace('2-10', 'Lucky House').replace('3-13', 'Lucky House').replace('4-10', 'Lucky House').replace('5-18', 'Lucky House').replace('6-13', 'Lucky House').replace('7-13', 'Lucky House').replace('8-15', 'Lucky House').replace('9-12', 'Lucky House').replace('1-11', '1-A').replace('2-11', '2-A').replace('3-14', '3-A').replace('4-11', '4-A').replace('5-19', '5-A').replace('6-14', '6-A').replace('7-14', 'Castle-A').replace('8-16', 'Bowser-A').replace('3-15', '3-B').replace('4-12', '4-B').replace('5-20', '5-B').replace('6-15', '6-B').replace('7-15', 'Castle-B').replace('8-17', 'Bowser-B').replace('6-16', '6-C').replace('7-16', 'Castle-C').replace('5-8', 'Coin Express').replace('2-8', '2-Mystery House').replace('4-8', '4-Mystery House').replace('6-10', '6-Mystery House').replace('8-11', 'Bowser-Mystery House').replace('10-8', 'Mushroom-Mystery House').replace('12-4', 'Crown-Mystery House').replace('7-', 'Castle-').replace('8-', 'Bowser-').replace('9-', 'Star-').replace('10-', 'Mushroom-').replace('11-', 'Flower-').replace('12-', 'Crown-')
 
     with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'-spoiler.txt', 'w', encoding='utf-8') as s:
         s.write(rep)  # Writing the corrected level slots back to the file.
@@ -1424,7 +1468,7 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, user_data):
 
 # Main Program Window
 class GUI:
-    def __init__(self, p_title, p_size):
+    def __init__(self, p_title, p_size, p_settings):
         # DearPyGUI setup
         dpg.create_context()
         dpg.create_viewport(title=p_title, width=p_size[0], height=p_size[1])
@@ -1435,25 +1479,34 @@ class GUI:
             with dpg.tab_bar():  # Add tabs which the user can change between
                 with dpg.tab(tag="t1", label="Program"):  # The main, default tab
                     dpg.add_text("Hello, welcome to the Super Mario 3D World Randomizer!")
-                    dpg.add_text(tag="dirtext", default_value="Load Directory", color=(255, 0, 0, 255))  # Selected Directory
+                    dpg.add_text(tag="dirtext", default_value=str(p_settings['dir']), color=(255, 0, 0, 255))  # Selected Directory
                     self.dir = dpg.add_button(tag="dirbutt", label="Load Input Directory", callback=lambda: dpg.show_item("dir"))  # Load Directory Button
-                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=self.directory)  # Directory Selector
-                    dpg.add_text(tag="rdirtext", default_value=os.getcwd())  # Selected Directory
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=directory)  # Directory Selector
+                    dpg.add_text(tag="rdirtext", default_value=str(p_settings['rdir']))  # Selected Directory
                     self.rdir = dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
-                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=self.rdirectory)  # Directory Selector
-                    self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="")  # Seed Input Text
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=os.getcwd())  # Directory Selector
+                    self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory)  # Seed Input Text
                     self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
                     dpg.add_progress_bar(tag="progress", label="progress", default_value=0)
+                    '''
                     dpg.add_text("This randomizer only effects Super Mario 3D World (Wii U and Switch), not Bowser's Fury.")
+                    '''
+                    dpg.add_text("This randomizer only effects Super Mario 3D World (Switch), not Bowser's Fury.")
                     self.test = dpg.add_button(tag="test", label="test", callback=lambda: dpg.configure_item("progress", default_value=1), show=False)
                     with dpg.tooltip("dirbutt"):
+                        '''
                         dpg.add_text("The directory selected must be the root directory of an unmodified dump of the "
                                      "game:\n"
                                      "\"00050000(\\)10106100\\content\\\" - Super Mario 3D World (JPN)\n"
                                      "\"00050000(\\)10145C00\\content\\\" - Super Mario 3D World (USA)\n"
                                      "\"00050000(\\)10145D00\\content\\\" - Super Mario 3D World (EUR)\n"
                                      "\"010028600EBDA000\\romfs\\\" - Super Mario 3D World + Bowser's Fury")
+                        '''
+                        dpg.add_text("The directory selected must be the root directory of an unmodified dump of the "
+                                     "game:\n"
+                                     "\"010028600EBDA000\\romfs\\\" - Super Mario 3D World + Bowser's Fury")
                     with dpg.tooltip("rdirbutt"):
+                        '''
                         dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
                                      "be your mods folder:\n"
                                      "\"Cemu\\graphicsPacks\\\" - Cemu (Wii U)\n"
@@ -1462,60 +1515,218 @@ class GUI:
                                      "\"sd:\\wiiu\\sdcafiine\\0005000010145D00\\\" - SDCafiine (Wii U, EUR version)\n"
                                      "\"%appdata%\\yuzu\\load\\010028600EBDA000\\\" - Yuzu (Switch)\n"
                                      "\"%appdata%\\Ryujinx\\mods\\contents\\010028600EBDA000\\\" - Ryujinx (Switch)\n"
-                                     "\"sd:\\atmosphere\\contents\\010028600EBDA000\\\"* - Atmosphère (Switch)\n\n"
+                                     "\"sd:\\mods\\Super Mario 3D World + Bowser's Fury\\Randomizer\\contents\\010028600EBDA000\\\"* - SMM (Switch)\n\n"
                                      "*The \"romfs\" folder inside the generated\"SM3DWR-<seed>\" folder should be "
-                                     "taken out and placed into the\nspecified atmosphere folder.")
+                                     "taken out and placed into the\nspecified SimpleModManager (SMM) folder.")
+                        '''
+                        dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
+                                     "be your mods folder:\n"
+                                     "\"%appdata%\\yuzu\\load\\010028600EBDA000\\\" - Yuzu (Switch)\n"
+                                     "\"%appdata%\\Ryujinx\\mods\\contents\\010028600EBDA000\\\" - Ryujinx (Switch)\n"
+                                     "\"sd:\\mods\\Super Mario 3D World + Bowser's Fury\\Randomizer\\contents\\010028600EBDA000\\\"* - SMM (Switch)\n\n"
+                                     "*The \"romfs\" folder inside the generated\"SM3DWR-<seed>\" folder should be "
+                                     "taken out and placed into the\nspecified SimpleModManager (SMM) folder.")
                     with dpg.tooltip('randoinit'):
                         dpg.add_text('To be able to start the randomizer, select a valid input directory.', tag='randotip')
+                checkDirectory()
                 with dpg.tab(tag="t2", label="Misc. Settings"):  # Settings tab
-                    self.spoil = dpg.add_checkbox(tag="spoil", label="Generate spoiler file?", default_value=True)
-                    self.star = dpg.add_checkbox(tag="star", label="Enable Green Star lock logic?", default_value=True)
-                    self.music = dpg.add_checkbox(tag="music", label="Randomize music?")
-                    self.lang = dpg.add_checkbox(tag="lang", label="Randomize language?")
+                    self.speedrun = dpg.add_checkbox(tag='speedrun', label='Speedrunner mode', default_value=bool(p_settings['speedrun']), callback=speedrunner)
+                    self.spoil = dpg.add_checkbox(tag="spoil", label="Generate spoiler file?", default_value=bool(p_settings['spoil']))
+                    self.music = dpg.add_checkbox(tag="music", label="Randomize music?", default_value=bool(p_settings['music']))
+                    self.lang = dpg.add_checkbox(tag="lang", label="Randomize language?", default_value=bool(p_settings['lang']))
+                    dpg.add_text('Green star locks:')
+                    self.star = dpg.add_radio_button(('Fully random', 'Random values', 'Disabled'), tag='star', horizontal=True, default_value=str(p_settings['star']), callback=showSlider)
+                    self.pslider = dpg.add_slider_float(tag='pslider', label='Green star lock probability', default_value=float(p_settings['pslider']), min_value=0, max_value=1, show=True, clamped=True)
+                    self.save = dpg.add_button(tag='save', label='Save Settings', callback=saveSettings)
+                    with dpg.tooltip('speedrun'):
+                        dpg.add_text('Lock the settings to be compatible with the official speedrun leaderboards.')
                     with dpg.tooltip('spoil'):
-                        dpg.add_text('Generate a text file which contains the full list of levels and what they have '
-                                     'been randomized to.')
+                        dpg.add_text('Generate a text file which contains the full list of levels and what they have\n'
+                                     'been randomized to, along with any green star lock values.')
                     with dpg.tooltip('star'):
-                        dpg.add_text('Instead of removing all Green Star locks, the randomizer will calculate new Green Star '
-                                     'requirements\nfor each lock based on what was generated beforehand.')
+                        dpg.add_text('Fully random: The green star locks can be placed anywhere and their\nrequirement value will change accordingly.\n'
+                                     'Random values: The green star locks are in their vanilla positions\nbut their requirement value will change depending on the levels\ngenerated beforehand.\n'
+                                     'Disabled: All green star locks will be removed from the game.')
                     with dpg.tooltip('music'):
                         dpg.add_text('Randomize the filenames for the music files.')
                     with dpg.tooltip('lang'):
+                        '''
                         dpg.add_text('Randomize the selected language. Will be the same language for everything.\n'
                                      'This feature is more limited on the Wii U version due to region locking so\nthe '
                                      'language pool is limited to the languages your region supports.')
+                        '''
+                        dpg.add_text('Randomize the selected language. Will be the same language for everything.')
+                    with dpg.tooltip('pslider'):
+                        dpg.add_text('CTRL+Left Click to enter a specific value.\nSetting the slider to 1 (maximum) will not make every level have a star lock to avoid softlocks.')
+                    showSlider()
+                speedrunner()
                 with dpg.tab(tag="t3", label="Credits"):  # Credits tab
-                    dpg.add_text("Super Mario 3D World Randomizer credits:\n\nDeveloper:\nToby Bailey - ("
-                                 "Skipper93653)\n\nSpecial Thanks:\nNintendo for creating the game.\nMembers of the "
-                                 "ZeldaMods Discord server for oead help.\nAll used Python module developers.\nAll "
-                                 "testers.")
-        with dpg.window(label="Finished!", modal=True, tag="popup", show=False):
+                    dpg.add_text("Super Mario 3D World Randomizer credits:\n\n"
+                                 "Developer:\n"
+                                 "Toby Bailey - (Skipper93653)\n\n"
+                                 "Module Credits:\n"
+                                 "ZeldaMods for oead.\n"
+                                 "Jonathan Hoffstadt for Dear PyGUI.\n"
+                                 "Nuitka for Nuitka.\n"
+                                 "Built-in Pythod modules.\n"
+                                 "...And all of their contributors.\n\n"
+                                 "Special Thanks:\n"
+                                 "Nintendo EAD/EPD for creating the game.\n"
+                                 "Members of the ZeldaMods Discord server for oead help.\n"
+                                 "Members of the 3D World Modding Community Discord server for general help.\n"
+                                 "All testers.")
+        with dpg.window(label="Finished!", modal=True, tag="popup", show=False, autosize=True):
             dpg.add_text("Randomization complete!")
+            dpg.add_text("", tag='popupSeed')
+            dpg.add_text("Settings:")
+            dpg.add_text('Speedrunner mode: '+str(dpg.get_value('speedrun')), tag='popupSpeedrun')
+            dpg.add_text("Generate spoiler file?: "+str(dpg.get_value('spoil')), tag='popupSpoil')
+            dpg.add_text("Randomize music?: "+str(dpg.get_value('music')), tag='popupMusic')
+            dpg.add_text("Randomize language?: "+str(dpg.get_value('lang')), tag='popupLang')
+            dpg.add_text("Green star locks: "+str(dpg.get_value('star')), tag='popupStar')
+            dpg.add_text("", tag='popupPslider')
             dpg.add_button(label="Close", callback=lambda: dpg.configure_item("popup", show=False))
 
-    def directory(self, sender, app_data):
-        dpg.set_value("dirtext", app_data['file_path_name'])  # Update directory text box with selected directory
-        if os.path.isfile(app_data['file_path_name']+'\\SystemData\\StageList.szs'):
-            dpg.set_value("dirbutt", "Valid Input Directory Loaded!")
-            dpg.configure_item('dirtext', color=(0, 255, 0, 255))
-            dpg.configure_item('randoinit', enabled=True)
-            dpg.configure_item('randotip', label='Start the randomizer!')
-        else:
-            dpg.set_value("dirbutt", "Load Input Directory")
-            dpg.configure_item('dirtext', color=(255, 0, 0, 255))
-            dpg.configure_item('randoinit', enabled=False)
-            dpg.configure_item('randotip', label='To be able to start the randomizer, select a valid input directory.')
 
-    def rdirectory(self, sender, app_data):
-        dpg.set_value("rdirtext", app_data['file_path_name'])
-
-    def show(self):
-        dpg.setup_dearpygui()
-        dpg.show_viewport()
-        dpg.set_primary_window("Main Window", True)  # Makes it so the UI fills the window
-        dpg.start_dearpygui()
-        dpg.destroy_context()
+def directory(sender, app_data):
+    dpg.set_value("dirtext", app_data['file_path_name'])  # Update directory text box with selected directory
+    checkDirectory()
 
 
-interface = GUI('Super Mario 3D World Randomizer', (800, 800))  # Initialise the main window
-interface.show()  # Show the main window
+def rdirectory(sender, app_data):
+    dpg.set_value("rdirtext", app_data['file_path_name'])
+    checkDirectory()
+
+
+def checkDirectory():
+    if len(str(dpg.get_value("seed"))) == 0:
+        seedRNG = time.time_ns()  # If no seed is entered, then it defaults to time since epoch.
+    else:
+        try:
+            seedRNG = int(dpg.get_value("seed"))  # Try to cast the input as an integer.
+        except ValueError:
+            seedRNG = 0
+            for i in str(dpg.get_value("seed")):
+                seedRNG += ord(i)
+    if os.path.isfile(dpg.get_value('dirtext')+'\\SystemData\\StageList.szs'):
+        dpg.configure_item("dirbutt", label="Valid Input Directory Loaded!")
+        dpg.configure_item('dirtext', color=(0, 255, 0, 255))
+    else:
+        dpg.configure_item("dirbutt", label="Load Input Directory")
+        dpg.configure_item('dirtext', color=(255, 0, 0, 255))
+
+    if os.path.isdir(dpg.get_value('rdirtext')):
+        dpg.configure_item('rdirbutt', label='Valid Output Directory Loaded!')
+        dpg.configure_item('rdirtext', color=(0, 255, 0, 255))
+    else:
+        dpg.configure_item("rdirbutt", label="Load Output Directory")
+        dpg.configure_item('rdirtext', color=(255, 0, 0, 255))
+
+    if not os.path.isdir(dpg.get_value('rdirtext')+'\\SM3DWR-'+str(seedRNG)):
+        dpg.configure_item('rdirbutt', label='Valid Output Directory Loaded!')
+        dpg.configure_item('rdirtext', color=(0, 255, 0, 255))
+    else:
+        dpg.configure_item("rdirbutt", label="Load Output Directory")
+        dpg.configure_item('rdirtext', color=(255, 0, 0, 255))
+
+    if os.path.isfile(dpg.get_value('dirtext')+'\\SystemData\\StageList.szs') and os.path.isdir(dpg.get_value('rdirtext')) and not os.path.isdir(dpg.get_value('rdirtext')+'\\SM3DWR-'+str(seedRNG)):
+        dpg.configure_item('randoinit', enabled=True)
+        dpg.set_value('randotip', 'Start the randomizer!')
+    else:
+        dpg.configure_item('randoinit', enabled=False)
+        dpg.set_value('randotip', 'To be able to start the randomizer, select a valid input and output directory.')
+
+
+def showSlider():
+    if dpg.get_value('star') == 'Fully random':
+        dpg.show_item('pslider')
+    else:
+        dpg.hide_item('pslider')
+    print(dpg.get_value('pslider'))
+
+
+def saveSettings():
+    settings.update({'dir': str(dpg.get_value('dirtext')),
+                     'rdir': str(dpg.get_value('rdirtext')),
+                     'speedrun': bool(dpg.get_value('speedrun')),
+                     'spoil': bool(dpg.get_value('spoil')),
+                     'music': bool(dpg.get_value('music')),
+                     'lang': bool(dpg.get_value('lang')),
+                     'star': str(dpg.get_value('star')),
+                     'pslider': float(dpg.get_value('pslider'))})
+
+    with open('settings.json', 'w') as s:
+        s.write(json.dumps(settings))
+
+
+def speedrunner():
+    if dpg.get_value('speedrun'):
+        dpg.set_value('spoil', False)
+        dpg.configure_item('spoil', enabled=False)
+        dpg.set_value('music', False)
+        dpg.configure_item('music', enabled=False)
+        dpg.set_value('lang', False)
+        dpg.configure_item('lang', enabled=False)
+        dpg.set_value('star', 'Fully random')
+        dpg.configure_item('star', enabled=False)
+        dpg.set_value('pslider', 0.15000000596046448)
+        dpg.configure_item('pslider', enabled=False, show=True)
+    else:
+        dpg.configure_item('spoil', enabled=True)
+        dpg.configure_item('music', enabled=True)
+        dpg.configure_item('lang', enabled=True)
+        dpg.configure_item('star', enabled=True)
+        dpg.configure_item('pslider', enabled=True)
+
+
+def show():
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    dpg.set_primary_window("Main Window", True)  # Makes it so the UI fills the window
+    dpg.start_dearpygui()
+    dpg.destroy_context()
+
+
+def main():
+    global settings, interface
+    if os.path.isfile(os.getcwd()+'\\settings.json'):
+        with open('settings.json', 'r') as s:
+            settings = json.loads(s.read())
+    else:
+        with open('settings.json', 'w') as s:
+            settings = {'dir': os.getcwd(),
+                        'rdir': os.getcwd(),
+                        'speedrun': False,
+                        'spoil': True,
+                        'music': False,
+                        'lang': False,
+                        'star': 'Fully random',
+                        'pslider': 0.15}
+            s.write(json.dumps(settings))
+    try:
+        if float(settings['pslider']) < 0 or float(settings['pslider']) > 1:
+            settings.update({'pslider': 0.15})
+        if str(settings['star']) != 'Fully random' or str(settings['star']) != 'Random values' or str(settings['star']) != 'Disabled':
+            settings.update({'star': 'Fully random'})
+        bool(settings['speedrun'])
+        bool(settings['spoil'])
+        bool(settings['music'])
+        bool(settings['lang'])
+    except:
+        with open('settings.json', 'w') as s:
+            settings = {'dir': os.getcwd(),
+                        'rdir': os.getcwd(),
+                        'speedrun': False,
+                        'spoil': True,
+                        'music': False,
+                        'lang': False,
+                        'star': 'Fully random',
+                        'pslider': 0.15}
+            s.write(json.dumps(settings))
+
+    interface = GUI('Super Mario 3D World Randomizer', (800, 800), settings)  # Initialise the main window
+    show()  # Show the main window
+
+
+if __name__ == "__main__":
+    main()
