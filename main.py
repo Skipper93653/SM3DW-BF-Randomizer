@@ -12,6 +12,7 @@ import json
 def randomizer():
     bar = 0  # Progress bar progress
     dpg.configure_item("randoinit", enabled=False, label="Randomizing...")
+    dpg.configure_item('seed', enabled=False)
     dpg.configure_item("progress", default_value=0)
     dpg.hide_item('t2')
     dpg.hide_item('t3')
@@ -26,20 +27,24 @@ def randomizer():
         except ValueError:
             seedRNG = 0
             for i in str(dpg.get_value("seed")):
-                seedRNG += ord(i)
+                if seedRNG == 0:
+                    seedRNG += ord(i)
+                else:
+                    seedRNG *= ord(i)
     rng = np.random.default_rng(seedRNG)
 
     # SystemData Path
-    oPath = os.path.join(user_data[0], 'SystemData\\')  # Original game path
+    oPath = os.path.join(user_data[0], 'SystemData')  # Original game path
 
-    if os.path.isfile(user_data[0]+'\\StageData\\CourseSelectW1ZoneMap1.szs'):  # Only the Wii U version contains a
+    if os.path.isfile(os.path.join(user_data[0], 'StageData', 'CourseSelectW1ZoneMap1.szs')):  # Only the Wii U version contains a
         # separate Map and Design file in StageData, Switch version has them merged.
         wiiu = True  # This variable is used to determine whether the files are from the Wii U version or not
     else:
         wiiu = False
 
     # Open StageList.szs and grab the BYML, convert to YML, open it as a list.
-    with open(oPath + "StageList.szs", "rb") as f:
+    print('Opening StageList.szs')
+    with open(os.path.join(oPath, "StageList.szs"), "rb") as f:
         archive = Sarc(yaz0.decompress(f.read()))  # Decompress and load SARC
     endianness = archive.get_endianness()
     raw = archive.get_file("StageList.byml").data
@@ -48,16 +53,18 @@ def randomizer():
     StageListNew = doc.split('\n')
     StageListNew.pop()
     StageListOld = StageListNew.copy()
+    print('Opened StageList.szs')
     bar += 1
     dpg.configure_item("progress", default_value=bar / 172)
 
-    sPath = os.path.join(user_data[0], 'StageData\\')
+    # StageData Path
+    sPath = os.path.join(user_data[0], 'StageData')
     if not wiiu:
-        rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\romfs\\SystemData\\')  # Randomizer path
-        srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\romfs\\StageData\\')
+        rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'SystemData')  # Randomizer path
+        srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'StageData')
     else:
-        rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\content\\SystemData\\')  # Randomizer path
-        srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\content\\StageData\\')
+        rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'content', 'SystemData')  # Randomizer path
+        srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'content', 'StageData')
     os.makedirs(rPath)
     os.makedirs(srPath)
     bar += 1
@@ -65,7 +72,8 @@ def randomizer():
 
     # Open each world map file and convert the map BYML into a readable format.
     if not wiiu:
-        with open(sPath + 'CourseSelectW1Zone.szs', 'rb') as f:
+        print('Opening CourseSelectW1Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectW1Zone.szs'), 'rb') as f:
             w1archive = Sarc(yaz0.decompress(f.read()))
         w1archive1 = w1archive.get_file('DofParam_obj10.bagldof').data
         w1archive2 = w1archive.get_file('DofParam_obj9.bagldof').data
@@ -81,10 +89,12 @@ def randomizer():
         CourseSelectW1ZoneMapn = w1archive6.split('\n')
         CourseSelectW1ZoneMapn.pop()
         CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
+        print('Opened CourseSelectW1Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW2Zone.szs', 'rb') as f:
+        print('Opening CourseSelectW2Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectW2Zone.szs'), 'rb') as f:
             w2archive = Sarc(yaz0.decompress(f.read()))
         w2archive1 = w2archive.get_file('DofParam_obj4.bagldof').data
         w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
@@ -100,10 +110,12 @@ def randomizer():
         CourseSelectW2ZoneMapn = w2archive2.split('\n')
         CourseSelectW2ZoneMapn.pop()
         CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
+        print('Opened CourseSelectW2Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW3Zone.szs', 'rb') as f:
+        print('Opening CourseSelectW3Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectW3Zone.szs'), 'rb') as f:
             w3archive = Sarc(yaz0.decompress(f.read()))
         w3archive1 = w3archive.get_file('CourseSelectW3ZoneDesign.byml').data
         w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
@@ -114,10 +126,12 @@ def randomizer():
         CourseSelectW3ZoneMapn = w3archive2.split('\n')
         CourseSelectW3ZoneMapn.pop()
         CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
+        print('Opened CourseSelectW3Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW4Zone.szs', 'rb') as f:
+        print('Opening CourseSelectW4Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectW4Zone.szs'), 'rb') as f:
             w4archive = Sarc(yaz0.decompress(f.read()))
         w4archive1 = w4archive.get_file('DofParam_obj4.bagldof').data
         w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
@@ -129,10 +143,12 @@ def randomizer():
         CourseSelectW4ZoneMapn = w4archive2.split('\n')
         CourseSelectW4ZoneMapn.pop()
         CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
+        print('Opened CourseSelectW4Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW5Zone.szs', 'rb') as f:
+        print('Opening CourseSelectW5Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectW5Zone.szs'), 'rb') as f:
             w5archive = Sarc(yaz0.decompress(f.read()))
         w5archive1 = w5archive.get_file('DofParam_obj4.bagldof').data
         w5archive2 = w5archive.get_file('CourseSelectW5ZoneDesign.byml').data
@@ -145,10 +161,12 @@ def randomizer():
         CourseSelectW5ZoneMapn = w5archive6.split('\n')
         CourseSelectW5ZoneMapn.pop()
         CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
+        print('Opened CourseSelectW5Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW6Zone.szs', 'rb') as f:
+        print('Opening CourseSelectW6Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectW6Zone.szs'), 'rb') as f:
             w6archive = Sarc(yaz0.decompress(f.read()))
         w6archive1 = w6archive.get_file('DofParam_obj18.bagldof').data
         w6archive2 = w6archive.get_file('DofParam_obj14.bagldof').data
@@ -170,10 +188,12 @@ def randomizer():
         CourseSelectW6ZoneMapn = w6archive7.split('\n')
         CourseSelectW6ZoneMapn.pop()
         CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
+        print('Opened CourseSelectW6Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW7Zone.szs', 'rb') as f:
+        print('Opening CourseSelectW7Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectW7Zone.szs'), 'rb') as f:
             w7archive = Sarc(yaz0.decompress(f.read()))
         w7archive1 = w7archive.get_file('CourseSelectW7ZoneDesign.byml').data
         w7archive2 = w7archive.get_file('DofParam_obj19.bagldof').data
@@ -185,10 +205,12 @@ def randomizer():
         CourseSelectW7ZoneMapn = w7archive6.split('\n')
         CourseSelectW7ZoneMapn.pop()
         CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
+        print('Opened CourseSelectW7Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW8Zone.szs', 'rb') as f:
+        print('Opening CourseSelectW8Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectW8Zone.szs'), 'rb') as f:
             w8archive = Sarc(yaz0.decompress(f.read()))
         w8archive1 = w8archive.get_file('DofParam_obj130.bagldof').data
         w8archive2 = w8archive.get_file('DofParam_obj129.bagldof').data
@@ -202,10 +224,12 @@ def randomizer():
         CourseSelectW8ZoneMapn = w8archive4.split('\n')
         CourseSelectW8ZoneMapn.pop()
         CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
+        print('Opened CourseSelectW8Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectS1Zone.szs', 'rb') as f:
+        print('Opening CourseSelectS1Zone.szs')
+        with open(os.path.join(sPath, 'CourseSelectS1Zone.szs'), 'rb') as f:
             s1archive = Sarc(yaz0.decompress(f.read()))
         s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
         s1archive2 = s1archive.get_file('CameraParam.byml').data
@@ -213,10 +237,12 @@ def randomizer():
         CourseSelectS1ZoneMapn = s1archive3.split('\n')
         CourseSelectS1ZoneMapn.pop()
         CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
+        print('Opened CourseSelectS1Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'KoopaLastBZone.szs', 'rb') as f:
+        print('Opening KoopaLastBZone.szs')
+        with open(os.path.join(sPath, 'KoopaLastBZone.szs'), 'rb') as f:
             KoopaLastBZone = Sarc(yaz0.decompress(f.read()))
         KoopaLastBZone1 = KoopaLastBZone.get_file('DofParam_obj0.bagldof').data
         KoopaLastBZone2 = byml.to_text(byml.from_binary(KoopaLastBZone.get_file('KoopaLastBZoneMap.byml').data))
@@ -227,88 +253,106 @@ def randomizer():
         KoopaLastBZone7 = KoopaLastBZone.get_file('CameraParam.byml').data
         KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
         KoopaLastBZoneMap.pop()
+        print('Opened KoopaLastBZone.szs')
     else:
-        with open(sPath + 'CourseSelectW1ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectW1ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectW1ZoneMap1.szs'), 'rb') as f:
             w1archive = Sarc(yaz0.decompress(f.read()))
         w1archive6 = byml.to_text(byml.from_binary(w1archive.get_file('CourseSelectW1ZoneMap.byml').data))
         w1archive8 = w1archive.get_file('CameraParam.byml').data
         CourseSelectW1ZoneMapn = w1archive6.split('\n')
         CourseSelectW1ZoneMapn.pop()
         CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
+        print('Opened CourseSelectW1ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW2ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectW2ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectW2ZoneMap1.szs'), 'rb') as f:
             w2archive = Sarc(yaz0.decompress(f.read()))
         w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
         w2archive7 = w2archive.get_file('CameraParam.byml').data
         CourseSelectW2ZoneMapn = w2archive2.split('\n')
         CourseSelectW2ZoneMapn.pop()
         CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
+        print('Opened CourseSelectW2ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW3ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectW3ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectW3ZoneMap1.szs'), 'rb') as f:
             w3archive = Sarc(yaz0.decompress(f.read()))
         w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
         w3archive3 = w3archive.get_file('CameraParam.byml').data
         CourseSelectW3ZoneMapn = w3archive2.split('\n')
         CourseSelectW3ZoneMapn.pop()
         CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
+        print('Opened CourseSelectW3ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW4ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectW4ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectW4ZoneMap1.szs'), 'rb') as f:
             w4archive = Sarc(yaz0.decompress(f.read()))
         w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
         w4archive6 = w4archive.get_file('CameraParam.byml').data
         CourseSelectW4ZoneMapn = w4archive2.split('\n')
         CourseSelectW4ZoneMapn.pop()
         CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
+        print('Opened CourseSelectW4ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW5ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectW5ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectW5ZoneMap1.szs'), 'rb') as f:
             w5archive = Sarc(yaz0.decompress(f.read()))
         w5archive5 = w5archive.get_file('CameraParam.byml').data
         w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
         CourseSelectW5ZoneMapn = w5archive6.split('\n')
         CourseSelectW5ZoneMapn.pop()
         CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
+        print('Opened CourseSelectW4ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW6ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectW6ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectW6ZoneMap1.szs'), 'rb') as f:
             w6archive = Sarc(yaz0.decompress(f.read()))
         w6archive7 = byml.to_text(byml.from_binary(w6archive.get_file('CourseSelectW6ZoneMap.byml').data))
         w6archive14 = w6archive.get_file('CameraParam.byml').data
         CourseSelectW6ZoneMapn = w6archive7.split('\n')
         CourseSelectW6ZoneMapn.pop()
         CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
+        print('Opened CourseSelectW6ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW7ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectW7ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectW7ZoneMap1.szs'), 'rb') as f:
             w7archive = Sarc(yaz0.decompress(f.read()))
         w7archive4 = w7archive.get_file('CameraParam.byml').data
         w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
         CourseSelectW7ZoneMapn = w7archive6.split('\n')
         CourseSelectW7ZoneMapn.pop()
         CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
+        print('Opened CourseSelectW7ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectW8ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectW8ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectW8ZoneMap1.szs'), 'rb') as f:
             w8archive = Sarc(yaz0.decompress(f.read()))
         w8archive4 = byml.to_text(byml.from_binary(w8archive.get_file('CourseSelectW8ZoneMap.byml').data))
         w8archive8 = w8archive.get_file('CameraParam.byml').data
         CourseSelectW8ZoneMapn = w8archive4.split('\n')
         CourseSelectW8ZoneMapn.pop()
         CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
+        print('Opened CourseSelectW8ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'CourseSelectS1ZoneMap1.szs', 'rb') as f:
+        print('Opening CourseSelectS1ZoneMap1.szs')
+        with open(os.path.join(sPath, 'CourseSelectS1ZoneMap1.szs'), 'rb') as f:
             s1archive = Sarc(yaz0.decompress(f.read()))
         s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
         s1archive2 = s1archive.get_file('CameraParam.byml').data
@@ -316,15 +360,18 @@ def randomizer():
         CourseSelectS1ZoneMapn = s1archive3.split('\n')
         CourseSelectS1ZoneMapn.pop()
         CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
+        print('Opened CourseSelectS1ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
-        with open(sPath + 'KoopaLastBZone.szs', 'rb') as f:
+        print('Opening KoopaLastBZoneMap1.szs')
+        with open(os.path.join(sPath, 'KoopaLastBZoneMap1.szs'), 'rb') as f:
             KoopaLastBZone = Sarc(yaz0.decompress(f.read()))
         KoopaLastBZone2 = byml.to_text(byml.from_binary(KoopaLastBZone.get_file('KoopaLastBZoneMap.byml').data))
         KoopaLastBZone7 = KoopaLastBZone.get_file('CameraParam.byml').data
         KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
         KoopaLastBZoneMap.pop()
+        print('Opened KoopaLastBZoneMap1.szs')
 
     # Creating base variables to be used and iterated on in the randomizer loop
     worldNo = 1
@@ -390,7 +437,7 @@ def randomizer():
         GreenStarLockHistory2.append([rng.choice([True, False], size=1, p=[float(dpg.get_value('pslider')), float(1 - dpg.get_value('pslider'))], replace=True), int(currentGreenStars * 0.6060809576)])  # 0.6060809576 is average
         if stageNo == 114:
             GreenStarLockHistory2[-1][0] = True  # Force Bowser-Castle to have a star lock when setting is on 'Fully random'
-        if dpg.get_value("star") == 'Disabled' or 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100:
+        if dpg.get_value("star") == 'Disabled' or 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100 or stageNo == 117 or stageNo == 118:
             # Remove all Green Star Locks when encountered
             print('Removing green star lock...')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
@@ -631,20 +678,21 @@ def randomizer():
     doc = '\n'.join(StageListNew)
     # Creating new SZS filers with the modified files.
     if not wiiu:
+        print('Writing StageList.szs')
         writer = SarcWriter()
         writer.set_endianness(endianness)
         writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), False, 2)  # Adding to SARC.
         data = writer.write()  # Write to SARC
 
-        with open(rPath+"StageList.szs", "wb") as randoSZS:
-            print('Writing StageList.szs.')
+        with open(os.path.join(rPath, "StageList.szs"), "wb") as randoSZS:
             randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
-            print('Written StageList.szs.')
+        print('Written StageList.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
         print('Writing world files:')
 
+        print('Writing CourseSelectW1Zone.szs')
         w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
         w1writer = SarcWriter()
         w1writer.set_endianness(endianness)
@@ -661,13 +709,13 @@ def randomizer():
         w1writer.files['DofParam_obj8.bagldof'] = Bytes(w1archive11)
         w1data = w1writer.write()
 
-        with open(srPath+'CourseSelectW1Zone.szs', 'wb') as w1:
-            print('Writing CourseSelectW1Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectW1Zone.szs'), 'wb') as w1:
             w1.write(yaz0.compress(w1data[1]))
-            print('Written CourseSelectW1Zone.szs')
+        print('Written CourseSelectW1Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW2Zone.szs')
         w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
         w2writer = SarcWriter()
         w2writer.set_endianness(endianness)
@@ -684,13 +732,13 @@ def randomizer():
         w2writer.files['DofParam_obj8.bagldof'] = Bytes(w2archive11)
         w2data = w2writer.write()
 
-        with open(srPath+'CourseSelectW2Zone.szs', 'wb') as w2:
-            print('Writing CourseSelectW2Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectW2Zone.szs'), 'wb') as w2:
             w2.write(yaz0.compress(w2data[1]))
-            print('Written CourseSelectW2Zone.szs')
+        print('Written CourseSelectW2Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW3Zone.szs')
         w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
         w3writer = SarcWriter()
         w3writer.set_endianness(endianness)
@@ -702,13 +750,13 @@ def randomizer():
         w3writer.files['DofParam_obj28.bagldof'] = Bytes(w3archive6)
         w3data = w3writer.write()
 
-        with open(srPath+'CourseSelectW3Zone.szs', 'wb') as w3:
-            print('Writing CourseSelectW3Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectW3Zone.szs'), 'wb') as w3:
             w3.write(yaz0.compress(w3data[1]))
-            print('Written CourseSelectW3Zone.szs')
+        print('Written CourseSelectW3Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW4Zone.szs')
         w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
         w4writer = SarcWriter()
         w4writer.set_endianness(endianness)
@@ -721,13 +769,13 @@ def randomizer():
         w4writer.files['CourseSelectW4ZoneDesign.byml'] = Bytes(w4archive7)
         w4data = w4writer.write()
 
-        with open(srPath+'CourseSelectW4Zone.szs', 'wb') as w4:
-            print('Writing CourseSelectW4Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectW4Zone.szs'), 'wb') as w4:
             w4.write(yaz0.compress(w4data[1]))
-            print('Written CourseSelectW4Zone.szs')
+        print('Written CourseSelectW4Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW5Zone.szs')
         w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
         w5writer = SarcWriter()
         w5writer.set_endianness(endianness)
@@ -741,13 +789,13 @@ def randomizer():
         w5writer.files['CourseSelectW5ZoneSound.byml'] = Bytes(w5archive8)
         w5data = w5writer.write()
 
-        with open(srPath+'CourseSelectW5Zone.szs', 'wb') as w5:
-            print('Writing CourseSelectW5Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectW5Zone.szs'), 'wb') as w5:
             w5.write(yaz0.compress(w5data[1]))
-            print('Written CourseSelectW5Zone.szs')
+        print('Written CourseSelectW5Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW6Zone.szs')
         w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
         w6writer = SarcWriter()
         w6writer.set_endianness(endianness)
@@ -770,13 +818,13 @@ def randomizer():
         w6writer.files['DofParam_obj8.bagldof'] = Bytes(w6archive17)
         w6data = w6writer.write()
 
-        with open(srPath+'CourseSelectW6Zone.szs', 'wb') as w6:
-            print('Writing CourseSelectW6Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectW6Zone.szs'), 'wb') as w6:
             w6.write(yaz0.compress(w6data[1]))
-            print('Written CourseSelectW6Zone.szs')
+        print('Written CourseSelectW6Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW7Zone.szs')
         w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
         w7writer = SarcWriter()
         w7writer.set_endianness(endianness)
@@ -789,13 +837,13 @@ def randomizer():
         w7writer.files['CourseSelectW7ZoneSound.byml'] = Bytes(w7archive7)
         w7data = w7writer.write()
 
-        with open(srPath+'CourseSelectW7Zone.szs', 'wb') as w7:
-            print('Writing CourseSelectW7Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectW7Zone.szs'), 'wb') as w7:
             w7.write(yaz0.compress(w7data[1]))
-            print('Written CourseSelectW7Zone.szs')
+        print('Written CourseSelectW7Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW8Zone.szs')
         w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
         w8writer = SarcWriter()
         w8writer.set_endianness(endianness)
@@ -810,13 +858,13 @@ def randomizer():
         w8writer.files['DofParam_obj133.bagldof'] = Bytes(w8archive9)
         w8data = w8writer.write()
 
-        with open(srPath+'CourseSelectW8Zone.szs', 'wb') as w8:
-            print('Writing CourseSelectW8Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectW8Zone.szs'), 'wb') as w8:
             w8.write(yaz0.compress(w8data[1]))
-            print('Written CourseSelectW8Zone.szs')
+        print('Written CourseSelectW8Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectS1Zone.szs')
         s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
         s1writer = SarcWriter()
         s1writer.set_endianness(endianness)
@@ -825,13 +873,13 @@ def randomizer():
         s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), False, 2)
         s1data = s1writer.write()
 
-        with open(srPath+'CourseSelectS1Zone.szs', 'wb') as s1:
-            print('Writing CourseSelectS1Zone.szs')
+        with open(os.path.join(srPath, 'CourseSelectS1Zone.szs'), 'wb') as s1:
             s1.write(yaz0.compress(s1data[1]))
-            print('Written CourseSelectS1Zone.szs')
+        print('Written CourseSelectS1Zone.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing KoopaLastBZone.szs')
         bzwriter = SarcWriter()
         bzwriter.set_endianness(endianness)
         bzwriter.files['DofParam_obj0.bagldof'] = Bytes(KoopaLastBZone1)
@@ -843,25 +891,25 @@ def randomizer():
         bzwriter.files['CameraParam.byml'] = Bytes(KoopaLastBZone7)
         bzdata = bzwriter.write()
 
-        with open(srPath+'KoopaLastBZone.szs', 'wb') as bz:
-            print('Writing KoopaLastBZone.szs')
+        with open(os.path.join(srPath, 'KoopaLastBZone.szs'), 'wb') as bz:
             bz.write(yaz0.compress(bzdata[1]))
-            print('Written KoopaLastBZone.szs')
+        print('Written KoopaLastBZone.szs')
 
     else:
+        print('Writing StageList.szs.')
         writer = SarcWriter()
         writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), True, 1)
         data = writer.write()
 
-        with open(rPath + "StageList.szs", "wb") as randoSZS:
-            print('Writing StageList.szs.')
+        with open(os.path.join(rPath, "StageList.szs"), "wb") as randoSZS:
             randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
-            print('Written StageList.szs.')
+        print('Written StageList.szs.')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
         print('Writing world files:')
 
+        print('Writing CourseSelectW1ZoneMap1.szs')
         w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
         w1writer = SarcWriter()
         w1writer.set_endianness(endianness)
@@ -869,13 +917,13 @@ def randomizer():
         w1writer.files['CameraParam.byml'] = Bytes(w1archive8)
         w1data = w1writer.write()
 
-        with open(srPath + 'CourseSelectW1ZoneMap1.szs', 'wb') as w1:
-            print('Writing CourseSelectW1ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectW1ZoneMap1.szs'), 'wb') as w1:
             w1.write(yaz0.compress(w1data[1]))
-            print('Written CourseSelectW1ZoneMap1.szs')
+        print('Written CourseSelectW1ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW2ZoneMap1.szs')
         w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
         w2writer = SarcWriter()
         w2writer.set_endianness(endianness)
@@ -883,13 +931,13 @@ def randomizer():
         w2writer.files['CameraParam.byml'] = Bytes(w2archive7)
         w2data = w2writer.write()
 
-        with open(srPath + 'CourseSelectW2ZoneMap1.szs', 'wb') as w2:
-            print('Writing CourseSelectW2ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectW2ZoneMap1.szs'), 'wb') as w2:
             w2.write(yaz0.compress(w2data[1]))
-            print('Written CourseSelectW2ZoneMap1.szs')
+        print('Written CourseSelectW2ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW3ZoneMap1.szs')
         w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
         w3writer = SarcWriter()
         w3writer.set_endianness(endianness)
@@ -897,13 +945,13 @@ def randomizer():
         w3writer.files['CameraParam.byml'] = Bytes(w3archive3)
         w3data = w3writer.write()
 
-        with open(srPath + 'CourseSelectW3ZoneMap1.szs', 'wb') as w3:
-            print('Writing CourseSelectW3ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectW3ZoneMap1.szs'), 'wb') as w3:
             w3.write(yaz0.compress(w3data[1]))
-            print('Written CourseSelectW3ZoneMap1.szs')
+        print('Written CourseSelectW3ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW4ZoneMap1.szs')
         w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
         w4writer = SarcWriter()
         w4writer.set_endianness(endianness)
@@ -911,13 +959,13 @@ def randomizer():
         w4writer.files['CameraParam.byml'] = Bytes(w4archive6)
         w4data = w4writer.write()
 
-        with open(srPath + 'CourseSelectW4ZoneMap1.szs', 'wb') as w4:
-            print('Writing CourseSelectW4ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectW4ZoneMap1.szs'), 'wb') as w4:
             w4.write(yaz0.compress(w4data[1]))
-            print('Written CourseSelectW4ZoneMap1.szs')
+        print('Written CourseSelectW4ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW5ZoneMap1.szs')
         w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
         w5writer = SarcWriter()
         w5writer.set_endianness(endianness)
@@ -925,13 +973,13 @@ def randomizer():
         w5writer.files['CourseSelectW5ZoneMap.byml'] = byml.to_binary(byml.from_text(w5archive6), True, 1)
         w5data = w5writer.write()
 
-        with open(srPath + 'CourseSelectW5ZoneMap1.szs', 'wb') as w5:
-            print('Writing CourseSelectW5ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectW5ZoneMap1.szs'), 'wb') as w5:
             w5.write(yaz0.compress(w5data[1]))
-            print('Written CourseSelectW5ZoneMap1.szs')
+        print('Written CourseSelectW5ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW6ZoneMap1.szs')
         w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
         w6writer = SarcWriter()
         w6writer.set_endianness(endianness)
@@ -939,13 +987,13 @@ def randomizer():
         w6writer.files['CameraParam.byml'] = Bytes(w6archive14)
         w6data = w6writer.write()
 
-        with open(srPath + 'CourseSelectW6ZoneMap1.szs', 'wb') as w6:
-            print('Writing CourseSelectW6ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectW6ZoneMap1.szs'), 'wb') as w6:
             w6.write(yaz0.compress(w6data[1]))
-            print('Written CourseSelectW6ZoneMap1.szs')
+        print('Written CourseSelectW6ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW7ZoneMap1.szs')
         w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
         w7writer = SarcWriter()
         w7writer.set_endianness(endianness)
@@ -953,13 +1001,13 @@ def randomizer():
         w7writer.files['CourseSelectW7ZoneMap.byml'] = byml.to_binary(byml.from_text(w7archive6), True, 1)
         w7data = w7writer.write()
 
-        with open(srPath + 'CourseSelectW7ZoneMap1.szs', 'wb') as w7:
-            print('Writing CourseSelectW7ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectW7ZoneMap1.szs'), 'wb') as w7:
             w7.write(yaz0.compress(w7data[1]))
-            print('Written CourseSelectW7ZoneMap1.szs')
+        print('Written CourseSelectW7ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectW8ZoneMap1.szs')
         w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
         w8writer = SarcWriter()
         w8writer.set_endianness(endianness)
@@ -967,13 +1015,13 @@ def randomizer():
         w8writer.files['CameraParam.byml'] = Bytes(w8archive8)
         w8data = w8writer.write()
 
-        with open(srPath + 'CourseSelectW8ZoneMap1.szs', 'wb') as w8:
-            print('Writing CourseSelectW8ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectW8ZoneMap1.szs'), 'wb') as w8:
             w8.write(yaz0.compress(w8data[1]))
-            print('Written CourseSelectW8ZoneMap1.szs')
+        print('Written CourseSelectW8ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing CourseSelectS1ZoneMap1.szs')
         s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
         s1writer = SarcWriter()
         s1writer.set_endianness(endianness)
@@ -982,25 +1030,24 @@ def randomizer():
         s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), True, 1)
         s1data = s1writer.write()
 
-        with open(srPath + 'CourseSelectS1ZoneMap1.szs', 'wb') as s1:
-            print('Writing CourseSelectS1ZoneMap1.szs')
+        with open(os.path.join(srPath, 'CourseSelectS1ZoneMap1.szs'), 'wb') as s1:
             s1.write(yaz0.compress(s1data[1]))
-            print('Written CourseSelectS1ZoneMap1.szs')
+        print('Written CourseSelectS1ZoneMap1.szs')
         bar += 1
         dpg.configure_item("progress", default_value=bar/172)
 
+        print('Writing KoopaLastBZoneMap1.szs')
         bzwriter = SarcWriter()
         bzwriter.set_endianness(endianness)
         bzwriter.files['KoopaLastBZoneMap.byml'] = byml.to_binary(byml.from_text(KoopaLastBZone2), True, 1)
         bzwriter.files['CameraParam.byml'] = Bytes(KoopaLastBZone7)
         bzdata = bzwriter.write()
 
-        with open(srPath + 'KoopaLastBZoneMap1.szs', 'wb') as bz:
-            print('Writing KoopaLastBZoneMap1.szs')
+        with open(os.path.join(srPath, 'KoopaLastBZoneMap1.szs'), 'wb') as bz:
             bz.write(yaz0.compress(bzdata[1]))
-            print('Written KoopaLastBZoneMap1.szs')
+        print('Written KoopaLastBZoneMap1.szs')
 
-    print('Finished writing world files.')
+    print('Finished writing stage files.')
 
     musicRandomizer(rng, seedRNG, user_data)
     bar += 1
@@ -1012,21 +1059,55 @@ def randomizer():
     if dpg.get_value("spoil"):
         spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), GreenStarLockHistory2, user_data)
     else:
-        print('Not generating spoiler file, only generating seed text file.')
-        with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'.txt', 'w', encoding='utf-8') as s:
-            s.write('Seed: '+str(seedRNG))  # Creating a new spoiler text file.
+        print('Not generating spoiler file, only generating seed and settings text file.')
+        with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), str(seedRNG)+'.txt'), 'w', encoding='utf-8') as s:
+            # Creating a new spoiler text file. This can be simplified but whatever - most of this entire program can be :P
+            if len(str(dpg.get_value('seed'))) == 0:
+                if str(dpg.get_value('star')) == 'Fully random':
+                    s.write('Seed: ' + str(seedRNG) + ' (Random seed)\n\n'
+                            'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
+                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
+                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
+                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
+                            'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
+                            'Green star lock probability: ' + str(dpg.get_value('pslider')))
+                else:
+                    s.write('Seed: ' + str(seedRNG) + ' (Random seed)\n\n'
+                            'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
+                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
+                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
+                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
+                            'Green star locks?: ' + str(dpg.get_value('star')))
+            else:
+                if str(dpg.get_value('star')) == 'Fully random':
+                    s.write('Seed: ' + str(seedRNG) + ' (Set seed)\n\n'
+                            'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
+                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
+                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
+                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
+                            'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
+                            'Green star lock probability: ' + str(dpg.get_value('pslider')))
+                else:
+                    s.write('Seed: ' + str(seedRNG) + ' (Set seed)\n\n'
+                            'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
+                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
+                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
+                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
+                            'Green star locks?: ' + str(dpg.get_value('star')))
+
     bar += 1
     dpg.configure_item("progress", default_value=bar/172)
 
     if wiiu:
-        with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\rules.txt', 'w', encoding='utf-8') as rules:
+        with open(user_data[1]+'\\SM3DWR-' + str(seedRNG)+'\\rules.txt', 'w', encoding='utf-8') as rules:
             rules.write('[Definition]\ntitleIds = 0005000010145D00,0005000010145C00,0005000010106100\nname = SM3DWR-'
-                        +str(seedRNG)+'\npath = \"Super Mario 3D World/Mods/SM3DWR-'+str(seedRNG)+'\"\ndescription = '
+                        + str(seedRNG)+'\npath = \"Super Mario 3D World/Mods/SM3DWR-' + str(seedRNG)+'\"\ndescription = '
                         'Super Mario 3D World Randomizer\nversion = 3\nfsPriority = 100')
     bar += 1
     dpg.configure_item("progress", default_value=bar/172)
 
     dpg.configure_item("progress", default_value=1)
+    dpg.configure_item('seed', enabled=True)
     dpg.configure_item("randoinit", enabled=True, label="Randomize!")
     dpg.show_item('t2')
     dpg.show_item('t3')
@@ -1051,12 +1132,12 @@ def musicRandomizer(rng, seedRNG, user_data):
     print('Randomizing music...')
 
     # Creating variables for the directories we are working with.
-    mPath = os.path.join(user_data[0], 'SoundData\\stream\\')
-    rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG) + '\\romfs\\SoundData\\stream\\')
+    mPath = os.path.join(user_data[0], 'SoundData', 'stream')
+    rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'SoundData', 'stream')
     os.makedirs(rPath)
-    if os.path.isdir(os.path.join(user_data[0], 'SoundData\\streamSe\\')):
-        mPath2 = os.path.join(user_data[0], 'SoundData\\streamSe\\')
-        rPath2 = os.path.join(user_data[1], 'SM3DWR-'+str(seedRNG)+'\\romfs\\SoundData\\streamSe\\')
+    if os.path.isdir(os.path.join(user_data[0], 'SoundData', 'streamSe')):
+        mPath2 = os.path.join(user_data[0], 'SoundData', 'streamSe')
+        rPath2 = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'SoundData', 'streamSe')
         os.makedirs(rPath2)
         # Making a list comprising the names of every file in the directory
         musicRando_order = os.listdir(mPath) + os.listdir(mPath2)
@@ -1074,15 +1155,15 @@ def musicRandomizer(rng, seedRNG, user_data):
             # Renaming music file to randomized music file using the list.
             if (music == 'DemoSingleModeEnding.dspadpcm.bfstm' or music == 'SingleModeOpening.dspadpcm.bfstm') and (
                     rmusic == 'DemoSingleModeEnding.dspadpcm.bfstm' or rmusic == 'SingleModeOpening.dspadpcm.bfstm'):
-                shutil.copy2(mPath2+music, rPath2+rmusic)
+                shutil.copy2(os.path.join(mPath2, music), os.path.join(rPath2, rmusic))
             elif (music != 'DemoSingleModeEnding.dspadpcm.bfstm' or music != 'SingleModeOpening.dspadpcm.bfstm') and (
                     rmusic == 'DemoSingleModeEnding.dspadpcm.bfstm' or rmusic == 'SingleModeOpening.dspadpcm.bfstm'):
-                shutil.copy2(mPath+music, rPath2+rmusic)
+                shutil.copy2(os.path.join(mPath, music), os.path.join(rPath2, rmusic))
             elif (music == 'DemoSingleModeEnding.dspadpcm.bfstm' or music == 'SingleModeOpening.dspadpcm.bfstm') and (
                     rmusic != 'DemoSingleModeEnding.dspadpcm.bfstm' or rmusic != 'SingleModeOpening.dspadpcm.bfstm'):
-                shutil.copy2(mPath2+music, rPath+rmusic)
+                shutil.copy2(os.path.join(mPath2, music), os.path.join(rPath, rmusic))
             else:
-                shutil.copy2(mPath+music, rPath+rmusic)
+                shutil.copy2(os.path.join(mPath, music), os.path.join(rPath, rmusic))
             print('Renamed', music, 'to', rmusic)
 
         print('Music randomizer procedure complete!')
@@ -1094,8 +1175,8 @@ def musicRandomizer(rng, seedRNG, user_data):
 def langRandomizer(rng, seedRNG, user_data):
     print('Randomizing language...')
 
-    lPath = os.path.join(user_data[0], 'LocalizedData\\')
-    rlPath = os.path.join(user_data[1], 'SM3DWR-'+str(seedRNG)+'\\romfs\\LocalizedData\\')
+    lPath = os.path.join(user_data[0], 'LocalizedData')
+    rlPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'LocalizedData')
     os.makedirs(rlPath)
 
     Lang_order = os.listdir(lPath)
@@ -1105,7 +1186,7 @@ def langRandomizer(rng, seedRNG, user_data):
     if dpg.get_value('lang'):
         for lang in Lang_order:
             rlang = rLang_order[Lang_order.index(lang)]
-            shutil.copytree(lPath+lang, rlPath+rlang)
+            shutil.copytree(os.path.join(lPath, lang), os.path.join(rlPath, rlang))
             print('Renamed', lang, 'to', rlang)
 
         print('Language randomizer procedure complete!')
@@ -1120,7 +1201,24 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
     worldIndex = 1
     overallIndex = 1
     overallIndex2 = 1
-    stageID_Name = ['Seed: '+str(seedRNG)+'\n\nLevel slot, Level name (Original level slot)\n\nWorld ' + str(worldIndex) + '\n']
+    if len(str(dpg.get_value('seed'))) == 0:
+        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Random seed)\n\n']
+    else:
+        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Set seed)\n\n']
+    if str(dpg.get_value('star')) == 'Fully random':
+        stageID_Name.append('Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
+                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
+                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
+                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
+                            'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
+                            'Green star lock probability: ' + str(dpg.get_value('pslider')))
+    else:
+        stageID_Name.append('Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
+                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
+                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
+                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
+                            'Green star locks?: ' + str(dpg.get_value('star')))
+    stageID_Name.append('\n\nLevel slot, Level name (Original level slot) (Green Stars required, if needed)\n\nWorld ' + str(worldIndex) + '\n')
 
     # Appending the name of each stage to stageID_name.
     while overallIndex <= 154:
@@ -1451,16 +1549,16 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
         if overallIndex != 34 and overallIndex != 62 and overallIndex != 63 and overallIndex != 64 and overallIndex != 65 and overallIndex != 66 and overallIndex != 81 and overallIndex != 97 and overallIndex != 115:
             overallIndex2 += 1
 
-    with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'-spoiler.txt', 'w', encoding='utf-8') as s:
+    with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), str(seedRNG) + '-spoiler.txt'), 'w', encoding='utf-8') as s:
         s.write(''.join([''.join(l2) for l2 in stageID_Name]))  # Creating a new spoiler text file.
 
-    with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'-spoiler.txt', 'r', encoding='utf-8') as s:
+    with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), str(seedRNG) + '-spoiler.txt'), 'r', encoding='utf-8') as s:
         s = s.read()  # Reading the spoiler file.
 
     # Making sure levels have the correct names.
     rep = s.replace('11-6', 'Flower-6').replace('11-7', 'Flower-7').replace('11-8', 'Flower-8').replace('11-9', 'Flower-9').replace('11-10', 'Flower-10').replace('11-11', 'Flower-11').replace('11-12', 'Flower-12').replace('12-1', 'Crown-Crown').replace('1-9', '1-Castle').replace('4-9', '4-Castle').replace('5-12', '5-Castle').replace('7-11', 'Castle-Castle').replace('8-13', 'Bowser-Castle').replace('2-9', '2-Tank').replace('6-11', '6-Tank').replace('3-11', '3-Train').replace('8-12', 'Bowser-Train').replace('1-6', '1-Toad House 1').replace('1-7', '1-Toad House 2').replace('2-6', '2-Toad House').replace('3-8', '3-Toad House').replace('3-12', '3-Toad House 2 (Unused)').replace('4-6', '4-Toad House').replace('5-9', '5-Toad House').replace('5-13', '5-Toad House 2 (Unused)').replace('5-14', '5-Toad House 3 (Unused)').replace('5-15', '5-Toad House 4 (Unused)').replace('5-16', '5-Toad House 5 (Unused)').replace('5-17', '5-Toad House 6 (Unused)').replace('6-8', '6-Toad House').replace('6-12', '6-Toad House 2 (Unused)').replace('7-8', 'Castle-Toad House').replace('7-12', 'Castle-Toad House 2 (Unused)').replace('8-8', 'Bowser-Toad House 1').replace('8-9', 'Bowser-Toad House 2').replace('8-14', 'Bowser-Toad House 3 (Unused)').replace('2-7', '2-Sprixie House').replace('3-9', '3-Sprixie House').replace('4-7', '4-Sprixie House').replace('5-10', '5-Sprixie House').replace('6-9', '6-Sprixie House').replace('7-9', 'Castle-Sprixie House').replace('8-10', 'Bowser-Sprixie House').replace('9-10', 'Star-Sprixie House').replace('12-2', 'Crown-Sprixie House').replace('1-8', '1-Captain Toad').replace('3-10', '3-Captain Toad').replace('5-11', '5-Captain Toad').replace('7-10', 'Castle-Captain Toad').replace('9-11', 'Star-Captain Toad').replace('12-3', 'Crown-Captain Toad').replace('1-10', 'Lucky House').replace('2-10', 'Lucky House').replace('3-13', 'Lucky House').replace('4-10', 'Lucky House').replace('5-18', 'Lucky House').replace('6-13', 'Lucky House').replace('7-13', 'Lucky House').replace('8-15', 'Lucky House').replace('9-12', 'Lucky House').replace('1-11', '1-A').replace('2-11', '2-A').replace('3-14', '3-A').replace('4-11', '4-A').replace('5-19', '5-A').replace('6-14', '6-A').replace('7-14', 'Castle-A').replace('8-16', 'Bowser-A').replace('3-15', '3-B').replace('4-12', '4-B').replace('5-20', '5-B').replace('6-15', '6-B').replace('7-15', 'Castle-B').replace('8-17', 'Bowser-B').replace('6-16', '6-C').replace('7-16', 'Castle-C').replace('5-8', 'Coin Express').replace('2-8', '2-Mystery House').replace('4-8', '4-Mystery House').replace('6-10', '6-Mystery House').replace('8-11', 'Bowser-Mystery House').replace('10-8', 'Mushroom-Mystery House').replace('12-4', 'Crown-Mystery House').replace('7-', 'Castle-').replace('8-', 'Bowser-').replace('9-', 'Star-').replace('10-', 'Mushroom-').replace('11-', 'Flower-').replace('12-', 'Crown-')
 
-    with open(user_data[1]+'\\SM3DWR-'+str(seedRNG)+'\\'+str(seedRNG)+'-spoiler.txt', 'w', encoding='utf-8') as s:
+    with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), str(seedRNG) + '-spoiler.txt'), 'w', encoding='utf-8') as s:
         s.write(rep)  # Writing the corrected level slots back to the file.
 
     print('Generated spoiler file!')
@@ -1496,36 +1594,36 @@ class GUI:
                     with dpg.tooltip("dirbutt"):
                         '''
                         dpg.add_text("The directory selected must be the root directory of an unmodified dump of the "
-                                     "game:\n"
-                                     "\"00050000(\\)10106100\\content\\\" - Super Mario 3D World (JPN)\n"
-                                     "\"00050000(\\)10145C00\\content\\\" - Super Mario 3D World (USA)\n"
-                                     "\"00050000(\\)10145D00\\content\\\" - Super Mario 3D World (EUR)\n"
-                                     "\"010028600EBDA000\\romfs\\\" - Super Mario 3D World + Bowser's Fury")
+                                     "game:\n" +
+                                     "\"" + os.path.join("00050000", "10106100", "content") + "\" - Super Mario 3D World (JPN)\n"
+                                     "\"" + os.path.join("00050000", "10145C00", "content") + "\" - Super Mario 3D World (USA)\n"
+                                     "\"" + os.path.join("00050000", "10145D00", "content") + "\" - Super Mario 3D World (JPN)\n"
+                                     "\"" + os.path.join("010028600EBDA000", "romfs") + "\" - Super Mario 3D World + Bowser's Fury")
                         '''
                         dpg.add_text("The directory selected must be the root directory of an unmodified dump of the "
-                                     "game:\n"
-                                     "\"010028600EBDA000\\romfs\\\" - Super Mario 3D World + Bowser's Fury")
+                                     "game:\n" +
+                                     "\"" + os.path.join("010028600EBDA000", "romfs") + "\" - Super Mario 3D World + Bowser's Fury")
                     with dpg.tooltip("rdirbutt"):
                         '''
                         dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
-                                     "be your mods folder:\n"
-                                     "\"Cemu\\graphicsPacks\\\" - Cemu (Wii U)\n"
-                                     "\"sd:\\wiiu\\sdcafiine\\0005000010106100\\\" - SDCafiine (Wii U, JPN version)\n"
-                                     "\"sd:\\wiiu\\sdcafiine\\0005000010145C00\\\" - SDCafinne (Wii U, USA version)\n"
-                                     "\"sd:\\wiiu\\sdcafiine\\0005000010145D00\\\" - SDCafiine (Wii U, EUR version)\n"
-                                     "\"%appdata%\\yuzu\\load\\010028600EBDA000\\\" - Yuzu (Switch)\n"
-                                     "\"%appdata%\\Ryujinx\\mods\\contents\\010028600EBDA000\\\" - Ryujinx (Switch)\n"
-                                     "\"sd:\\mods\\Super Mario 3D World + Bowser's Fury\\Randomizer\\contents\\010028600EBDA000\\\"* - SMM (Switch)\n\n"
-                                     "*The \"romfs\" folder inside the generated\"SM3DWR-<seed>\" folder should be "
-                                     "taken out and placed into the\nspecified SimpleModManager (SMM) folder.")
+                                     "be your mods folder:\n" +
+                                     "\"" + os.path.join("sd:", "wiiu", "sdcafiine", "0005000010106100") + "\" - SDCafiine (Wii U, JPN)\n"
+                                     "\"" + os.path.join("sd:", "wiiu", "sdcafiine", "0005000010145C00") + "\" - SDCafiine (Wii U, USA)\n"
+                                     "\"" + os.path.join("sd:", "wiiu", "sdcafiine", "0005000010145D00") + "\" - SDCafiine (Wii U, JPN)\n"
+                                     "\"" + os.path.join("Cemu", "graphicsPacks") + "\" - Cemu (Wii U)\n"
+                                     "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury", "<name of your choice>", "contents", "010028600EBDA000") + "\"* - SMM (Switch)\n"
+                                     "\"" + os.path.join("Ryujinx", "mods", "contents", "010028600EBDA000") + "\" - Ryujinx (Switch)\n\n"
+                                     "*The \"romfs\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
+                                     "specified SimpleModManager (SMM) folder.\n\n"
+                                     "Note: Yuzu is not officially supported and you may encounter issues if you use it.")
                         '''
                         dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
-                                     "be your mods folder:\n"
-                                     "\"%appdata%\\yuzu\\load\\010028600EBDA000\\\" - Yuzu (Switch)\n"
-                                     "\"%appdata%\\Ryujinx\\mods\\contents\\010028600EBDA000\\\" - Ryujinx (Switch)\n"
-                                     "\"sd:\\mods\\Super Mario 3D World + Bowser's Fury\\Randomizer\\contents\\010028600EBDA000\\\"* - SMM (Switch)\n\n"
-                                     "*The \"romfs\" folder inside the generated\"SM3DWR-<seed>\" folder should be "
-                                     "taken out and placed into the\nspecified SimpleModManager (SMM) folder.")
+                                     "be your mods folder:\n" +
+                                     "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury", "<name of your choice>", "contents", "010028600EBDA000") + "\"* - SMM (Switch)\n"
+                                     "\"" + os.path.join("Ryujinx", "mods", "contents", "010028600EBDA000") + "\" - Ryujinx (Switch)\n\n"
+                                     "*The \"romfs\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
+                                     "specified SimpleModManager (SMM) folder.\n\n"
+                                     "Note: Yuzu is not officially supported and you may encounter issues if you use it.")
                     with dpg.tooltip('randoinit'):
                         dpg.add_text('To be able to start the randomizer, select a valid input directory.', tag='randotip')
                 checkDirectory()
@@ -1607,8 +1705,12 @@ def checkDirectory():
         except ValueError:
             seedRNG = 0
             for i in str(dpg.get_value("seed")):
-                seedRNG += ord(i)
-    if os.path.isfile(dpg.get_value('dirtext')+'\\SystemData\\StageList.szs'):
+                if seedRNG == 0:
+                    seedRNG += ord(i)
+                else:
+                    seedRNG *= ord(i)
+
+    if os.path.isfile(os.path.join(dpg.get_value('dirtext'), 'SystemData', 'StageList.szs')):
         dpg.configure_item("dirbutt", label="Valid Input Directory Loaded!")
         dpg.configure_item('dirtext', color=(0, 255, 0, 255))
     else:
@@ -1622,14 +1724,14 @@ def checkDirectory():
         dpg.configure_item("rdirbutt", label="Load Output Directory")
         dpg.configure_item('rdirtext', color=(255, 0, 0, 255))
 
-    if not os.path.isdir(dpg.get_value('rdirtext')+'\\SM3DWR-'+str(seedRNG)):
+    if not os.path.isdir(os.path.join(dpg.get_value('rdirtext'), 'SM3DWR-' + str(seedRNG))):
         dpg.configure_item('rdirbutt', label='Valid Output Directory Loaded!')
         dpg.configure_item('rdirtext', color=(0, 255, 0, 255))
     else:
         dpg.configure_item("rdirbutt", label="Load Output Directory")
         dpg.configure_item('rdirtext', color=(255, 0, 0, 255))
 
-    if os.path.isfile(dpg.get_value('dirtext')+'\\SystemData\\StageList.szs') and os.path.isdir(dpg.get_value('rdirtext')) and not os.path.isdir(dpg.get_value('rdirtext')+'\\SM3DWR-'+str(seedRNG)):
+    if os.path.isfile(os.path.join(dpg.get_value('dirtext'), 'SystemData', 'StageList.szs')) and os.path.isdir(dpg.get_value('rdirtext')) and not os.path.isdir(os.path.join(dpg.get_value('rdirtext'), 'SM3DWR-' + str(seedRNG))):
         dpg.configure_item('randoinit', enabled=True)
         dpg.set_value('randotip', 'Start the randomizer!')
     else:
@@ -1642,7 +1744,6 @@ def showSlider():
         dpg.show_item('pslider')
     else:
         dpg.hide_item('pslider')
-    print(dpg.get_value('pslider'))
 
 
 def saveSettings():
@@ -1689,7 +1790,7 @@ def show():
 
 def main():
     global settings, interface
-    if os.path.isfile(os.getcwd()+'\\settings.json'):
+    if os.path.isfile('settings.json'):
         with open('settings.json', 'r') as s:
             settings = json.loads(s.read())
     else:
@@ -1701,11 +1802,11 @@ def main():
                         'music': False,
                         'lang': False,
                         'star': 'Fully random',
-                        'pslider': 0.15}
+                        'pslider': 0.15000000596046448}
             s.write(json.dumps(settings))
     try:
         if float(settings['pslider']) < 0 or float(settings['pslider']) > 1:
-            settings.update({'pslider': 0.15})
+            settings.update({'pslider': 0.15000000596046448})
         if str(settings['star']) != 'Fully random' or str(settings['star']) != 'Random values' or str(settings['star']) != 'Disabled':
             settings.update({'star': 'Fully random'})
         bool(settings['speedrun'])
@@ -1721,7 +1822,7 @@ def main():
                         'music': False,
                         'lang': False,
                         'star': 'Fully random',
-                        'pslider': 0.15}
+                        'pslider': 0.15000000596046448}
             s.write(json.dumps(settings))
 
     interface = GUI('Super Mario 3D World Randomizer', (800, 800), settings)  # Initialise the main window

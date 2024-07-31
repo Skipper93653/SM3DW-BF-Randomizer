@@ -8,7 +8,7 @@ The release executable is Windows only, to build for MacOS or Linux, see the Bui
 
 ### Generating the randomized files
 
-Select a valid RomFS dump (the root of the RomFS directory - contains folders such as `StageData`, `SystemData`, etc.) of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize!' button and wait for the pop-up window to tell you the process has finished, this should generate a folder called `SM3DWR-seed` (with 'seed' being the seed used by the random number generator).
+Select a valid RomFS dump (the root of the RomFS directory - contains folders such as `StageData`, `SystemData`, etc.) of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize!' button and wait for the pop-up window to tell you the process has finished, this should generate a folder called `SM3DWR-<seed>` (with 'seed' being the seed used by the random number generator).
 
 ### Playing with the newly generated files
 
@@ -16,17 +16,15 @@ Note: enable with other mods at your own risk, as this mod is only designed to b
 
 ### Console
 
-With Atmosphere CFW and [SimpleModManager](https://github.com/nadrino/SimpleModManager) - on the root of your microSD card, go to `mods/Super Mario 3D World + Bowser's Fury/Randomizer/contents/010028600EBDA000` (create these folders if they don't exist) and copy the `romfs` folder from inside the newly generated `SM3DW-seed` folder to this location. Then, on console, make your way to SimpleModManager and enable the mod, then you're free to play!
+With Atmosphere CFW and [SimpleModManager](https://github.com/nadrino/SimpleModManager) - on the root of your microSD card, go to `mods/Super Mario 3D World + Bowser's Fury/<name of your choice>/contents/010028600EBDA000` (create these folders if they don't exist, it is recommended that you have a unique name for each seed on your SD card) and copy the `romfs` folder from inside the newly generated `SM3DW-<seed>` folder to this location. Then, on console, make your way to SimpleModManager and enable the mod, then you're free to play!
 
-### Emulators
+Make sure that if you have multiple seeds present in your mods folder, have only **one** activated at a time.
 
-#### yuzu
+### [Ryujinx](https://ryujinx.org)
 
-For usage with yuzu - open yuzu, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mod Data Location', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-seed` folder into said mod folder (if you didn't select here as the output directory already). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury' and click 'Properties'. Go to the 'Add-Ons' tab and tick your mod folder if it isn't already, then you're free to play!
+For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-<seed>` folder into said mod folder (if you didn't select here as the output directory already). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury and click 'Manage Mods' and enable the mod folder if it isn't already, then you're free to play!
 
-#### [Ryujinx](https://ryujinx.org)
-
-For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-seed` folder into said mod folder (if you didn't select here as the output directory already). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury and click 'Manage Mods' and enable the mod folder if it isn't already, then you're free to play! 
+Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if you want to use an emulator.
 
 ## Known Issues
 
@@ -35,18 +33,19 @@ For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowse
 * Some stage numbers are glitched.
 * The World Warp Pipes which should take you to the next world do not work and just kick you out of the stage.
 * Sometimes, with randomized music, the music may sometimes cut out abruptly.
+* Lucky Houses do not disappear after use, but they cannot be re-entered.
 
 ## Potential future features in no particular order
 
 * Wii U support
 * Bowser's Fury island randomizer
 * Character statistics randomizer
-* Adjusting the end-of-level Goal Poles to properly represent the new location of the level e.g. Levels where a castle used to be will now have the castle Goal Pole.
+* Adjusting the end-of-level Goal Poles to properly represent the new location of the level e.g. levels where a castle used to be will now have the castle Goal Pole, castles where a normal level used to be will now have the normal Goal Pole, etc.
 * Doing something with the World Warp Pipes in Koopa Troopa Cave and Piranha Creeper Creek.
 
 ## Building
 
-To build this software, open this project in PyCharm, and run `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --windows-icon-from-ico=ico.ico` for Windows, `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --macos-create-app-bundle --macos-app-icon=ico.ico` for MacOS, and `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico` for Linux in the built-in PowerShell terminal. The resulting output will be in a folder called `main.dist`
+To build this software, open [this project](https://github.com/Skipper93653/SM3DW-BF-Randomizer) in PyCharm using your own Python environment (virtual is recommended) after cloning the repository so a suitable location and run `pip install -r requirements.txt` in the built-in terminal, and run `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --windows-icon-from-ico=ico.ico` for Windows, `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --macos-create-app-bundle --macos-app-icon=ico.ico` for MacOS, and `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico` for Linux in the same terminal. The resulting output will be in a folder called `main.dist`
 
 ## Support
 
