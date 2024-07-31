@@ -13,6 +13,8 @@ def randomizer():
     bar = 0  # Progress bar progress
     dpg.configure_item("randoinit", enabled=False, label="Randomizing...")
     dpg.configure_item('seed', enabled=False)
+    dpg.configure_item('dirbutt', enabled=False)
+    dpg.configure_item('rdirbutt', enabled=False)
     dpg.configure_item("progress", default_value=0)
     dpg.hide_item('t2')
     dpg.hide_item('t3')
@@ -55,7 +57,7 @@ def randomizer():
     StageListOld = StageListNew.copy()
     print('Opened StageList.szs')
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 174)
 
     # StageData Path
     sPath = os.path.join(user_data[0], 'StageData')
@@ -68,7 +70,7 @@ def randomizer():
     os.makedirs(rPath)
     os.makedirs(srPath)
     bar += 1
-    dpg.configure_item("progress", default_value=bar/172)
+    dpg.configure_item("progress", default_value=bar / 174)
 
     # Open each world map file and convert the map BYML into a readable format.
     if not wiiu:
@@ -91,7 +93,7 @@ def randomizer():
         CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
         print('Opened CourseSelectW1Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW2Zone.szs')
         with open(os.path.join(sPath, 'CourseSelectW2Zone.szs'), 'rb') as f:
@@ -112,7 +114,7 @@ def randomizer():
         CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
         print('Opened CourseSelectW2Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW3Zone.szs')
         with open(os.path.join(sPath, 'CourseSelectW3Zone.szs'), 'rb') as f:
@@ -128,7 +130,7 @@ def randomizer():
         CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
         print('Opened CourseSelectW3Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW4Zone.szs')
         with open(os.path.join(sPath, 'CourseSelectW4Zone.szs'), 'rb') as f:
@@ -145,7 +147,7 @@ def randomizer():
         CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
         print('Opened CourseSelectW4Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW5Zone.szs')
         with open(os.path.join(sPath, 'CourseSelectW5Zone.szs'), 'rb') as f:
@@ -163,7 +165,7 @@ def randomizer():
         CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
         print('Opened CourseSelectW5Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW6Zone.szs')
         with open(os.path.join(sPath, 'CourseSelectW6Zone.szs'), 'rb') as f:
@@ -190,7 +192,7 @@ def randomizer():
         CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
         print('Opened CourseSelectW6Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW7Zone.szs')
         with open(os.path.join(sPath, 'CourseSelectW7Zone.szs'), 'rb') as f:
@@ -207,7 +209,7 @@ def randomizer():
         CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
         print('Opened CourseSelectW7Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW8Zone.szs')
         with open(os.path.join(sPath, 'CourseSelectW8Zone.szs'), 'rb') as f:
@@ -226,7 +228,7 @@ def randomizer():
         CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
         print('Opened CourseSelectW8Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectS1Zone.szs')
         with open(os.path.join(sPath, 'CourseSelectS1Zone.szs'), 'rb') as f:
@@ -239,7 +241,7 @@ def randomizer():
         CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
         print('Opened CourseSelectS1Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening KoopaLastBZone.szs')
         with open(os.path.join(sPath, 'KoopaLastBZone.szs'), 'rb') as f:
@@ -254,6 +256,8 @@ def randomizer():
         KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
         KoopaLastBZoneMap.pop()
         print('Opened KoopaLastBZone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar / 174)
     else:
         print('Opening CourseSelectW1ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectW1ZoneMap1.szs'), 'rb') as f:
@@ -265,7 +269,7 @@ def randomizer():
         CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
         print('Opened CourseSelectW1ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW2ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectW2ZoneMap1.szs'), 'rb') as f:
@@ -277,7 +281,7 @@ def randomizer():
         CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
         print('Opened CourseSelectW2ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW3ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectW3ZoneMap1.szs'), 'rb') as f:
@@ -289,7 +293,7 @@ def randomizer():
         CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
         print('Opened CourseSelectW3ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW4ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectW4ZoneMap1.szs'), 'rb') as f:
@@ -301,7 +305,7 @@ def randomizer():
         CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
         print('Opened CourseSelectW4ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW5ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectW5ZoneMap1.szs'), 'rb') as f:
@@ -313,7 +317,7 @@ def randomizer():
         CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
         print('Opened CourseSelectW4ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW6ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectW6ZoneMap1.szs'), 'rb') as f:
@@ -325,7 +329,7 @@ def randomizer():
         CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
         print('Opened CourseSelectW6ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW7ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectW7ZoneMap1.szs'), 'rb') as f:
@@ -337,7 +341,7 @@ def randomizer():
         CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
         print('Opened CourseSelectW7ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectW8ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectW8ZoneMap1.szs'), 'rb') as f:
@@ -349,7 +353,7 @@ def randomizer():
         CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
         print('Opened CourseSelectW8ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening CourseSelectS1ZoneMap1.szs')
         with open(os.path.join(sPath, 'CourseSelectS1ZoneMap1.szs'), 'rb') as f:
@@ -362,7 +366,7 @@ def randomizer():
         CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
         print('Opened CourseSelectS1ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Opening KoopaLastBZoneMap1.szs')
         with open(os.path.join(sPath, 'KoopaLastBZoneMap1.szs'), 'rb') as f:
@@ -372,6 +376,8 @@ def randomizer():
         KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
         KoopaLastBZoneMap.pop()
         print('Opened KoopaLastBZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar / 174)
 
     # Creating base variables to be used and iterated on in the randomizer loop
     worldNo = 1
@@ -399,7 +405,7 @@ def randomizer():
     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
     ready = False
     bar += 1
-    dpg.configure_item("progress", default_value=bar/172)
+    dpg.configure_item("progress", default_value=bar / 174)
 
     # This loop happens when stageID generates a special level when stageNo is currently a castle stage and forces
     # stageID to randomize again until it's not a special level (basically until it gives you a stage where it's
@@ -418,7 +424,7 @@ def randomizer():
                     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
                     ready = False
     bar += 1
-    dpg.configure_item("progress", default_value=bar/172)
+    dpg.configure_item("progress", default_value=bar / 174)
 
     print('Random stage order:', rstageID_order)
 
@@ -434,10 +440,10 @@ def randomizer():
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 6] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 6]  # IllustItemNum
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 8]  # StageName
         currentGreenStarsOld += int(StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
-        GreenStarLockHistory2.append([rng.choice([True, False], size=1, p=[float(dpg.get_value('pslider')), float(1 - dpg.get_value('pslider'))], replace=True), int(currentGreenStars * 0.6060809576)])  # 0.6060809576 is average
+        GreenStarLockHistory2.append([rng.choice([True, False], size=1, p=[float(dpg.get_value('pslider')), float(1 - dpg.get_value('pslider'))], replace=True), int(currentGreenStars * float(dpg.get_value('sslider')))])
         if stageNo == 114:
             GreenStarLockHistory2[-1][0] = True  # Force Bowser-Castle to have a star lock when setting is on 'Fully random'
-        if dpg.get_value("star") == 'Disabled' or 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100 or stageNo == 117 or stageNo == 118:
+        if dpg.get_value("star") == 'Disabled' or float(dpg.get_value('sslider')) == 0 or 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100 or stageNo == 117 or stageNo == 118:
             # Remove all Green Star Locks when encountered
             print('Removing green star lock...')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
@@ -664,7 +670,7 @@ def randomizer():
                     elif 'ModelName: Miniature' in CourseSelectS1ZoneMapo[i - 6] and CourseSelectS1ZoneMapo[i + 15][CourseSelectS1ZoneMapo[i + 15].index(':') + 2:] == str(worldNo):
                         CourseSelectS1ZoneMapn[i - 6] = CourseSelectS1ZoneMapo[i - 6][:CourseSelectS1ZoneMapo[i - 6].index(':') + 2] + StageName
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
     print('Total Green Star Count: ' + str(currentGreenStars))
     print('Randomized stages!')
@@ -688,7 +694,7 @@ def randomizer():
             randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
         print('Written StageList.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing world files:')
 
@@ -713,7 +719,7 @@ def randomizer():
             w1.write(yaz0.compress(w1data[1]))
         print('Written CourseSelectW1Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW2Zone.szs')
         w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
@@ -736,7 +742,7 @@ def randomizer():
             w2.write(yaz0.compress(w2data[1]))
         print('Written CourseSelectW2Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW3Zone.szs')
         w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
@@ -754,7 +760,7 @@ def randomizer():
             w3.write(yaz0.compress(w3data[1]))
         print('Written CourseSelectW3Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW4Zone.szs')
         w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
@@ -773,7 +779,7 @@ def randomizer():
             w4.write(yaz0.compress(w4data[1]))
         print('Written CourseSelectW4Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW5Zone.szs')
         w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
@@ -793,7 +799,7 @@ def randomizer():
             w5.write(yaz0.compress(w5data[1]))
         print('Written CourseSelectW5Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW6Zone.szs')
         w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
@@ -822,7 +828,7 @@ def randomizer():
             w6.write(yaz0.compress(w6data[1]))
         print('Written CourseSelectW6Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW7Zone.szs')
         w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
@@ -841,7 +847,7 @@ def randomizer():
             w7.write(yaz0.compress(w7data[1]))
         print('Written CourseSelectW7Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW8Zone.szs')
         w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
@@ -862,7 +868,7 @@ def randomizer():
             w8.write(yaz0.compress(w8data[1]))
         print('Written CourseSelectW8Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectS1Zone.szs')
         s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
@@ -877,7 +883,7 @@ def randomizer():
             s1.write(yaz0.compress(s1data[1]))
         print('Written CourseSelectS1Zone.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing KoopaLastBZone.szs')
         bzwriter = SarcWriter()
@@ -894,6 +900,8 @@ def randomizer():
         with open(os.path.join(srPath, 'KoopaLastBZone.szs'), 'wb') as bz:
             bz.write(yaz0.compress(bzdata[1]))
         print('Written KoopaLastBZone.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar / 174)
 
     else:
         print('Writing StageList.szs.')
@@ -905,7 +913,7 @@ def randomizer():
             randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
         print('Written StageList.szs.')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing world files:')
 
@@ -921,7 +929,7 @@ def randomizer():
             w1.write(yaz0.compress(w1data[1]))
         print('Written CourseSelectW1ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW2ZoneMap1.szs')
         w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
@@ -935,7 +943,7 @@ def randomizer():
             w2.write(yaz0.compress(w2data[1]))
         print('Written CourseSelectW2ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW3ZoneMap1.szs')
         w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
@@ -949,7 +957,7 @@ def randomizer():
             w3.write(yaz0.compress(w3data[1]))
         print('Written CourseSelectW3ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW4ZoneMap1.szs')
         w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
@@ -963,7 +971,7 @@ def randomizer():
             w4.write(yaz0.compress(w4data[1]))
         print('Written CourseSelectW4ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW5ZoneMap1.szs')
         w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
@@ -977,7 +985,7 @@ def randomizer():
             w5.write(yaz0.compress(w5data[1]))
         print('Written CourseSelectW5ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW6ZoneMap1.szs')
         w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
@@ -991,7 +999,7 @@ def randomizer():
             w6.write(yaz0.compress(w6data[1]))
         print('Written CourseSelectW6ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW7ZoneMap1.szs')
         w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
@@ -1005,7 +1013,7 @@ def randomizer():
             w7.write(yaz0.compress(w7data[1]))
         print('Written CourseSelectW7ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectW8ZoneMap1.szs')
         w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
@@ -1019,7 +1027,7 @@ def randomizer():
             w8.write(yaz0.compress(w8data[1]))
         print('Written CourseSelectW8ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing CourseSelectS1ZoneMap1.szs')
         s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
@@ -1034,7 +1042,7 @@ def randomizer():
             s1.write(yaz0.compress(s1data[1]))
         print('Written CourseSelectS1ZoneMap1.szs')
         bar += 1
-        dpg.configure_item("progress", default_value=bar/172)
+        dpg.configure_item("progress", default_value=bar / 174)
 
         print('Writing KoopaLastBZoneMap1.szs')
         bzwriter = SarcWriter()
@@ -1046,15 +1054,17 @@ def randomizer():
         with open(os.path.join(srPath, 'KoopaLastBZoneMap1.szs'), 'wb') as bz:
             bz.write(yaz0.compress(bzdata[1]))
         print('Written KoopaLastBZoneMap1.szs')
+        bar += 1
+        dpg.configure_item("progress", default_value=bar / 174)
 
     print('Finished writing stage files.')
 
     musicRandomizer(rng, seedRNG, user_data)
     bar += 1
-    dpg.configure_item("progress", default_value=bar/172)
+    dpg.configure_item("progress", default_value=bar / 174)
     langRandomizer(rng, seedRNG, user_data)
     bar += 1
-    dpg.configure_item("progress", default_value=bar/172)
+    dpg.configure_item("progress", default_value=bar / 174)
 
     if dpg.get_value("spoil"):
         spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), GreenStarLockHistory2, user_data)
@@ -1070,7 +1080,8 @@ def randomizer():
                             'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
                             'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
                             'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
-                            'Green star lock probability: ' + str(dpg.get_value('pslider')))
+                            'Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n'
+                            'Green star lock strictness: ' + str(dpg.get_value('sslider')))
                 else:
                     s.write('Seed: ' + str(seedRNG) + ' (Random seed)\n\n'
                             'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
@@ -1086,7 +1097,8 @@ def randomizer():
                             'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
                             'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
                             'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
-                            'Green star lock probability: ' + str(dpg.get_value('pslider')))
+                            'Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n'
+                            'Green star lock strictness: ' + str(dpg.get_value('sslider')))
                 else:
                     s.write('Seed: ' + str(seedRNG) + ' (Set seed)\n\n'
                             'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
@@ -1096,23 +1108,26 @@ def randomizer():
                             'Green star locks?: ' + str(dpg.get_value('star')))
 
     bar += 1
-    dpg.configure_item("progress", default_value=bar/172)
+    dpg.configure_item("progress", default_value=bar / 174)
 
     if wiiu:
-        with open(user_data[1]+'\\SM3DWR-' + str(seedRNG)+'\\rules.txt', 'w', encoding='utf-8') as rules:
+        with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'rules.txt'), 'w', encoding='utf-8') as rules:
             rules.write('[Definition]\ntitleIds = 0005000010145D00,0005000010145C00,0005000010106100\nname = SM3DWR-'
                         + str(seedRNG)+'\npath = \"Super Mario 3D World/Mods/SM3DWR-' + str(seedRNG)+'\"\ndescription = '
                         'Super Mario 3D World Randomizer\nversion = 3\nfsPriority = 100')
     bar += 1
-    dpg.configure_item("progress", default_value=bar/172)
+    dpg.configure_item("progress", default_value=bar / 174)
 
     dpg.configure_item("progress", default_value=1)
+    dpg.configure_item('dirbutt', enabled=True)
+    dpg.configure_item('rdirbutt', enabled=True)
     dpg.configure_item('seed', enabled=True)
     dpg.configure_item("randoinit", enabled=True, label="Randomize!")
     dpg.show_item('t2')
     dpg.show_item('t3')
     saveSettings()
     checkDirectory()
+
     if len(str(dpg.get_value('seed'))) == 0:
         dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Random seed)')
     else:
@@ -1124,6 +1139,12 @@ def randomizer():
     dpg.set_value('popupStar', "Green star locks: " + str(dpg.get_value('star')))
     if str(dpg.get_value('star')) == 'Fully random':
         dpg.set_value('popupPslider', "Green star lock probability: " + str(dpg.get_value('pslider')))
+        dpg.set_value('popupSslider', "Green star lock strictness: " + str(dpg.get_value('sslider')))
+    else:
+        dpg.set_value('popupPslider', "")
+        dpg.set_value('popupSslider', "")
+
+    print('Randomization complete!')
     dpg.configure_item("popup", show=True)
 
 
@@ -1211,7 +1232,8 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
                             'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
                             'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
                             'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
-                            'Green star lock probability: ' + str(dpg.get_value('pslider')))
+                            'Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n'
+                            'Green star lock strictness: ' + str(dpg.get_value('sslider')))
     else:
         stageID_Name.append('Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
                             'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
@@ -1485,14 +1507,17 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
             # Denoting Green Star Lock requirements
             if dpg.get_value("star") == 'Random values':
                 try:
-                    stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires '+str(GreenStarLockHistory[overallIndex])+' Green Star(s))\n'
+                    if int(GreenStarLockHistory[overallIndex]) > 1:
+                        stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory[overallIndex]) + ' Green Stars)\n'
+                    else:
+                        stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory[overallIndex]) + ' Green Star)\n'
                 except KeyError:
                     pass
             elif dpg.get_value("star") == 'Fully random':
                 try:
                     if GreenStarLockHistory2[overallIndex2 - 1][1] != 0 and GreenStarLockHistory2[overallIndex2 - 1][0] and overallIndex != 34 and overallIndex != 62 and overallIndex != 63 and overallIndex != 64 and overallIndex != 65 and overallIndex != 66 and overallIndex != 81 and overallIndex != 97 and overallIndex != 115:
                         if int(GreenStarLockHistory2[overallIndex2 - 1][1]) > 1:
-                            stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires '+str(GreenStarLockHistory2[overallIndex2 - 1][1])+' Green Stars)\n'
+                            stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory2[overallIndex2 - 1][1]) + ' Green Stars)\n'
                         else:
                             stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory2[overallIndex2 - 1][1]) + ' Green Star)\n'
                 except KeyError:
@@ -1579,10 +1604,10 @@ class GUI:
                     dpg.add_text("Hello, welcome to the Super Mario 3D World Randomizer!")
                     dpg.add_text(tag="dirtext", default_value=str(p_settings['dir']), color=(255, 0, 0, 255))  # Selected Directory
                     self.dir = dpg.add_button(tag="dirbutt", label="Load Input Directory", callback=lambda: dpg.show_item("dir"))  # Load Directory Button
-                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=directory)  # Directory Selector
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=directory, default_path=str(p_settings['dir']))  # Directory Selector
                     dpg.add_text(tag="rdirtext", default_value=str(p_settings['rdir']))  # Selected Directory
                     self.rdir = dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
-                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=os.getcwd())  # Directory Selector
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=str(p_settings['rdir']))  # Directory Selector
                     self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory)  # Seed Input Text
                     self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
                     dpg.add_progress_bar(tag="progress", label="progress", default_value=0)
@@ -1611,18 +1636,20 @@ class GUI:
                                      "\"" + os.path.join("sd:", "wiiu", "sdcafiine", "0005000010145C00") + "\" - SDCafiine (Wii U, USA)\n"
                                      "\"" + os.path.join("sd:", "wiiu", "sdcafiine", "0005000010145D00") + "\" - SDCafiine (Wii U, JPN)\n"
                                      "\"" + os.path.join("Cemu", "graphicsPacks") + "\" - Cemu (Wii U)\n"
+                                     "\"" + os.path.join("sd:", "atmosphere", "contents", "010028600EBDA000") + "\"* - Atmosphere (Switch)\n"
                                      "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury", "<name of your choice>", "contents", "010028600EBDA000") + "\"* - SMM (Switch)\n"
                                      "\"" + os.path.join("Ryujinx", "mods", "contents", "010028600EBDA000") + "\" - Ryujinx (Switch)\n\n"
                                      "*The \"romfs\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
-                                     "specified SimpleModManager (SMM) folder.\n\n"
+                                     "specified Atmosphere or SimpleModManager (SMM) folder.\n\n"
                                      "Note: Yuzu is not officially supported and you may encounter issues if you use it.")
                         '''
                         dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
                                      "be your mods folder:\n" +
+                                     "\"" + os.path.join("sd:", "atmosphere", "contents", "010028600EBDA000") + "\"* - Atmosphere (Switch)\n"
                                      "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury", "<name of your choice>", "contents", "010028600EBDA000") + "\"* - SMM (Switch)\n"
                                      "\"" + os.path.join("Ryujinx", "mods", "contents", "010028600EBDA000") + "\" - Ryujinx (Switch)\n\n"
                                      "*The \"romfs\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
-                                     "specified SimpleModManager (SMM) folder.\n\n"
+                                     "specified Atmosphere or SimpleModManager (SMM) folder.\n\n"
                                      "Note: Yuzu is not officially supported and you may encounter issues if you use it.")
                     with dpg.tooltip('randoinit'):
                         dpg.add_text('To be able to start the randomizer, select a valid input directory.', tag='randotip')
@@ -1635,6 +1662,7 @@ class GUI:
                     dpg.add_text('Green star locks:')
                     self.star = dpg.add_radio_button(('Fully random', 'Random values', 'Disabled'), tag='star', horizontal=True, default_value=str(p_settings['star']), callback=showSlider)
                     self.pslider = dpg.add_slider_float(tag='pslider', label='Green star lock probability', default_value=float(p_settings['pslider']), min_value=0, max_value=1, show=True, clamped=True)
+                    self.sslider = dpg.add_slider_float(tag='sslider', label='Green star lock strictness', default_value=float(p_settings['sslider']), min_value=0, max_value=1, show=True, clamped=True)
                     self.save = dpg.add_button(tag='save', label='Save Settings', callback=saveSettings)
                     with dpg.tooltip('speedrun'):
                         dpg.add_text('Lock the settings to be compatible with the official speedrun leaderboards.')
@@ -1655,13 +1683,15 @@ class GUI:
                         '''
                         dpg.add_text('Randomize the selected language. Will be the same language for everything.')
                     with dpg.tooltip('pslider'):
-                        dpg.add_text('CTRL+Left Click to enter a specific value.\nSetting the slider to 1 (maximum) will not make every level have a star lock to avoid softlocks.')
+                        dpg.add_text('CTRL+Left Click to enter a specific value.\nControl how often should green star locks should appear.\nSetting the slider to 1 (maximum) will not make every level have a star lock to avoid softlocks.')
+                    with dpg.tooltip('sslider'):
+                        dpg.add_text('CTRL+Left Click to enter a specific value.\nControl the strictness for how many green stars you need to have to open the green star locks.')
                     showSlider()
                 speedrunner()
                 with dpg.tab(tag="t3", label="Credits"):  # Credits tab
                     dpg.add_text("Super Mario 3D World Randomizer credits:\n\n"
                                  "Developer:\n"
-                                 "Toby Bailey - (Skipper93653)\n\n"
+                                 "Skipper93653\n\n"
                                  "Module Credits:\n"
                                  "ZeldaMods for oead.\n"
                                  "Jonathan Hoffstadt for Dear PyGUI.\n"
@@ -1683,6 +1713,7 @@ class GUI:
             dpg.add_text("Randomize language?: "+str(dpg.get_value('lang')), tag='popupLang')
             dpg.add_text("Green star locks: "+str(dpg.get_value('star')), tag='popupStar')
             dpg.add_text("", tag='popupPslider')
+            dpg.add_text("", tag='popupSslider')
             dpg.add_button(label="Close", callback=lambda: dpg.configure_item("popup", show=False))
 
 
@@ -1742,8 +1773,10 @@ def checkDirectory():
 def showSlider():
     if dpg.get_value('star') == 'Fully random':
         dpg.show_item('pslider')
+        dpg.show_item('sslider')
     else:
         dpg.hide_item('pslider')
+        dpg.hide_item('sslider')
 
 
 def saveSettings():
@@ -1754,7 +1787,8 @@ def saveSettings():
                      'music': bool(dpg.get_value('music')),
                      'lang': bool(dpg.get_value('lang')),
                      'star': str(dpg.get_value('star')),
-                     'pslider': float(dpg.get_value('pslider'))})
+                     'pslider': float(dpg.get_value('pslider')),
+                     'sslider': float(dpg.get_value('sslider'))})
 
     with open('settings.json', 'w') as s:
         s.write(json.dumps(settings))
@@ -1772,12 +1806,15 @@ def speedrunner():
         dpg.configure_item('star', enabled=False)
         dpg.set_value('pslider', 0.15000000596046448)
         dpg.configure_item('pslider', enabled=False, show=True)
+        dpg.set_value('sslider', 0.606080949306488)
+        dpg.configure_item('sslider', enabled=False, show=True)
     else:
         dpg.configure_item('spoil', enabled=True)
         dpg.configure_item('music', enabled=True)
         dpg.configure_item('lang', enabled=True)
         dpg.configure_item('star', enabled=True)
         dpg.configure_item('pslider', enabled=True)
+        dpg.configure_item('sslider', enabled=True)
 
 
 def show():
@@ -1802,11 +1839,14 @@ def main():
                         'music': False,
                         'lang': False,
                         'star': 'Fully random',
-                        'pslider': 0.15000000596046448}
+                        'pslider': 0.15000000596046448,
+                        'sslider': 0.606080949306488}   # 0.6060809576 is the average
             s.write(json.dumps(settings))
     try:
         if float(settings['pslider']) < 0 or float(settings['pslider']) > 1:
             settings.update({'pslider': 0.15000000596046448})
+        if float(settings['sslider']) < 0 or float(settings['sslider']) > 1:
+            settings.update({'sslider': 0.606080949306488})
         if str(settings['star']) != 'Fully random' or str(settings['star']) != 'Random values' or str(settings['star']) != 'Disabled':
             settings.update({'star': 'Fully random'})
         bool(settings['speedrun'])
@@ -1822,7 +1862,8 @@ def main():
                         'music': False,
                         'lang': False,
                         'star': 'Fully random',
-                        'pslider': 0.15000000596046448}
+                        'pslider': 0.15000000596046448,
+                        'sslider': 0.606080949306488}
             s.write(json.dumps(settings))
 
     interface = GUI('Super Mario 3D World Randomizer', (800, 800), settings)  # Initialise the main window

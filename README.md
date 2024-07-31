@@ -2,7 +2,8 @@
 
 Super Mario 3D World Randomizer is a stage randomizer for Super Mario 3D World (Switch)!<br>
 Bowser's Fury and Wii U support are planned for a later time.<br>
-The release executable is Windows only, to build for MacOS or Linux, see the Building section further down this README.
+The release executable is Windows only, to build for macOS or Linux, see the Building section further down this README.<br>
+You can also run from source if you are using macOS or Linux by opening [this project](https://github.com/Skipper93653/SM3DW-BF-Randomizer) in PyCharm after cloning this repository to a suitable directory.
 
 ## Usage
 
@@ -16,13 +17,21 @@ Note: enable with other mods at your own risk, as this mod is only designed to b
 
 ### Console
 
-With Atmosphere CFW and [SimpleModManager](https://github.com/nadrino/SimpleModManager) - on the root of your microSD card, go to `mods/Super Mario 3D World + Bowser's Fury/<name of your choice>/contents/010028600EBDA000` (create these folders if they don't exist, it is recommended that you have a unique name for each seed on your SD card) and copy the `romfs` folder from inside the newly generated `SM3DW-<seed>` folder to this location. Then, on console, make your way to SimpleModManager and enable the mod, then you're free to play!
+#### [Atmosphere](https://github.com/Atmosphere-NX/Atmosphere)
+
+With Atmosphere - on the root of your microSD card, go to `atmosphere/contents/010028600EBDA000` (create these folders if they don't exist, remove any existing files within this location after safely backing up whatever was there to avoid possible conflicts) and copy the `romfs` folder from inside the newly generated `SM3DW-<seed>` folder to this location, then you're free to play!
+
+#### Atmosphere and [SimpleModManager](https://github.com/nadrino/SimpleModManager)
+
+With Atmosphere and SimpleModManager - on the root of your microSD card, go to `mods/Super Mario 3D World + Bowser's Fury/<name of your choice>/contents/010028600EBDA000` (create these folders if they don't exist, it is recommended that you have a unique name for each seed on your microSD card to avoid possible conflicts) and copy the `romfs` folder from inside the newly generated `SM3DW-<seed>` folder to this location. Then, on console, make your way to SimpleModManager and enable the mod, then you're free to play!
 
 Make sure that if you have multiple seeds present in your mods folder, have only **one** activated at a time.
 
-### [Ryujinx](https://ryujinx.org)
+### Emulator
 
-For usage with Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-<seed>` folder into said mod folder (if you didn't select here as the output directory already). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury and click 'Manage Mods' and enable the mod folder if it isn't already, then you're free to play!
+#### [Ryujinx](https://ryujinx.org)
+
+With Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-<seed>` folder into said mod folder (if you didn't select here as the output directory already). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury and click 'Manage Mods' and enable the mod folder if it isn't already, then you're free to play!
 
 Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if you want to use an emulator.
 
@@ -45,7 +54,7 @@ Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if
 
 ## Building
 
-To build this software, open [this project](https://github.com/Skipper93653/SM3DW-BF-Randomizer) in PyCharm using your own Python environment (virtual is recommended) after cloning the repository so a suitable location and run `pip install -r requirements.txt` in the built-in terminal, and run `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --windows-icon-from-ico=ico.ico` for Windows, `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --macos-create-app-bundle --macos-app-icon=ico.ico` for MacOS, and `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico` for Linux in the same terminal. The resulting output will be in a folder called `main.dist`
+To build this software, open [this project](https://github.com/Skipper93653/SM3DW-BF-Randomizer) in PyCharm using your own Python environment (virtual is recommended) after cloning the repository to a suitable directory and run `pip install -r requirements.txt` in the built-in terminal, and run `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --windows-icon-from-ico=ico.ico` for Windows, `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --macos-create-app-bundle --macos-app-icon=ico.ico` for macOS, and `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico` for Linux in the same terminal. The resulting output will be in a folder called `main.dist`
 
 ## Support
 
