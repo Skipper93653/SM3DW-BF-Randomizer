@@ -2,10 +2,11 @@
 import os  # For OS files
 import shutil  # For OS files
 import time  # For time calculations
+import json  # For saving settings
+import hashlib  # For file verification
 import dearpygui.dearpygui as dpg  # User interface
 import numpy as np  # Random number generation
 from oead import *  # For common Nintendo EAD/EPD file formats
-import json
 
 
 # Level randomizer
@@ -1070,43 +1071,29 @@ def randomizer():
     if dpg.get_value("spoil"):
         spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), GreenStarLockHistory2, user_data)
     else:
-        print('Not generating spoiler file, only generating seed and settings text file.')
+        print('Not generating spoiler file, only generating seed/settings/hash text file.')
         with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), str(seedRNG)+'.txt'), 'w', encoding='utf-8') as s:
-            # Creating a new spoiler text file. This can be simplified but whatever - most of this entire program can be :P
+            # Creating a new spoiler text file.
             if len(str(dpg.get_value('seed'))) == 0:
-                if str(dpg.get_value('star')) == 'Fully random':
-                    s.write('Seed: ' + str(seedRNG) + ' (Random seed)\n\n'
-                            'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
-                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
-                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
-                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
-                            'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
-                            'Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n'
-                            'Green star lock strictness: ' + str(dpg.get_value('sslider')))
-                else:
-                    s.write('Seed: ' + str(seedRNG) + ' (Random seed)\n\n'
-                            'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
-                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
-                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
-                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
-                            'Green star locks?: ' + str(dpg.get_value('star')))
+                stageID_Name = ['Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
             else:
-                if str(dpg.get_value('star')) == 'Fully random':
-                    s.write('Seed: ' + str(seedRNG) + ' (Set seed)\n\n'
-                            'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
-                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
-                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
-                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
-                            'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
-                            'Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n'
-                            'Green star lock strictness: ' + str(dpg.get_value('sslider')))
-                else:
-                    s.write('Seed: ' + str(seedRNG) + ' (Set seed)\n\n'
-                            'Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
-                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
-                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
-                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
-                            'Green star locks?: ' + str(dpg.get_value('star')))
+                stageID_Name = ['Seed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
+            stageID_Name.append('Settings:\n')
+            stageID_Name.append('Speedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n')
+            stageID_Name.append('Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n')
+            stageID_Name.append('Randomize music?: ' + str(dpg.get_value('music')) + '\n')
+            stageID_Name.append('Randomize language?: ' + str(dpg.get_value('lang')) + '\n')
+            if str(dpg.get_value('star')) == 'Fully random':
+                stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n')
+                stageID_Name.append('Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n')
+                stageID_Name.append('Green star lock strictness: ' + str(dpg.get_value('sslider')) + '\n\n')
+            else:
+                stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n\n')
+            for i in hashDict:
+                with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
+                    hash_object = hashlib.md5(f.read())
+                    stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
+            s.write(''.join(stageID_Name)[:-1])
 
     bar += 1
     dpg.configure_item("progress", default_value=bar / 174)
@@ -1134,9 +1121,9 @@ def randomizer():
     checkDirectory()
 
     if len(str(dpg.get_value('seed'))) == 0:
-        dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Random seed)')
+        dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')')
     else:
-        dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Set seed)')
+        dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Set seed, ' + version + ')')
     dpg.set_value('popupSpeedrun', 'Speedrunner mode: ' + str(dpg.get_value('speedrun')))
     dpg.set_value('popupSpoil', "Generate spoiler file?: " + str(dpg.get_value('spoil')))
     dpg.set_value('popupMusic', "Randomize music?: " + str(dpg.get_value('music')))
@@ -1144,10 +1131,14 @@ def randomizer():
     dpg.set_value('popupStar', "Green star locks: " + str(dpg.get_value('star')))
     if str(dpg.get_value('star')) == 'Fully random':
         dpg.set_value('popupPslider', "Green star lock probability: " + str(dpg.get_value('pslider')))
+        dpg.show_item('popupPslider')
         dpg.set_value('popupSslider', "Green star lock strictness: " + str(dpg.get_value('sslider')))
+        dpg.show_item('popupSslider')
     else:
         dpg.set_value('popupPslider', "")
+        dpg.hide_item('popupPslider')
         dpg.set_value('popupSslider', "")
+        dpg.hide_item('popupSslider')
 
     print('Randomization complete!')
     dpg.configure_item("popup", show=True)
@@ -1228,23 +1219,20 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
     overallIndex = 1
     overallIndex2 = 1
     if len(str(dpg.get_value('seed'))) == 0:
-        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Random seed)\n\n']
+        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
     else:
-        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Set seed)\n\n']
+        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
+    stageID_Name.append('Settings:\n')
+    stageID_Name.append('Speedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n')
+    stageID_Name.append('Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n')
+    stageID_Name.append('Randomize music?: ' + str(dpg.get_value('music')) + '\n')
+    stageID_Name.append('Randomize language?: ' + str(dpg.get_value('lang')) + '\n')
     if str(dpg.get_value('star')) == 'Fully random':
-        stageID_Name.append('Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
-                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
-                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
-                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
-                            'Green star locks?: ' + str(dpg.get_value('star')) + '\n'
-                            'Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n'
-                            'Green star lock strictness: ' + str(dpg.get_value('sslider')))
+        stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n')
+        stageID_Name.append('Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n')
+        stageID_Name.append('Green star lock strictness: ' + str(dpg.get_value('sslider')))
     else:
-        stageID_Name.append('Settings:\nSpeedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n'
-                            'Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n'
-                            'Randomize music?: ' + str(dpg.get_value('music')) + '\n'
-                            'Randomize language?: ' + str(dpg.get_value('lang')) + '\n'
-                            'Green star locks?: ' + str(dpg.get_value('star')))
+        stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')))
     stageID_Name.append('\n\nLevel slot, Level name (Original level slot) (Green Stars required, if needed)\n\nWorld ' + str(worldIndex) + '\n')
 
     # Appending the name of each stage to stageID_name.
@@ -1579,7 +1567,13 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
         if overallIndex != 34 and overallIndex != 62 and overallIndex != 63 and overallIndex != 64 and overallIndex != 65 and overallIndex != 66 and overallIndex != 81 and overallIndex != 97 and overallIndex != 115:
             overallIndex2 += 1
 
-    spoiler = ''.join(stageID_Name)
+    stageID_Name[-1] = stageID_Name[-1] + '\n\n'
+    for i in hashDict:
+        with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
+            hash_object = hashlib.md5(f.read())
+            stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
+
+    spoiler = ''.join(stageID_Name)[:-1]
     # Making sure levels have the correct names.
     rep = spoiler.replace('11-6', 'Flower-6').replace('11-7', 'Flower-7').replace('11-8', 'Flower-8').replace('11-9', 'Flower-9').replace('11-10', 'Flower-10').replace('11-11', 'Flower-11').replace('11-12', 'Flower-12').replace('12-1', 'Crown-Crown').replace('1-9', '1-Castle').replace('4-9', '4-Castle').replace('5-12', '5-Castle').replace('7-11', 'Castle-Castle').replace('8-13', 'Bowser-Castle').replace('2-9', '2-Tank').replace('6-11', '6-Tank').replace('3-11', '3-Train').replace('8-12', 'Bowser-Train').replace('1-6', '1-Toad House 1').replace('1-7', '1-Toad House 2').replace('2-6', '2-Toad House').replace('3-8', '3-Toad House').replace('3-12', '3-Toad House 2 (Unused)').replace('4-6', '4-Toad House').replace('5-9', '5-Toad House').replace('5-13', '5-Toad House 2 (Unused)').replace('5-14', '5-Toad House 3 (Unused)').replace('5-15', '5-Toad House 4 (Unused)').replace('5-16', '5-Toad House 5 (Unused)').replace('5-17', '5-Toad House 6 (Unused)').replace('6-8', '6-Toad House').replace('6-12', '6-Toad House 2 (Unused)').replace('7-8', 'Castle-Toad House').replace('7-12', 'Castle-Toad House 2 (Unused)').replace('8-8', 'Bowser-Toad House 1').replace('8-9', 'Bowser-Toad House 2').replace('8-14', 'Bowser-Toad House 3 (Unused)').replace('2-7', '2-Sprixie House').replace('3-9', '3-Sprixie House').replace('4-7', '4-Sprixie House').replace('5-10', '5-Sprixie House').replace('6-9', '6-Sprixie House').replace('7-9', 'Castle-Sprixie House').replace('8-10', 'Bowser-Sprixie House').replace('9-10', 'Star-Sprixie House').replace('12-2', 'Crown-Sprixie House').replace('1-8', '1-Captain Toad').replace('3-10', '3-Captain Toad').replace('5-11', '5-Captain Toad').replace('7-10', 'Castle-Captain Toad').replace('9-11', 'Star-Captain Toad').replace('12-3', 'Crown-Captain Toad').replace('1-10', 'Lucky House').replace('2-10', 'Lucky House').replace('3-13', 'Lucky House').replace('4-10', 'Lucky House').replace('5-18', 'Lucky House').replace('6-13', 'Lucky House').replace('7-13', 'Lucky House').replace('8-15', 'Lucky House').replace('9-12', 'Lucky House').replace('1-11', '1-A').replace('2-11', '2-A').replace('3-14', '3-A').replace('4-11', '4-A').replace('5-19', '5-A').replace('6-14', '6-A').replace('7-14', 'Castle-A').replace('8-16', 'Bowser-A').replace('3-15', '3-B').replace('4-12', '4-B').replace('5-20', '5-B').replace('6-15', '6-B').replace('7-15', 'Castle-B').replace('8-17', 'Bowser-B').replace('6-16', '6-C').replace('7-16', 'Castle-C').replace('5-8', 'Coin Express').replace('2-8', '2-Mystery House').replace('4-8', '4-Mystery House').replace('6-10', '6-Mystery House').replace('8-11', 'Bowser-Mystery House').replace('10-8', 'Mushroom-Mystery House').replace('12-4', 'Crown-Mystery House').replace('7-', 'Castle-').replace('8-', 'Bowser-').replace('9-', 'Star-').replace('10-', 'Mushroom-').replace('11-', 'Flower-').replace('12-', 'Crown-')
 
@@ -1602,12 +1596,12 @@ class GUI:
             with dpg.tab_bar():  # Add tabs which the user can change between
                 with dpg.tab(tag="t1", label="Program"):  # The main, default tab
                     dpg.add_text("Hello, welcome to the Super Mario 3D World Randomizer!")
-                    dpg.add_text(tag="dirtext", default_value=str(p_settings['dir']), color=(255, 0, 0, 255))  # Selected Directory
+                    dpg.add_text(tag="dirtext", default_value=str(p_settings['dir']))  # Selected Directory
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=directory, default_path=str(dpg.get_value('dirtext')))  # Directory Selector
                     self.dir = dpg.add_button(tag="dirbutt", label="Load Input Directory", callback=lambda: dpg.show_item("dir"))  # Load Directory Button
-                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=directory, default_path=str(p_settings['dir']))  # Directory Selector
                     dpg.add_text(tag="rdirtext", default_value=str(p_settings['rdir']))  # Selected Directory
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=str(dpg.get_value('rdirtext')))  # Directory Selector
                     self.rdir = dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
-                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=str(p_settings['rdir']))  # Directory Selector
                     self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory)  # Seed Input Text
                     self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
                     dpg.add_progress_bar(tag="progress", label="progress", default_value=0)
@@ -1747,23 +1741,23 @@ def checkDirectory():
                 else:
                     seedRNG *= ord(i)
 
-    if os.path.isfile(os.path.join(dpg.get_value('dirtext'), 'SystemData', 'StageList.szs')):
-        dpg.configure_item("dirbutt", label="Valid Input Directory Loaded!")
-        dpg.configure_item('dirtext', color=(0, 255, 0, 255))
-    else:
-        dpg.configure_item("dirbutt", label="Load Input Directory")
-        dpg.configure_item('dirtext', color=(255, 0, 0, 255))
-        valid = False
+    for i in hashDict:  # Loop through the array to compare the hash, if one file fails, the entire check fails.
+        if os.path.isfile(os.path.join(dpg.get_value('dirtext'), i[0])):
+            with open(os.path.join(dpg.get_value('dirtext'), i[0]), 'rb') as f:
+                hash_object = hashlib.md5(f.read())
+                if hash_object.hexdigest() == i[1]:
+                    dpg.configure_item("dirbutt", label="Valid Input Directory Loaded!")
+                    dpg.configure_item('dirtext', color=(0, 255, 0, 255))
+                else:
+                    dpg.configure_item("dirbutt", label="Load Input Directory")
+                    dpg.configure_item('dirtext', color=(255, 0, 0, 255))
+                    valid = False
+        else:
+            dpg.configure_item("dirbutt", label="Load Input Directory")
+            dpg.configure_item('dirtext', color=(255, 0, 0, 255))
+            valid = False
 
-    if os.path.isdir(dpg.get_value('rdirtext')):
-        dpg.configure_item('rdirbutt', label='Valid Output Directory Loaded!')
-        dpg.configure_item('rdirtext', color=(0, 255, 0, 255))
-    else:
-        dpg.configure_item("rdirbutt", label="Load Output Directory")
-        dpg.configure_item('rdirtext', color=(255, 0, 0, 255))
-        valid = False
-
-    if not os.path.isdir(os.path.join(dpg.get_value('rdirtext'), 'SM3DWR-' + str(seedRNG))):
+    if os.path.isdir(dpg.get_value('rdirtext')) and not os.path.isdir(os.path.join(dpg.get_value('rdirtext'), 'SM3DWR-' + str(seedRNG))):
         dpg.configure_item('rdirbutt', label='Valid Output Directory Loaded!')
         dpg.configure_item('rdirtext', color=(0, 255, 0, 255))
     else:
@@ -1835,7 +1829,22 @@ def show():
 
 
 def main():
-    global settings, interface
+    global settings, interface, version, hashDict
+    version = 'v3.0.0'
+
+    # MD5 hash 2D array for file verification, only Switch version at the moment.
+    hashDict = [[os.path.join('SystemData', 'StageList.szs'), 'e267c452769c2cc45670b58234fbc3e5'],
+                [os.path.join('StageData', 'CourseSelectW1Zone.szs'), '372523814613f05923fd8672938324de'],
+                [os.path.join('StageData', 'CourseSelectW2Zone.szs'), '79d177268cc140588da9af1b0ccee25b'],
+                [os.path.join('StageData', 'CourseSelectW3Zone.szs'), 'f49ae49045ab8918731bb2a7510a1afe'],
+                [os.path.join('StageData', 'CourseSelectW4Zone.szs'), 'b20cbac5ecc3cbfe751fd632e36285a7'],
+                [os.path.join('StageData', 'CourseSelectW5Zone.szs'), '14133c3aa06838074b483f4d8c7aaddc'],
+                [os.path.join('StageData', 'CourseSelectW6Zone.szs'), '33beb74589dab18b328a855e43195b38'],
+                [os.path.join('StageData', 'CourseSelectW7Zone.szs'), 'e95a6fd9162f5eeefb06fb461e9ad514'],
+                [os.path.join('StageData', 'CourseSelectW8Zone.szs'), '0c93355dd9a30287006d97a90b2fc9c1'],
+                [os.path.join('StageData', 'CourseSelectS1Zone.szs'), '5e534b8ea2068faa1cba9d0e124135e6'],
+                [os.path.join('StageData', 'KoopaLastBZone.szs'), '4146dbdd3200ca39f100a02253e4b5d6']]
+
     if os.path.isfile('settings.json'):
         with open('settings.json', 'r') as s:
             settings = json.loads(s.read())

@@ -54,7 +54,7 @@ Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if
 
 ## Building
 
-To build this software, open [this project](https://github.com/Skipper93653/SM3DW-BF-Randomizer) in PyCharm using your own Python environment (virtual is recommended) after cloning the repository to a suitable directory and run `pip install -r requirements.txt` in the built-in terminal, and run `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --windows-icon-from-ico=ico.ico` for Windows, `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --macos-create-app-bundle --macos-app-icon=ico.ico` for macOS, and `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico` for Linux in the same terminal. The resulting output will be in a folder called `main.dist`
+To build this software, open [this project](https://github.com/Skipper93653/SM3DW-BF-Randomizer) in PyCharm using your own Python environment (virtual is recommended) after cloning the repository to a suitable directory and run `pip install -r requirements.txt` in the built-in terminal, and run `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --windows-icon-from-ico=ico.ico` for Windows, `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --macos-create-app-bundle --macos-app-icon=ico.ico` for macOS, and `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico` for Linux in the same terminal. The resulting output will be in a folder called `main.dist`.
 
 ## Support
 
