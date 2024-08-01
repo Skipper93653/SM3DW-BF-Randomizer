@@ -9,7 +9,7 @@ You can also run from source if you are using macOS or Linux by opening [this pr
 
 ### Generating the randomized files
 
-Select a valid RomFS dump (the root of the RomFS directory - contains folders such as `StageData`, `SystemData`, etc.) of Super Mario 3D World + Bowser's Fury, enable any additional options and then hit the 'Randomize!' button and wait for the pop-up window to tell you the process has finished, this should generate a folder called `SM3DWR-<seed>` (with 'seed' being the seed used by the random number generator).
+Select a valid unmodified RomFS dump (the root of the RomFS directory - contains folders such as `StageData`, `SystemData`, etc.) of Super Mario 3D World + Bowser's Fury (either v1.0.0 or v1.1.0), enable any additional options and then hit the 'Randomize!' button and wait for the pop-up window to tell you the process has finished, this should generate a folder called `SM3DWR-<seed>` (with 'seed' being the seed used by the random number generator).
 
 ### Playing with the newly generated files
 
