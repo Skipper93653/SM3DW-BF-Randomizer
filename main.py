@@ -60,12 +60,6 @@ def randomizer():
     # SystemData Path
     oPath = os.path.join(user_data[0], 'SystemData')  # Original game path
 
-    if os.path.isfile(os.path.join(user_data[0], 'StageData', 'CourseSelectW1ZoneMap1.szs')):  # Only the Wii U version contains a
-        # separate Map and Design file in StageData, Switch version has them merged.
-        wiiu = True  # This variable is used to determine whether the files are from the Wii U version or not
-    else:
-        wiiu = False
-
     # Open StageList.szs and grab the BYML, convert to YML, open it as a list.
     print('Opening StageList.szs')
     with open(os.path.join(oPath, "StageList.szs"), "rb") as f:
@@ -83,323 +77,198 @@ def randomizer():
 
     # StageData Path
     sPath = os.path.join(user_data[0], 'StageData')
-    if not wiiu:
-        rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'SystemData')  # Randomizer path
-        srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'StageData')
-    else:
-        rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'content', 'SystemData')  # Randomizer path
-        srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'content', 'StageData')
+    rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'SystemData')  # Randomizer path
+    srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'StageData')
     os.makedirs(rPath)
     os.makedirs(srPath)
     bar += 1
     dpg.configure_item("progress", default_value=bar / 174)
 
     # Open each world map file and convert the map BYML into a readable format.
-    if not wiiu:
-        print('Opening CourseSelectW1Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectW1Zone.szs'), 'rb') as f:
-            w1archive = Sarc(yaz0.decompress(f.read()))
-        w1archive1 = w1archive.get_file('DofParam_obj10.bagldof').data
-        w1archive2 = w1archive.get_file('DofParam_obj9.bagldof').data
-        w1archive3 = w1archive.get_file('DofParam_obj11.bagldof').data
-        w1archive4 = w1archive.get_file('CourseSelectW1ZoneDesign.byml').data
-        w1archive5 = w1archive.get_file('DofParam_obj6.bagldof').data
-        w1archive6 = byml.to_text(byml.from_binary(w1archive.get_file('CourseSelectW1ZoneMap.byml').data))
-        w1archive7 = w1archive.get_file('DofParam_obj12.bagldof').data
-        w1archive8 = w1archive.get_file('CameraParam.byml').data
-        w1archive9 = w1archive.get_file('DofParam_obj7.bagldof').data
-        w1archive10 = w1archive.get_file('CourseSelectW1ZoneSound.byml').data
-        w1archive11 = w1archive.get_file('DofParam_obj8.bagldof').data
-        CourseSelectW1ZoneMapn = w1archive6.split('\n')
-        CourseSelectW1ZoneMapn.pop()
-        CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
-        print('Opened CourseSelectW1Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectW1Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectW1Zone.szs'), 'rb') as f:
+        w1archive = Sarc(yaz0.decompress(f.read()))
+    w1archive1 = w1archive.get_file('DofParam_obj10.bagldof').data
+    w1archive2 = w1archive.get_file('DofParam_obj9.bagldof').data
+    w1archive3 = w1archive.get_file('DofParam_obj11.bagldof').data
+    w1archive4 = w1archive.get_file('CourseSelectW1ZoneDesign.byml').data
+    w1archive5 = w1archive.get_file('DofParam_obj6.bagldof').data
+    w1archive6 = byml.to_text(byml.from_binary(w1archive.get_file('CourseSelectW1ZoneMap.byml').data))
+    w1archive7 = w1archive.get_file('DofParam_obj12.bagldof').data
+    w1archive8 = w1archive.get_file('CameraParam.byml').data
+    w1archive9 = w1archive.get_file('DofParam_obj7.bagldof').data
+    w1archive10 = w1archive.get_file('CourseSelectW1ZoneSound.byml').data
+    w1archive11 = w1archive.get_file('DofParam_obj8.bagldof').data
+    CourseSelectW1ZoneMapn = w1archive6.split('\n')
+    CourseSelectW1ZoneMapn.pop()
+    CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
+    print('Opened CourseSelectW1Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening CourseSelectW2Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectW2Zone.szs'), 'rb') as f:
-            w2archive = Sarc(yaz0.decompress(f.read()))
-        w2archive1 = w2archive.get_file('DofParam_obj4.bagldof').data
-        w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
-        w2archive3 = w2archive.get_file('DofParam_obj9.bagldof').data
-        w2archive4 = w2archive.get_file('DofParam_obj5.bagldof').data
-        w2archive5 = w2archive.get_file('CourseSelectW2ZoneSound.byml').data
-        w2archive6 = w2archive.get_file('DofParam_obj6.bagldof').data
-        w2archive7 = w2archive.get_file('CameraParam.byml').data
-        w2archive8 = w2archive.get_file('DofParam_obj7.bagldof').data
-        w2archive9 = w2archive.get_file('DofParam_obj3.bagldof').data
-        w2archive10 = w2archive.get_file('CourseSelectW2ZoneDesign.byml').data
-        w2archive11 = w2archive.get_file('DofParam_obj8.bagldof').data
-        CourseSelectW2ZoneMapn = w2archive2.split('\n')
-        CourseSelectW2ZoneMapn.pop()
-        CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
-        print('Opened CourseSelectW2Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectW2Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectW2Zone.szs'), 'rb') as f:
+        w2archive = Sarc(yaz0.decompress(f.read()))
+    w2archive1 = w2archive.get_file('DofParam_obj4.bagldof').data
+    w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
+    w2archive3 = w2archive.get_file('DofParam_obj9.bagldof').data
+    w2archive4 = w2archive.get_file('DofParam_obj5.bagldof').data
+    w2archive5 = w2archive.get_file('CourseSelectW2ZoneSound.byml').data
+    w2archive6 = w2archive.get_file('DofParam_obj6.bagldof').data
+    w2archive7 = w2archive.get_file('CameraParam.byml').data
+    w2archive8 = w2archive.get_file('DofParam_obj7.bagldof').data
+    w2archive9 = w2archive.get_file('DofParam_obj3.bagldof').data
+    w2archive10 = w2archive.get_file('CourseSelectW2ZoneDesign.byml').data
+    w2archive11 = w2archive.get_file('DofParam_obj8.bagldof').data
+    CourseSelectW2ZoneMapn = w2archive2.split('\n')
+    CourseSelectW2ZoneMapn.pop()
+    CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
+    print('Opened CourseSelectW2Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening CourseSelectW3Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectW3Zone.szs'), 'rb') as f:
-            w3archive = Sarc(yaz0.decompress(f.read()))
-        w3archive1 = w3archive.get_file('CourseSelectW3ZoneDesign.byml').data
-        w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
-        w3archive3 = w3archive.get_file('CameraParam.byml').data
-        w3archive4 = w3archive.get_file('DofParam_obj27.bagldof').data
-        w3archive5 = w3archive.get_file('CourseSelectW3ZoneSound.byml').data
-        w3archive6 = w3archive.get_file('DofParam_obj28.bagldof').data
-        CourseSelectW3ZoneMapn = w3archive2.split('\n')
-        CourseSelectW3ZoneMapn.pop()
-        CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
-        print('Opened CourseSelectW3Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectW3Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectW3Zone.szs'), 'rb') as f:
+        w3archive = Sarc(yaz0.decompress(f.read()))
+    w3archive1 = w3archive.get_file('CourseSelectW3ZoneDesign.byml').data
+    w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
+    w3archive3 = w3archive.get_file('CameraParam.byml').data
+    w3archive4 = w3archive.get_file('DofParam_obj27.bagldof').data
+    w3archive5 = w3archive.get_file('CourseSelectW3ZoneSound.byml').data
+    w3archive6 = w3archive.get_file('DofParam_obj28.bagldof').data
+    CourseSelectW3ZoneMapn = w3archive2.split('\n')
+    CourseSelectW3ZoneMapn.pop()
+    CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
+    print('Opened CourseSelectW3Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening CourseSelectW4Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectW4Zone.szs'), 'rb') as f:
-            w4archive = Sarc(yaz0.decompress(f.read()))
-        w4archive1 = w4archive.get_file('DofParam_obj4.bagldof').data
-        w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
-        w4archive3 = w4archive.get_file('DofParam_obj5.bagldof').data
-        w4archive4 = w4archive.get_file('CourseSelectW4ZoneSound.byml').data
-        w4archive5 = w4archive.get_file('DofParam_obj6.bagldof').data
-        w4archive6 = w4archive.get_file('CameraParam.byml').data
-        w4archive7 = w4archive.get_file('CourseSelectW4ZoneDesign.byml').data
-        CourseSelectW4ZoneMapn = w4archive2.split('\n')
-        CourseSelectW4ZoneMapn.pop()
-        CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
-        print('Opened CourseSelectW4Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectW4Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectW4Zone.szs'), 'rb') as f:
+        w4archive = Sarc(yaz0.decompress(f.read()))
+    w4archive1 = w4archive.get_file('DofParam_obj4.bagldof').data
+    w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
+    w4archive3 = w4archive.get_file('DofParam_obj5.bagldof').data
+    w4archive4 = w4archive.get_file('CourseSelectW4ZoneSound.byml').data
+    w4archive5 = w4archive.get_file('DofParam_obj6.bagldof').data
+    w4archive6 = w4archive.get_file('CameraParam.byml').data
+    w4archive7 = w4archive.get_file('CourseSelectW4ZoneDesign.byml').data
+    CourseSelectW4ZoneMapn = w4archive2.split('\n')
+    CourseSelectW4ZoneMapn.pop()
+    CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
+    print('Opened CourseSelectW4Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening CourseSelectW5Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectW5Zone.szs'), 'rb') as f:
-            w5archive = Sarc(yaz0.decompress(f.read()))
-        w5archive1 = w5archive.get_file('DofParam_obj4.bagldof').data
-        w5archive2 = w5archive.get_file('CourseSelectW5ZoneDesign.byml').data
-        w5archive3 = w5archive.get_file('DofParam_obj5.bagldof').data
-        w5archive4 = w5archive.get_file('DofParam_obj6.bagldof').data
-        w5archive5 = w5archive.get_file('CameraParam.byml').data
-        w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
-        w5archive7 = w5archive.get_file('DofParam_obj3.bagldof').data
-        w5archive8 = w5archive.get_file('CourseSelectW5ZoneSound.byml').data
-        CourseSelectW5ZoneMapn = w5archive6.split('\n')
-        CourseSelectW5ZoneMapn.pop()
-        CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
-        print('Opened CourseSelectW5Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectW5Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectW5Zone.szs'), 'rb') as f:
+        w5archive = Sarc(yaz0.decompress(f.read()))
+    w5archive1 = w5archive.get_file('DofParam_obj4.bagldof').data
+    w5archive2 = w5archive.get_file('CourseSelectW5ZoneDesign.byml').data
+    w5archive3 = w5archive.get_file('DofParam_obj5.bagldof').data
+    w5archive4 = w5archive.get_file('DofParam_obj6.bagldof').data
+    w5archive5 = w5archive.get_file('CameraParam.byml').data
+    w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
+    w5archive7 = w5archive.get_file('DofParam_obj3.bagldof').data
+    w5archive8 = w5archive.get_file('CourseSelectW5ZoneSound.byml').data
+    CourseSelectW5ZoneMapn = w5archive6.split('\n')
+    CourseSelectW5ZoneMapn.pop()
+    CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
+    print('Opened CourseSelectW5Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening CourseSelectW6Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectW6Zone.szs'), 'rb') as f:
-            w6archive = Sarc(yaz0.decompress(f.read()))
-        w6archive1 = w6archive.get_file('DofParam_obj18.bagldof').data
-        w6archive2 = w6archive.get_file('DofParam_obj14.bagldof').data
-        w6archive3 = w6archive.get_file('DofParam_obj10.bagldof').data
-        w6archive4 = w6archive.get_file('DofParam_obj9.bagldof').data
-        w6archive5 = w6archive.get_file('DofParam_obj19.bagldof').data
-        w6archive6 = w6archive.get_file('DofParam_obj15.bagldof').data
-        w6archive7 = byml.to_text(byml.from_binary(w6archive.get_file('CourseSelectW6ZoneMap.byml').data))
-        w6archive8 = w6archive.get_file('DofParam_obj11.bagldof').data
-        w6archive9 = w6archive.get_file('CourseSelectW6ZoneSound.byml').data
-        w6archive10 = w6archive.get_file('DofParam_obj6.bagldof').data
-        w6archive11 = w6archive.get_file('DofParam_obj16.bagldof').data
-        w6archive12 = w6archive.get_file('CourseSelectW6ZoneDesign.byml').data
-        w6archive13 = w6archive.get_file('DofParam_obj12.bagldof').data
-        w6archive14 = w6archive.get_file('CameraParam.byml').data
-        w6archive15 = w6archive.get_file('DofParam_obj17.bagldof').data
-        w6archive16 = w6archive.get_file('DofParam_obj13.bagldof').data
-        w6archive17 = w6archive.get_file('DofParam_obj8.bagldof').data
-        CourseSelectW6ZoneMapn = w6archive7.split('\n')
-        CourseSelectW6ZoneMapn.pop()
-        CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
-        print('Opened CourseSelectW6Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectW6Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectW6Zone.szs'), 'rb') as f:
+        w6archive = Sarc(yaz0.decompress(f.read()))
+    w6archive1 = w6archive.get_file('DofParam_obj18.bagldof').data
+    w6archive2 = w6archive.get_file('DofParam_obj14.bagldof').data
+    w6archive3 = w6archive.get_file('DofParam_obj10.bagldof').data
+    w6archive4 = w6archive.get_file('DofParam_obj9.bagldof').data
+    w6archive5 = w6archive.get_file('DofParam_obj19.bagldof').data
+    w6archive6 = w6archive.get_file('DofParam_obj15.bagldof').data
+    w6archive7 = byml.to_text(byml.from_binary(w6archive.get_file('CourseSelectW6ZoneMap.byml').data))
+    w6archive8 = w6archive.get_file('DofParam_obj11.bagldof').data
+    w6archive9 = w6archive.get_file('CourseSelectW6ZoneSound.byml').data
+    w6archive10 = w6archive.get_file('DofParam_obj6.bagldof').data
+    w6archive11 = w6archive.get_file('DofParam_obj16.bagldof').data
+    w6archive12 = w6archive.get_file('CourseSelectW6ZoneDesign.byml').data
+    w6archive13 = w6archive.get_file('DofParam_obj12.bagldof').data
+    w6archive14 = w6archive.get_file('CameraParam.byml').data
+    w6archive15 = w6archive.get_file('DofParam_obj17.bagldof').data
+    w6archive16 = w6archive.get_file('DofParam_obj13.bagldof').data
+    w6archive17 = w6archive.get_file('DofParam_obj8.bagldof').data
+    CourseSelectW6ZoneMapn = w6archive7.split('\n')
+    CourseSelectW6ZoneMapn.pop()
+    CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
+    print('Opened CourseSelectW6Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening CourseSelectW7Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectW7Zone.szs'), 'rb') as f:
-            w7archive = Sarc(yaz0.decompress(f.read()))
-        w7archive1 = w7archive.get_file('CourseSelectW7ZoneDesign.byml').data
-        w7archive2 = w7archive.get_file('DofParam_obj19.bagldof').data
-        w7archive3 = w7archive.get_file('DofParam_obj22.bagldof').data
-        w7archive4 = w7archive.get_file('CameraParam.byml').data
-        w7archive5 = w7archive.get_file('DofParam_obj23.bagldof').data
-        w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
-        w7archive7 = w7archive.get_file('CourseSelectW7ZoneSound.byml').data
-        CourseSelectW7ZoneMapn = w7archive6.split('\n')
-        CourseSelectW7ZoneMapn.pop()
-        CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
-        print('Opened CourseSelectW7Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectW7Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectW7Zone.szs'), 'rb') as f:
+        w7archive = Sarc(yaz0.decompress(f.read()))
+    w7archive1 = w7archive.get_file('CourseSelectW7ZoneDesign.byml').data
+    w7archive2 = w7archive.get_file('DofParam_obj19.bagldof').data
+    w7archive3 = w7archive.get_file('DofParam_obj22.bagldof').data
+    w7archive4 = w7archive.get_file('CameraParam.byml').data
+    w7archive5 = w7archive.get_file('DofParam_obj23.bagldof').data
+    w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
+    w7archive7 = w7archive.get_file('CourseSelectW7ZoneSound.byml').data
+    CourseSelectW7ZoneMapn = w7archive6.split('\n')
+    CourseSelectW7ZoneMapn.pop()
+    CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
+    print('Opened CourseSelectW7Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening CourseSelectW8Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectW8Zone.szs'), 'rb') as f:
-            w8archive = Sarc(yaz0.decompress(f.read()))
-        w8archive1 = w8archive.get_file('DofParam_obj130.bagldof').data
-        w8archive2 = w8archive.get_file('DofParam_obj129.bagldof').data
-        w8archive3 = w8archive.get_file('DofParam_obj131.bagldof').data
-        w8archive4 = byml.to_text(byml.from_binary(w8archive.get_file('CourseSelectW8ZoneMap.byml').data))
-        w8archive5 = w8archive.get_file('CourseSelectW8ZoneSound.byml').data
-        w8archive6 = w8archive.get_file('CourseSelectW8ZoneDesign.byml').data
-        w8archive7 = w8archive.get_file('DofParam_obj132.bagldof').data
-        w8archive8 = w8archive.get_file('CameraParam.byml').data
-        w8archive9 = w8archive.get_file('DofParam_obj133.bagldof').data
-        CourseSelectW8ZoneMapn = w8archive4.split('\n')
-        CourseSelectW8ZoneMapn.pop()
-        CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
-        print('Opened CourseSelectW8Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectW8Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectW8Zone.szs'), 'rb') as f:
+        w8archive = Sarc(yaz0.decompress(f.read()))
+    w8archive1 = w8archive.get_file('DofParam_obj130.bagldof').data
+    w8archive2 = w8archive.get_file('DofParam_obj129.bagldof').data
+    w8archive3 = w8archive.get_file('DofParam_obj131.bagldof').data
+    w8archive4 = byml.to_text(byml.from_binary(w8archive.get_file('CourseSelectW8ZoneMap.byml').data))
+    w8archive5 = w8archive.get_file('CourseSelectW8ZoneSound.byml').data
+    w8archive6 = w8archive.get_file('CourseSelectW8ZoneDesign.byml').data
+    w8archive7 = w8archive.get_file('DofParam_obj132.bagldof').data
+    w8archive8 = w8archive.get_file('CameraParam.byml').data
+    w8archive9 = w8archive.get_file('DofParam_obj133.bagldof').data
+    CourseSelectW8ZoneMapn = w8archive4.split('\n')
+    CourseSelectW8ZoneMapn.pop()
+    CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
+    print('Opened CourseSelectW8Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening CourseSelectS1Zone.szs')
-        with open(os.path.join(sPath, 'CourseSelectS1Zone.szs'), 'rb') as f:
-            s1archive = Sarc(yaz0.decompress(f.read()))
-        s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
-        s1archive2 = s1archive.get_file('CameraParam.byml').data
-        s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
-        CourseSelectS1ZoneMapn = s1archive3.split('\n')
-        CourseSelectS1ZoneMapn.pop()
-        CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
-        print('Opened CourseSelectS1Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening CourseSelectS1Zone.szs')
+    with open(os.path.join(sPath, 'CourseSelectS1Zone.szs'), 'rb') as f:
+        s1archive = Sarc(yaz0.decompress(f.read()))
+    s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
+    s1archive2 = s1archive.get_file('CameraParam.byml').data
+    s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
+    CourseSelectS1ZoneMapn = s1archive3.split('\n')
+    CourseSelectS1ZoneMapn.pop()
+    CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
+    print('Opened CourseSelectS1Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Opening KoopaLastBZone.szs')
-        with open(os.path.join(sPath, 'KoopaLastBZone.szs'), 'rb') as f:
-            KoopaLastBZone = Sarc(yaz0.decompress(f.read()))
-        KoopaLastBZone1 = KoopaLastBZone.get_file('DofParam_obj0.bagldof').data
-        KoopaLastBZone2 = byml.to_text(byml.from_binary(KoopaLastBZone.get_file('KoopaLastBZoneMap.byml').data))
-        KoopaLastBZone3 = KoopaLastBZone.get_file('DofParam_obj1.bagldof').data
-        KoopaLastBZone4 = KoopaLastBZone.get_file('KoopaLastBZoneDesign.byml').data
-        KoopaLastBZone5 = KoopaLastBZone.get_file('KoopaLastBZoneSound.byml').data
-        KoopaLastBZone6 = KoopaLastBZone.get_file('CubeMapMgr.baglcube').data
-        KoopaLastBZone7 = KoopaLastBZone.get_file('CameraParam.byml').data
-        KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
-        KoopaLastBZoneMap.pop()
-        print('Opened KoopaLastBZone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-    else:
-        print('Opening CourseSelectW1ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectW1ZoneMap1.szs'), 'rb') as f:
-            w1archive = Sarc(yaz0.decompress(f.read()))
-        w1archive6 = byml.to_text(byml.from_binary(w1archive.get_file('CourseSelectW1ZoneMap.byml').data))
-        w1archive8 = w1archive.get_file('CameraParam.byml').data
-        CourseSelectW1ZoneMapn = w1archive6.split('\n')
-        CourseSelectW1ZoneMapn.pop()
-        CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
-        print('Opened CourseSelectW1ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening CourseSelectW2ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectW2ZoneMap1.szs'), 'rb') as f:
-            w2archive = Sarc(yaz0.decompress(f.read()))
-        w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
-        w2archive7 = w2archive.get_file('CameraParam.byml').data
-        CourseSelectW2ZoneMapn = w2archive2.split('\n')
-        CourseSelectW2ZoneMapn.pop()
-        CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
-        print('Opened CourseSelectW2ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening CourseSelectW3ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectW3ZoneMap1.szs'), 'rb') as f:
-            w3archive = Sarc(yaz0.decompress(f.read()))
-        w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
-        w3archive3 = w3archive.get_file('CameraParam.byml').data
-        CourseSelectW3ZoneMapn = w3archive2.split('\n')
-        CourseSelectW3ZoneMapn.pop()
-        CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
-        print('Opened CourseSelectW3ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening CourseSelectW4ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectW4ZoneMap1.szs'), 'rb') as f:
-            w4archive = Sarc(yaz0.decompress(f.read()))
-        w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
-        w4archive6 = w4archive.get_file('CameraParam.byml').data
-        CourseSelectW4ZoneMapn = w4archive2.split('\n')
-        CourseSelectW4ZoneMapn.pop()
-        CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
-        print('Opened CourseSelectW4ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening CourseSelectW5ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectW5ZoneMap1.szs'), 'rb') as f:
-            w5archive = Sarc(yaz0.decompress(f.read()))
-        w5archive5 = w5archive.get_file('CameraParam.byml').data
-        w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
-        CourseSelectW5ZoneMapn = w5archive6.split('\n')
-        CourseSelectW5ZoneMapn.pop()
-        CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
-        print('Opened CourseSelectW4ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening CourseSelectW6ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectW6ZoneMap1.szs'), 'rb') as f:
-            w6archive = Sarc(yaz0.decompress(f.read()))
-        w6archive7 = byml.to_text(byml.from_binary(w6archive.get_file('CourseSelectW6ZoneMap.byml').data))
-        w6archive14 = w6archive.get_file('CameraParam.byml').data
-        CourseSelectW6ZoneMapn = w6archive7.split('\n')
-        CourseSelectW6ZoneMapn.pop()
-        CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
-        print('Opened CourseSelectW6ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening CourseSelectW7ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectW7ZoneMap1.szs'), 'rb') as f:
-            w7archive = Sarc(yaz0.decompress(f.read()))
-        w7archive4 = w7archive.get_file('CameraParam.byml').data
-        w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
-        CourseSelectW7ZoneMapn = w7archive6.split('\n')
-        CourseSelectW7ZoneMapn.pop()
-        CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
-        print('Opened CourseSelectW7ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening CourseSelectW8ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectW8ZoneMap1.szs'), 'rb') as f:
-            w8archive = Sarc(yaz0.decompress(f.read()))
-        w8archive4 = byml.to_text(byml.from_binary(w8archive.get_file('CourseSelectW8ZoneMap.byml').data))
-        w8archive8 = w8archive.get_file('CameraParam.byml').data
-        CourseSelectW8ZoneMapn = w8archive4.split('\n')
-        CourseSelectW8ZoneMapn.pop()
-        CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
-        print('Opened CourseSelectW8ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening CourseSelectS1ZoneMap1.szs')
-        with open(os.path.join(sPath, 'CourseSelectS1ZoneMap1.szs'), 'rb') as f:
-            s1archive = Sarc(yaz0.decompress(f.read()))
-        s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
-        s1archive2 = s1archive.get_file('CameraParam.byml').data
-        s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
-        CourseSelectS1ZoneMapn = s1archive3.split('\n')
-        CourseSelectS1ZoneMapn.pop()
-        CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
-        print('Opened CourseSelectS1ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Opening KoopaLastBZoneMap1.szs')
-        with open(os.path.join(sPath, 'KoopaLastBZoneMap1.szs'), 'rb') as f:
-            KoopaLastBZone = Sarc(yaz0.decompress(f.read()))
-        KoopaLastBZone2 = byml.to_text(byml.from_binary(KoopaLastBZone.get_file('KoopaLastBZoneMap.byml').data))
-        KoopaLastBZone7 = KoopaLastBZone.get_file('CameraParam.byml').data
-        KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
-        KoopaLastBZoneMap.pop()
-        print('Opened KoopaLastBZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    print('Opening KoopaLastBZone.szs')
+    with open(os.path.join(sPath, 'KoopaLastBZone.szs'), 'rb') as f:
+        KoopaLastBZone = Sarc(yaz0.decompress(f.read()))
+    KoopaLastBZone1 = KoopaLastBZone.get_file('DofParam_obj0.bagldof').data
+    KoopaLastBZone2 = byml.to_text(byml.from_binary(KoopaLastBZone.get_file('KoopaLastBZoneMap.byml').data))
+    KoopaLastBZone3 = KoopaLastBZone.get_file('DofParam_obj1.bagldof').data
+    KoopaLastBZone4 = KoopaLastBZone.get_file('KoopaLastBZoneDesign.byml').data
+    KoopaLastBZone5 = KoopaLastBZone.get_file('KoopaLastBZoneSound.byml').data
+    KoopaLastBZone6 = KoopaLastBZone.get_file('CubeMapMgr.baglcube').data
+    KoopaLastBZone7 = KoopaLastBZone.get_file('CameraParam.byml').data
+    KoopaLastBZoneMap = KoopaLastBZone2.split('\n')
+    KoopaLastBZoneMap.pop()
+    print('Opened KoopaLastBZone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
     # Creating base variables to be used and iterated on in the randomizer loop
     worldNo = 1
@@ -494,93 +363,54 @@ def randomizer():
             # Making sure Gimmick stages, Captain Toad stages, Mystery Houses, Toad Houses, Stamp Houses, Roulettes, Blockades, and Golden Express have the correct StageType depending on the slot they are on after they are randomized.
             if 'KinopioBrigade' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Captain Toad StageType fixed!')
-                if not wiiu:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオ探検隊'  # StageType for Captain Toad levels.
-                else:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�T����'
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオ探検隊'  # StageType for Captain Toad levels.
             elif 'KinopioHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Toad House StageType fixed!')
-                if not wiiu:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
-                else:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
             elif 'FairyHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Stamp House StageType fixed!')
-                if not wiiu:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 妖精の家'  # StageType for Stamp Houses.
-                else:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �d���̉�'
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 妖精の家'  # StageType for Stamp Houses.
             elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType.
                 if stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130:
                     print('Roulette StageType fixed with Roulette StageType!')
-                    if not wiiu:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: カジノ部屋'  # StageType for Roulettes.
-                    else:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �J�W�m����'
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: カジノ部屋'  # StageType for Roulettes.
                 # A lucky house where the golden express usually is gets it the golden express stage type.
                 elif stageNo == 57:
                     print('Roulette StageType fixed with Golden Express StageType!')
-                    if not wiiu:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゴールデンエクスプレス'  # StageType for Roulettes (カジノ部屋) is not used because they don't appear on the world map immediately which can cause progression issues. So the golden express is used instead.
-                    else:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �S�[���f���G�N�X�v���X'
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゴールデンエクスプレス'  # StageType for Roulettes (カジノ部屋) is not used because they don't appear on the world map immediately which can cause progression issues. So the golden express is used instead.
                 # To avoid a lucky house from being already active on the world map path, we use the Toad House StageType.
                 else:
                     print('Roulette StageType fixed with Toad House StageType!')
-                    if not wiiu:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
-                    else:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
             elif 'GoldenExpressStage' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 # Forcing golden express StageType when in a slot originally belonging to a roulette or the golden express itself
                 if stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 57 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130:
                     print('Golden Express StageType fixed!')
-                    if not wiiu:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゴールデンエクスプレス'  # StageType for golden express.
-                    else:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �S�[���f���G�N�X�v���X'
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゴールデンエクスプレス'  # StageType for golden express.
                 # Forcing Toad Houses in other scenarios (see: lucky house reasoning)
                 else:
                     print('Golden Express StageType fixed with Toad House!')
-                    if not wiiu:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
-                    else:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �L�m�s�I�̉�'
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: キノピオの家'  # StageType for Toad Houses.
             elif 'MysteryHouse' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Mystery House StageType fixed!')
-                if not wiiu:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ミステリーハウス'  # StageType for MysteryHouses.
-                else:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �~�X�e���[�n�E�X'
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ミステリーハウス'  # StageType for MysteryHouses.
             elif 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 # If it is a boss blockade...
                 if StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv2Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage':
                     print('Boss Blockade StageType fixed!')
-                    if not wiiu:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー[GPあり]'  # StageType for Boss Blockades.
-                    else:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �Q�[�g�L�[�p�[[GP����]'
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー[GPあり]'  # StageType for Boss Blockades.
                 # If it is a normal boss blockade...
                 else:
                     print('Blockade StageType fixed!')
-                    if not wiiu:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー'  # StageType for Blockades.
-                    else:
-                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �Q�[�g�L�[�p�['
+                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー'  # StageType for Blockades.
             elif 'TouchAndMike' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or 'KarakuriCastle' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Gimmick stage StageType fixed!')
-                if not wiiu:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: DRC専用'
-                else:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: DRC��p'
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: DRC専用'
             # Fix certain stages having a StageType which breaks certain things.
             elif ('KinopioBrigade' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: キノピオ探検隊') or ('KinopioHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: キノピオの家' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: 隠しキノピオの家' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: 隠し土管')) or ('FairyHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: 妖精の家') or ('RouletteRoomZone' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: カジノ部屋') or ('GoldenExpressStage' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: ゴールデンエクスプレス')) or ('GateKeeper' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and (StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: ゲートキーパー[GPあり]' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: ゲートキーパー')) or ('MysteryHouse' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: ミステリーハウス') or (('TouchAndMike' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or 'KarakuriCastle' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]) and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: DRC専用') or ('EnemyExpress' not in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] and StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] == '    StageType: クッパ城[列車通常]'):
                 print('Non-\'special\' level with \'special\' StageType fixed!')
-                if not wiiu:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 通常'  # StageType for normal levels.
-                else:
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: �ʏ�'
+                StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 通常'  # StageType for normal levels.
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 9] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 9]  # StageTimer
 
         StageName = StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]
@@ -705,380 +535,224 @@ def randomizer():
 
     doc = '\n'.join(StageListNew)
     # Creating new SZS filers with the modified files.
-    if not wiiu:
-        print('Writing StageList.szs')
-        writer = SarcWriter()
-        writer.set_endianness(endianness)
-        writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), False, 2)  # Adding to SARC.
-        data = writer.write()  # Write to SARC
+    print('Writing StageList.szs')
+    writer = SarcWriter()
+    writer.set_endianness(endianness)
+    writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), False, 2)  # Adding to SARC.
+    data = writer.write()  # Write to SARC
 
-        with open(os.path.join(rPath, "StageList.szs"), "wb") as randoSZS:
-            randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
-        print('Written StageList.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(rPath, "StageList.szs"), "wb") as randoSZS:
+        randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
+    print('Written StageList.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing world files:')
+    print('Writing world files:')
 
-        print('Writing CourseSelectW1Zone.szs')
-        w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
-        w1writer = SarcWriter()
-        w1writer.set_endianness(endianness)
-        w1writer.files['DofParam_obj10.bagldof'] = Bytes(w1archive1)
-        w1writer.files['DofParam_obj9.bagldof'] = Bytes(w1archive2)
-        w1writer.files['DofParam_obj11.bagldof'] = Bytes(w1archive3)
-        w1writer.files['CourseSelectW1ZoneDesign.byml'] = Bytes(w1archive4)
-        w1writer.files['DofParam_obj6.bagldof'] = Bytes(w1archive5)
-        w1writer.files['CourseSelectW1ZoneMap.byml'] = byml.to_binary(byml.from_text(w1archive6), False, 2)
-        w1writer.files['DofParam_obj12.bagldof'] = Bytes(w1archive7)
-        w1writer.files['CameraParam.byml'] = Bytes(w1archive8)
-        w1writer.files['DofParam_obj7.bagldof'] = Bytes(w1archive9)
-        w1writer.files['CourseSelectW1ZoneSound.byml'] = Bytes(w1archive10)
-        w1writer.files['DofParam_obj8.bagldof'] = Bytes(w1archive11)
-        w1data = w1writer.write()
+    print('Writing CourseSelectW1Zone.szs')
+    w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
+    w1writer = SarcWriter()
+    w1writer.set_endianness(endianness)
+    w1writer.files['DofParam_obj10.bagldof'] = Bytes(w1archive1)
+    w1writer.files['DofParam_obj9.bagldof'] = Bytes(w1archive2)
+    w1writer.files['DofParam_obj11.bagldof'] = Bytes(w1archive3)
+    w1writer.files['CourseSelectW1ZoneDesign.byml'] = Bytes(w1archive4)
+    w1writer.files['DofParam_obj6.bagldof'] = Bytes(w1archive5)
+    w1writer.files['CourseSelectW1ZoneMap.byml'] = byml.to_binary(byml.from_text(w1archive6), False, 2)
+    w1writer.files['DofParam_obj12.bagldof'] = Bytes(w1archive7)
+    w1writer.files['CameraParam.byml'] = Bytes(w1archive8)
+    w1writer.files['DofParam_obj7.bagldof'] = Bytes(w1archive9)
+    w1writer.files['CourseSelectW1ZoneSound.byml'] = Bytes(w1archive10)
+    w1writer.files['DofParam_obj8.bagldof'] = Bytes(w1archive11)
+    w1data = w1writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectW1Zone.szs'), 'wb') as w1:
-            w1.write(yaz0.compress(w1data[1]))
-        print('Written CourseSelectW1Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectW1Zone.szs'), 'wb') as w1:
+        w1.write(yaz0.compress(w1data[1]))
+    print('Written CourseSelectW1Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing CourseSelectW2Zone.szs')
-        w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
-        w2writer = SarcWriter()
-        w2writer.set_endianness(endianness)
-        w2writer.files['DofParam_obj4.bagldof'] = Bytes(w2archive1)
-        w2writer.files['CourseSelectW2ZoneMap.byml'] = byml.to_binary(byml.from_text(w2archive2), False, 2)
-        w2writer.files['DofParam_obj9.bagldof'] = Bytes(w2archive3)
-        w2writer.files['DofParam_obj5.bagldof'] = Bytes(w2archive4)
-        w2writer.files['CourseSelectW2ZoneSound.byml'] = Bytes(w2archive5)
-        w2writer.files['DofParam_obj6.bagldof'] = Bytes(w2archive6)
-        w2writer.files['CameraParam.byml'] = Bytes(w2archive7)
-        w2writer.files['DofParam_obj7.bagldof'] = Bytes(w2archive8)
-        w2writer.files['DofParam_obj3.bagldof'] = Bytes(w2archive9)
-        w2writer.files['CourseSelectW2ZoneDesign.byml'] = Bytes(w2archive10)
-        w2writer.files['DofParam_obj8.bagldof'] = Bytes(w2archive11)
-        w2data = w2writer.write()
+    print('Writing CourseSelectW2Zone.szs')
+    w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
+    w2writer = SarcWriter()
+    w2writer.set_endianness(endianness)
+    w2writer.files['DofParam_obj4.bagldof'] = Bytes(w2archive1)
+    w2writer.files['CourseSelectW2ZoneMap.byml'] = byml.to_binary(byml.from_text(w2archive2), False, 2)
+    w2writer.files['DofParam_obj9.bagldof'] = Bytes(w2archive3)
+    w2writer.files['DofParam_obj5.bagldof'] = Bytes(w2archive4)
+    w2writer.files['CourseSelectW2ZoneSound.byml'] = Bytes(w2archive5)
+    w2writer.files['DofParam_obj6.bagldof'] = Bytes(w2archive6)
+    w2writer.files['CameraParam.byml'] = Bytes(w2archive7)
+    w2writer.files['DofParam_obj7.bagldof'] = Bytes(w2archive8)
+    w2writer.files['DofParam_obj3.bagldof'] = Bytes(w2archive9)
+    w2writer.files['CourseSelectW2ZoneDesign.byml'] = Bytes(w2archive10)
+    w2writer.files['DofParam_obj8.bagldof'] = Bytes(w2archive11)
+    w2data = w2writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectW2Zone.szs'), 'wb') as w2:
-            w2.write(yaz0.compress(w2data[1]))
-        print('Written CourseSelectW2Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectW2Zone.szs'), 'wb') as w2:
+        w2.write(yaz0.compress(w2data[1]))
+    print('Written CourseSelectW2Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing CourseSelectW3Zone.szs')
-        w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
-        w3writer = SarcWriter()
-        w3writer.set_endianness(endianness)
-        w3writer.files['CourseSelectW3ZoneDesign.byml'] = Bytes(w3archive1)
-        w3writer.files['CourseSelectW3ZoneMap.byml'] = byml.to_binary(byml.from_text(w3archive2), False, 2)
-        w3writer.files['CameraParam.byml'] = Bytes(w3archive3)
-        w3writer.files['DofParam_obj27.bagldof'] = Bytes(w3archive4)
-        w3writer.files['CourseSelectW3ZoneSound.byml'] = Bytes(w3archive5)
-        w3writer.files['DofParam_obj28.bagldof'] = Bytes(w3archive6)
-        w3data = w3writer.write()
+    print('Writing CourseSelectW3Zone.szs')
+    w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
+    w3writer = SarcWriter()
+    w3writer.set_endianness(endianness)
+    w3writer.files['CourseSelectW3ZoneDesign.byml'] = Bytes(w3archive1)
+    w3writer.files['CourseSelectW3ZoneMap.byml'] = byml.to_binary(byml.from_text(w3archive2), False, 2)
+    w3writer.files['CameraParam.byml'] = Bytes(w3archive3)
+    w3writer.files['DofParam_obj27.bagldof'] = Bytes(w3archive4)
+    w3writer.files['CourseSelectW3ZoneSound.byml'] = Bytes(w3archive5)
+    w3writer.files['DofParam_obj28.bagldof'] = Bytes(w3archive6)
+    w3data = w3writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectW3Zone.szs'), 'wb') as w3:
-            w3.write(yaz0.compress(w3data[1]))
-        print('Written CourseSelectW3Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectW3Zone.szs'), 'wb') as w3:
+        w3.write(yaz0.compress(w3data[1]))
+    print('Written CourseSelectW3Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing CourseSelectW4Zone.szs')
-        w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
-        w4writer = SarcWriter()
-        w4writer.set_endianness(endianness)
-        w4writer.files['DofParam_obj4.bagldof'] = Bytes(w4archive1)
-        w4writer.files['CourseSelectW4ZoneMap.byml'] = byml.to_binary(byml.from_text(w4archive2), False, 2)
-        w4writer.files['DofParam_obj5.bagldof'] = Bytes(w4archive3)
-        w4writer.files['CourseSelectW4ZoneSound.byml'] = Bytes(w4archive4)
-        w4writer.files['DofParam_obj6.bagldof'] = Bytes(w4archive5)
-        w4writer.files['CameraParam.byml'] = Bytes(w4archive6)
-        w4writer.files['CourseSelectW4ZoneDesign.byml'] = Bytes(w4archive7)
-        w4data = w4writer.write()
+    print('Writing CourseSelectW4Zone.szs')
+    w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
+    w4writer = SarcWriter()
+    w4writer.set_endianness(endianness)
+    w4writer.files['DofParam_obj4.bagldof'] = Bytes(w4archive1)
+    w4writer.files['CourseSelectW4ZoneMap.byml'] = byml.to_binary(byml.from_text(w4archive2), False, 2)
+    w4writer.files['DofParam_obj5.bagldof'] = Bytes(w4archive3)
+    w4writer.files['CourseSelectW4ZoneSound.byml'] = Bytes(w4archive4)
+    w4writer.files['DofParam_obj6.bagldof'] = Bytes(w4archive5)
+    w4writer.files['CameraParam.byml'] = Bytes(w4archive6)
+    w4writer.files['CourseSelectW4ZoneDesign.byml'] = Bytes(w4archive7)
+    w4data = w4writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectW4Zone.szs'), 'wb') as w4:
-            w4.write(yaz0.compress(w4data[1]))
-        print('Written CourseSelectW4Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectW4Zone.szs'), 'wb') as w4:
+        w4.write(yaz0.compress(w4data[1]))
+    print('Written CourseSelectW4Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing CourseSelectW5Zone.szs')
-        w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
-        w5writer = SarcWriter()
-        w5writer.set_endianness(endianness)
-        w5writer.files['DofParam_obj4.bagldof'] = Bytes(w5archive1)
-        w5writer.files['CourseSelectW5ZoneDesign.byml'] = Bytes(w5archive2)
-        w5writer.files['DofParam_obj5.bagldof'] = Bytes(w5archive3)
-        w5writer.files['DofParam_obj6.bagldof'] = Bytes(w5archive4)
-        w5writer.files['CameraParam.byml'] = Bytes(w5archive5)
-        w5writer.files['CourseSelectW5ZoneMap.byml'] = byml.to_binary(byml.from_text(w5archive6), False, 2)
-        w5writer.files['DofParam_obj3.bagldof'] = Bytes(w5archive7)
-        w5writer.files['CourseSelectW5ZoneSound.byml'] = Bytes(w5archive8)
-        w5data = w5writer.write()
+    print('Writing CourseSelectW5Zone.szs')
+    w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
+    w5writer = SarcWriter()
+    w5writer.set_endianness(endianness)
+    w5writer.files['DofParam_obj4.bagldof'] = Bytes(w5archive1)
+    w5writer.files['CourseSelectW5ZoneDesign.byml'] = Bytes(w5archive2)
+    w5writer.files['DofParam_obj5.bagldof'] = Bytes(w5archive3)
+    w5writer.files['DofParam_obj6.bagldof'] = Bytes(w5archive4)
+    w5writer.files['CameraParam.byml'] = Bytes(w5archive5)
+    w5writer.files['CourseSelectW5ZoneMap.byml'] = byml.to_binary(byml.from_text(w5archive6), False, 2)
+    w5writer.files['DofParam_obj3.bagldof'] = Bytes(w5archive7)
+    w5writer.files['CourseSelectW5ZoneSound.byml'] = Bytes(w5archive8)
+    w5data = w5writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectW5Zone.szs'), 'wb') as w5:
-            w5.write(yaz0.compress(w5data[1]))
-        print('Written CourseSelectW5Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectW5Zone.szs'), 'wb') as w5:
+        w5.write(yaz0.compress(w5data[1]))
+    print('Written CourseSelectW5Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing CourseSelectW6Zone.szs')
-        w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
-        w6writer = SarcWriter()
-        w6writer.set_endianness(endianness)
-        w6writer.files['DofParam_obj18.bagldof'] = Bytes(w6archive1)
-        w6writer.files['DofParam_obj14.bagldof'] = Bytes(w6archive2)
-        w6writer.files['DofParam_obj10.bagldof'] = Bytes(w6archive3)
-        w6writer.files['DofParam_obj9.bagldof'] = Bytes(w6archive4)
-        w6writer.files['DofParam_obj19.bagldof'] = Bytes(w6archive5)
-        w6writer.files['DofParam_obj15.bagldof'] = Bytes(w6archive6)
-        w6writer.files['CourseSelectW6ZoneMap.byml'] = byml.to_binary(byml.from_text(w6archive7), False, 2)
-        w6writer.files['DofParam_obj11.bagldof'] = Bytes(w6archive8)
-        w6writer.files['CourseSelectW6ZoneSound.byml'] = Bytes(w6archive9)
-        w6writer.files['DofParam_obj6.bagldof'] = Bytes(w6archive10)
-        w6writer.files['DofParam_obj16.bagldof'] = Bytes(w6archive11)
-        w6writer.files['CourseSelectW6ZoneDesign.byml'] = Bytes(w6archive12)
-        w6writer.files['DofParam_obj12.bagldof'] = Bytes(w6archive13)
-        w6writer.files['CameraParam.byml'] = Bytes(w6archive14)
-        w6writer.files['DofParam_obj17.bagldof'] = Bytes(w6archive15)
-        w6writer.files['DofParam_obj13.bagldof'] = Bytes(w6archive16)
-        w6writer.files['DofParam_obj8.bagldof'] = Bytes(w6archive17)
-        w6data = w6writer.write()
+    print('Writing CourseSelectW6Zone.szs')
+    w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
+    w6writer = SarcWriter()
+    w6writer.set_endianness(endianness)
+    w6writer.files['DofParam_obj18.bagldof'] = Bytes(w6archive1)
+    w6writer.files['DofParam_obj14.bagldof'] = Bytes(w6archive2)
+    w6writer.files['DofParam_obj10.bagldof'] = Bytes(w6archive3)
+    w6writer.files['DofParam_obj9.bagldof'] = Bytes(w6archive4)
+    w6writer.files['DofParam_obj19.bagldof'] = Bytes(w6archive5)
+    w6writer.files['DofParam_obj15.bagldof'] = Bytes(w6archive6)
+    w6writer.files['CourseSelectW6ZoneMap.byml'] = byml.to_binary(byml.from_text(w6archive7), False, 2)
+    w6writer.files['DofParam_obj11.bagldof'] = Bytes(w6archive8)
+    w6writer.files['CourseSelectW6ZoneSound.byml'] = Bytes(w6archive9)
+    w6writer.files['DofParam_obj6.bagldof'] = Bytes(w6archive10)
+    w6writer.files['DofParam_obj16.bagldof'] = Bytes(w6archive11)
+    w6writer.files['CourseSelectW6ZoneDesign.byml'] = Bytes(w6archive12)
+    w6writer.files['DofParam_obj12.bagldof'] = Bytes(w6archive13)
+    w6writer.files['CameraParam.byml'] = Bytes(w6archive14)
+    w6writer.files['DofParam_obj17.bagldof'] = Bytes(w6archive15)
+    w6writer.files['DofParam_obj13.bagldof'] = Bytes(w6archive16)
+    w6writer.files['DofParam_obj8.bagldof'] = Bytes(w6archive17)
+    w6data = w6writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectW6Zone.szs'), 'wb') as w6:
-            w6.write(yaz0.compress(w6data[1]))
-        print('Written CourseSelectW6Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectW6Zone.szs'), 'wb') as w6:
+        w6.write(yaz0.compress(w6data[1]))
+    print('Written CourseSelectW6Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing CourseSelectW7Zone.szs')
-        w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
-        w7writer = SarcWriter()
-        w7writer.set_endianness(endianness)
-        w7writer.files['CourseSelectW7ZoneDesign.byml'] = Bytes(w7archive1)
-        w7writer.files['DofParam_obj19.bagldof'] = Bytes(w7archive2)
-        w7writer.files['DofParam_obj22.bagldof'] = Bytes(w7archive3)
-        w7writer.files['CameraParam.byml'] = Bytes(w7archive4)
-        w7writer.files['DofParam_obj23.bagldof'] = Bytes(w7archive5)
-        w7writer.files['CourseSelectW7ZoneMap.byml'] = byml.to_binary(byml.from_text(w7archive6), False, 2)
-        w7writer.files['CourseSelectW7ZoneSound.byml'] = Bytes(w7archive7)
-        w7data = w7writer.write()
+    print('Writing CourseSelectW7Zone.szs')
+    w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
+    w7writer = SarcWriter()
+    w7writer.set_endianness(endianness)
+    w7writer.files['CourseSelectW7ZoneDesign.byml'] = Bytes(w7archive1)
+    w7writer.files['DofParam_obj19.bagldof'] = Bytes(w7archive2)
+    w7writer.files['DofParam_obj22.bagldof'] = Bytes(w7archive3)
+    w7writer.files['CameraParam.byml'] = Bytes(w7archive4)
+    w7writer.files['DofParam_obj23.bagldof'] = Bytes(w7archive5)
+    w7writer.files['CourseSelectW7ZoneMap.byml'] = byml.to_binary(byml.from_text(w7archive6), False, 2)
+    w7writer.files['CourseSelectW7ZoneSound.byml'] = Bytes(w7archive7)
+    w7data = w7writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectW7Zone.szs'), 'wb') as w7:
-            w7.write(yaz0.compress(w7data[1]))
-        print('Written CourseSelectW7Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectW7Zone.szs'), 'wb') as w7:
+        w7.write(yaz0.compress(w7data[1]))
+    print('Written CourseSelectW7Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing CourseSelectW8Zone.szs')
-        w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
-        w8writer = SarcWriter()
-        w8writer.set_endianness(endianness)
-        w8writer.files['DofParam_obj130.bagldof'] = Bytes(w8archive1)
-        w8writer.files['DofParam_obj129.bagldof'] = Bytes(w8archive2)
-        w8writer.files['DofParam_obj131.bagldof'] = Bytes(w8archive3)
-        w8writer.files['CourseSelectW8ZoneMap.byml'] = byml.to_binary(byml.from_text(w8archive4), False, 2)
-        w8writer.files['CourseSelectW8ZoneSound.byml'] = Bytes(w8archive5)
-        w8writer.files['CourseSelectW8ZoneDesign.byml'] = Bytes(w8archive6)
-        w8writer.files['DofParam_obj132.bagldof'] = Bytes(w8archive7)
-        w8writer.files['CameraParam.byml'] = Bytes(w8archive8)
-        w8writer.files['DofParam_obj133.bagldof'] = Bytes(w8archive9)
-        w8data = w8writer.write()
+    print('Writing CourseSelectW8Zone.szs')
+    w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
+    w8writer = SarcWriter()
+    w8writer.set_endianness(endianness)
+    w8writer.files['DofParam_obj130.bagldof'] = Bytes(w8archive1)
+    w8writer.files['DofParam_obj129.bagldof'] = Bytes(w8archive2)
+    w8writer.files['DofParam_obj131.bagldof'] = Bytes(w8archive3)
+    w8writer.files['CourseSelectW8ZoneMap.byml'] = byml.to_binary(byml.from_text(w8archive4), False, 2)
+    w8writer.files['CourseSelectW8ZoneSound.byml'] = Bytes(w8archive5)
+    w8writer.files['CourseSelectW8ZoneDesign.byml'] = Bytes(w8archive6)
+    w8writer.files['DofParam_obj132.bagldof'] = Bytes(w8archive7)
+    w8writer.files['CameraParam.byml'] = Bytes(w8archive8)
+    w8writer.files['DofParam_obj133.bagldof'] = Bytes(w8archive9)
+    w8data = w8writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectW8Zone.szs'), 'wb') as w8:
-            w8.write(yaz0.compress(w8data[1]))
-        print('Written CourseSelectW8Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectW8Zone.szs'), 'wb') as w8:
+        w8.write(yaz0.compress(w8data[1]))
+    print('Written CourseSelectW8Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing CourseSelectS1Zone.szs')
-        s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
-        s1writer = SarcWriter()
-        s1writer.set_endianness(endianness)
-        s1writer.files['CourseSelectS1ZoneSound.byml'] = Bytes(s1archive1)
-        s1writer.files['CameraParam.byml'] = Bytes(s1archive2)
-        s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), False, 2)
-        s1data = s1writer.write()
+    print('Writing CourseSelectS1Zone.szs')
+    s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
+    s1writer = SarcWriter()
+    s1writer.set_endianness(endianness)
+    s1writer.files['CourseSelectS1ZoneSound.byml'] = Bytes(s1archive1)
+    s1writer.files['CameraParam.byml'] = Bytes(s1archive2)
+    s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), False, 2)
+    s1data = s1writer.write()
 
-        with open(os.path.join(srPath, 'CourseSelectS1Zone.szs'), 'wb') as s1:
-            s1.write(yaz0.compress(s1data[1]))
-        print('Written CourseSelectS1Zone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'CourseSelectS1Zone.szs'), 'wb') as s1:
+        s1.write(yaz0.compress(s1data[1]))
+    print('Written CourseSelectS1Zone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
-        print('Writing KoopaLastBZone.szs')
-        bzwriter = SarcWriter()
-        bzwriter.set_endianness(endianness)
-        bzwriter.files['DofParam_obj0.bagldof'] = Bytes(KoopaLastBZone1)
-        bzwriter.files['KoopaLastBZoneMap.byml'] = byml.to_binary(byml.from_text(KoopaLastBZone2), False, 2)
-        bzwriter.files['DofParam_obj1.bagldof'] = Bytes(KoopaLastBZone3)
-        bzwriter.files['KoopaLastBZoneDesign.byml'] = Bytes(KoopaLastBZone4)
-        bzwriter.files['KoopaLastBZoneSound.byml'] = Bytes(KoopaLastBZone5)
-        bzwriter.files['CubeMapMgr.baglcube'] = Bytes(KoopaLastBZone6)
-        bzwriter.files['CameraParam.byml'] = Bytes(KoopaLastBZone7)
-        bzdata = bzwriter.write()
+    print('Writing KoopaLastBZone.szs')
+    bzwriter = SarcWriter()
+    bzwriter.set_endianness(endianness)
+    bzwriter.files['DofParam_obj0.bagldof'] = Bytes(KoopaLastBZone1)
+    bzwriter.files['KoopaLastBZoneMap.byml'] = byml.to_binary(byml.from_text(KoopaLastBZone2), False, 2)
+    bzwriter.files['DofParam_obj1.bagldof'] = Bytes(KoopaLastBZone3)
+    bzwriter.files['KoopaLastBZoneDesign.byml'] = Bytes(KoopaLastBZone4)
+    bzwriter.files['KoopaLastBZoneSound.byml'] = Bytes(KoopaLastBZone5)
+    bzwriter.files['CubeMapMgr.baglcube'] = Bytes(KoopaLastBZone6)
+    bzwriter.files['CameraParam.byml'] = Bytes(KoopaLastBZone7)
+    bzdata = bzwriter.write()
 
-        with open(os.path.join(srPath, 'KoopaLastBZone.szs'), 'wb') as bz:
-            bz.write(yaz0.compress(bzdata[1]))
-        print('Written KoopaLastBZone.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-    else:
-        print('Writing StageList.szs.')
-        writer = SarcWriter()
-        writer.set_endianness(endianness)
-        writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), True, 1)
-        data = writer.write()
-
-        with open(os.path.join(rPath, "StageList.szs"), "wb") as randoSZS:
-            randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
-        print('Written StageList.szs.')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing world files:')
-
-        print('Writing CourseSelectW1ZoneMap1.szs')
-        w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
-        w1writer = SarcWriter()
-        w1writer.set_endianness(endianness)
-        w1writer.files['CourseSelectW1ZoneMap.byml'] = byml.to_binary(byml.from_text(w1archive6), True, 1)
-        w1writer.files['CameraParam.byml'] = Bytes(w1archive8)
-        w1data = w1writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectW1ZoneMap1.szs'), 'wb') as w1:
-            w1.write(yaz0.compress(w1data[1]))
-        print('Written CourseSelectW1ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing CourseSelectW2ZoneMap1.szs')
-        w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
-        w2writer = SarcWriter()
-        w2writer.set_endianness(endianness)
-        w2writer.files['CourseSelectW2ZoneMap.byml'] = byml.to_binary(byml.from_text(w2archive2), True, 1)
-        w2writer.files['CameraParam.byml'] = Bytes(w2archive7)
-        w2data = w2writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectW2ZoneMap1.szs'), 'wb') as w2:
-            w2.write(yaz0.compress(w2data[1]))
-        print('Written CourseSelectW2ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing CourseSelectW3ZoneMap1.szs')
-        w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
-        w3writer = SarcWriter()
-        w3writer.set_endianness(endianness)
-        w3writer.files['CourseSelectW3ZoneMap.byml'] = byml.to_binary(byml.from_text(w3archive2), True, 1)
-        w3writer.files['CameraParam.byml'] = Bytes(w3archive3)
-        w3data = w3writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectW3ZoneMap1.szs'), 'wb') as w3:
-            w3.write(yaz0.compress(w3data[1]))
-        print('Written CourseSelectW3ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing CourseSelectW4ZoneMap1.szs')
-        w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
-        w4writer = SarcWriter()
-        w4writer.set_endianness(endianness)
-        w4writer.files['CourseSelectW4ZoneMap.byml'] = byml.to_binary(byml.from_text(w4archive2), True, 1)
-        w4writer.files['CameraParam.byml'] = Bytes(w4archive6)
-        w4data = w4writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectW4ZoneMap1.szs'), 'wb') as w4:
-            w4.write(yaz0.compress(w4data[1]))
-        print('Written CourseSelectW4ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing CourseSelectW5ZoneMap1.szs')
-        w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
-        w5writer = SarcWriter()
-        w5writer.set_endianness(endianness)
-        w5writer.files['CameraParam.byml'] = Bytes(w5archive5)
-        w5writer.files['CourseSelectW5ZoneMap.byml'] = byml.to_binary(byml.from_text(w5archive6), True, 1)
-        w5data = w5writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectW5ZoneMap1.szs'), 'wb') as w5:
-            w5.write(yaz0.compress(w5data[1]))
-        print('Written CourseSelectW5ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing CourseSelectW6ZoneMap1.szs')
-        w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
-        w6writer = SarcWriter()
-        w6writer.set_endianness(endianness)
-        w6writer.files['CourseSelectW6ZoneMap.byml'] = byml.to_binary(byml.from_text(w6archive7), True, 1)
-        w6writer.files['CameraParam.byml'] = Bytes(w6archive14)
-        w6data = w6writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectW6ZoneMap1.szs'), 'wb') as w6:
-            w6.write(yaz0.compress(w6data[1]))
-        print('Written CourseSelectW6ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing CourseSelectW7ZoneMap1.szs')
-        w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
-        w7writer = SarcWriter()
-        w7writer.set_endianness(endianness)
-        w7writer.files['CameraParam.byml'] = Bytes(w7archive4)
-        w7writer.files['CourseSelectW7ZoneMap.byml'] = byml.to_binary(byml.from_text(w7archive6), True, 1)
-        w7data = w7writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectW7ZoneMap1.szs'), 'wb') as w7:
-            w7.write(yaz0.compress(w7data[1]))
-        print('Written CourseSelectW7ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing CourseSelectW8ZoneMap1.szs')
-        w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
-        w8writer = SarcWriter()
-        w8writer.set_endianness(endianness)
-        w8writer.files['CourseSelectW8ZoneMap.byml'] = byml.to_binary(byml.from_text(w8archive4), True, 1)
-        w8writer.files['CameraParam.byml'] = Bytes(w8archive8)
-        w8data = w8writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectW8ZoneMap1.szs'), 'wb') as w8:
-            w8.write(yaz0.compress(w8data[1]))
-        print('Written CourseSelectW8ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing CourseSelectS1ZoneMap1.szs')
-        s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
-        s1writer = SarcWriter()
-        s1writer.set_endianness(endianness)
-        s1writer.files['CourseSelectS1ZoneSound.byml'] = Bytes(s1archive1)
-        s1writer.files['CameraParam.byml'] = Bytes(s1archive2)
-        s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), True, 1)
-        s1data = s1writer.write()
-
-        with open(os.path.join(srPath, 'CourseSelectS1ZoneMap1.szs'), 'wb') as s1:
-            s1.write(yaz0.compress(s1data[1]))
-        print('Written CourseSelectS1ZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
-
-        print('Writing KoopaLastBZoneMap1.szs')
-        bzwriter = SarcWriter()
-        bzwriter.set_endianness(endianness)
-        bzwriter.files['KoopaLastBZoneMap.byml'] = byml.to_binary(byml.from_text(KoopaLastBZone2), True, 1)
-        bzwriter.files['CameraParam.byml'] = Bytes(KoopaLastBZone7)
-        bzdata = bzwriter.write()
-
-        with open(os.path.join(srPath, 'KoopaLastBZoneMap1.szs'), 'wb') as bz:
-            bz.write(yaz0.compress(bzdata[1]))
-        print('Written KoopaLastBZoneMap1.szs')
-        bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+    with open(os.path.join(srPath, 'KoopaLastBZone.szs'), 'wb') as bz:
+        bz.write(yaz0.compress(bzdata[1]))
+    print('Written KoopaLastBZone.szs')
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
 
     print('Finished writing stage files.')
 
@@ -1118,6 +792,9 @@ def randomizer():
             # Creating a new spoiler text file.
             s.write(''.join(stageID_Name)[:-1])
 
+    bar += 1
+    dpg.configure_item("progress", default_value=bar / 174)
+
     with open('seedHistory.txt', 'a+') as h:
         # Seed History file
         h.seek(0)
@@ -1128,18 +805,6 @@ def randomizer():
             stageID_Name[0] = '\n\n-------------------------------------------------------------\n\n' + str(now.strftime("%Y-%m-%d")) + '\n' + stageID_Name[0]
             h.write(''.join(stageID_Name)[:-1])
 
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    if wiiu:
-        with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'rules.txt'), 'w', encoding='utf-8') as rules:
-            rules.write('[Definition]\n'
-                        'titleIds = 0005000010145D00,0005000010145C00,0005000010106100\n'
-                        'name = SM3DWR-' + str(seedRNG)+'\n'
-                        'path = \"Super Mario 3D World/Mods/SM3DWR-' + str(seedRNG) + '\"\n'
-                        'description = Super Mario 3D World Randomizer\n'
-                        'version = 3\n'
-                        'fsPriority = 100')
     bar += 1
     dpg.configure_item("progress", default_value=bar / 174)
 
@@ -1638,36 +1303,12 @@ class GUI:
                     self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory)  # Seed Input Text
                     self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
                     dpg.add_progress_bar(tag="progress", label="progress", default_value=0)
-                    '''
-                    dpg.add_text("This randomizer only effects Super Mario 3D World (Wii U and Switch), not Bowser's Fury.")
-                    '''
                     dpg.add_text("This randomizer only effects Super Mario 3D World (Switch), not Bowser's Fury.")
                     self.test = dpg.add_button(tag="test", label="test", callback=lambda: dpg.configure_item("progress", default_value=1), show=False)
                     with dpg.tooltip("dirbutt"):
-                        '''
-                        dpg.add_text("The directory selected must be the root directory of an unmodified dump of the "
-                                     "game:\n" +
-                                     "\"" + os.path.join("00050000", "10106100", "content") + "\" - Super Mario 3D World (JPN)\n"
-                                     "\"" + os.path.join("00050000", "10145C00", "content") + "\" - Super Mario 3D World (USA)\n"
-                                     "\"" + os.path.join("00050000", "10145D00", "content") + "\" - Super Mario 3D World (EUR)\n"
-                                     "\"" + os.path.join("010028600EBDA000", "romfs") + "\" - Super Mario 3D World + Bowser's Fury")
-                        '''
                         dpg.add_text("The directory selected must be the root directory of an unmodified dump of the game:\n" +
                                      "\"" + os.path.join("010028600EBDA000", "romfs") + "\" - Super Mario 3D World + Bowser's Fury")
                     with dpg.tooltip("rdirbutt"):
-                        '''
-                        dpg.add_text("Select your desired output folder of choice. The recommended output folder would be your mods folder:\n" +
-                                     "\"" + os.path.join("sd:", "wiiu", "sdcafiine", "0005000010106100") + "\" - SDCafiine (Wii U, JPN)\n"
-                                     "\"" + os.path.join("sd:", "wiiu", "sdcafiine", "0005000010145C00") + "\" - SDCafiine (Wii U, USA)\n"
-                                     "\"" + os.path.join("sd:", "wiiu", "sdcafiine", "0005000010145D00") + "\" - SDCafiine (Wii U, EUR)\n"
-                                     "\"" + os.path.join("Cemu", "graphicsPacks") + "\" - Cemu (Wii U)\n"
-                                     "\"" + os.path.join("sd:", "atmosphere", "contents", "010028600EBDA000") + "\"* - Atmosphere (Switch)\n"
-                                     "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury", "<name of your choice>", "contents", "010028600EBDA000") + "\"* - SMM (Switch)\n"
-                                     "\"" + os.path.join("Ryujinx", "mods", "contents", "010028600EBDA000") + "\" - Ryujinx (Switch)\n\n"
-                                     "*The \"romfs\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
-                                     "specified Atmosphere or SimpleModManager (SMM) folder.\n\n"
-                                     "Note: Yuzu is not officially supported and you may encounter issues if you use it.")
-                        '''
                         dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
                                      "be your mods folder:\n" +
                                      "\"" + os.path.join("sd:", "atmosphere", "contents", "010028600EBDA000") + "\"* - Atmosphere (Switch)\n"
@@ -1704,11 +1345,6 @@ class GUI:
                     with dpg.tooltip('music'):
                         dpg.add_text('Randomize the filenames for the music files.')
                     with dpg.tooltip('lang'):
-                        '''
-                        dpg.add_text('Randomize the selected language. Will be the same language for everything.\n'
-                                     'Best results on the Switch version due to the larger language pool than\n
-                                     each of the individual Wii U versions (depending on your region).')
-                        '''
                         dpg.add_text('Randomize the selected language. Will be the same language for everything.')
                     with dpg.tooltip('pslider'):
                         dpg.add_text('CTRL+Left Click to enter a specific value.\n'
