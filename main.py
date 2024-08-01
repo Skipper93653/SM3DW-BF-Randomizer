@@ -465,7 +465,7 @@ def randomizer():
         GreenStarLockHistory2.append([rng.choice([True, False], size=1, p=[float(dpg.get_value('pslider')), float(1 - dpg.get_value('pslider'))], replace=True), int(currentGreenStars * float(dpg.get_value('sslider')))])
         if stageNo == 114:
             GreenStarLockHistory2[-1][0] = True  # Force Bowser-Castle to have a star lock when setting is on 'Fully random'
-        if dpg.get_value("star") == 'Disabled' or float(dpg.get_value('sslider')) == 0 or 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100 or stageNo == 117 or stageNo == 118:
+        if dpg.get_value("star") == 'Disabled' or float(dpg.get_value('sslider')) == 0 or 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 49 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100 or stageNo == 113 or stageNo == 117 or stageNo == 118:
             # Remove all Green Star Locks when encountered
             print('Removing green star lock...')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
