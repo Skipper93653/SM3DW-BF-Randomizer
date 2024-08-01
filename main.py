@@ -6,6 +6,7 @@ import json  # For saving settings
 import hashlib  # For file verification
 import dearpygui.dearpygui as dpg  # User interface
 import numpy as np  # Random number generation
+from datetime import datetime  # For seed history
 from oead import *  # For common Nintendo EAD/EPD file formats
 
 
@@ -1068,32 +1069,44 @@ def randomizer():
     bar += 1
     dpg.configure_item("progress", default_value=bar / 174)
 
+    # For seed history and non-spoiler text file
+    if len(str(dpg.get_value('seed'))) == 0:
+        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
+    else:
+        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
+    stageID_Name.append('Settings:\n')
+    stageID_Name.append('Speedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n')
+    stageID_Name.append('Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n')
+    stageID_Name.append('Randomize music?: ' + str(dpg.get_value('music')) + '\n')
+    stageID_Name.append('Randomize language?: ' + str(dpg.get_value('lang')) + '\n')
+    if str(dpg.get_value('star')) == 'Fully random':
+        stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n')
+        stageID_Name.append('Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n')
+        stageID_Name.append('Green star lock strictness: ' + str(dpg.get_value('sslider')) + '\n\n')
+    else:
+        stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n\n')
+    for i in hashDict:
+        with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
+            hash_object = hashlib.md5(f.read())
+            stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
+
     if dpg.get_value("spoil"):
         spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), GreenStarLockHistory2, user_data)
     else:
         print('Not generating spoiler file, only generating seed/settings/hash text file.')
         with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), str(seedRNG)+'.txt'), 'w', encoding='utf-8') as s:
             # Creating a new spoiler text file.
-            if len(str(dpg.get_value('seed'))) == 0:
-                stageID_Name = ['Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
-            else:
-                stageID_Name = ['Seed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
-            stageID_Name.append('Settings:\n')
-            stageID_Name.append('Speedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n')
-            stageID_Name.append('Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n')
-            stageID_Name.append('Randomize music?: ' + str(dpg.get_value('music')) + '\n')
-            stageID_Name.append('Randomize language?: ' + str(dpg.get_value('lang')) + '\n')
-            if str(dpg.get_value('star')) == 'Fully random':
-                stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n')
-                stageID_Name.append('Green star lock probability: ' + str(dpg.get_value('pslider')) + '\n')
-                stageID_Name.append('Green star lock strictness: ' + str(dpg.get_value('sslider')) + '\n\n')
-            else:
-                stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n\n')
-            for i in hashDict:
-                with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
-                    hash_object = hashlib.md5(f.read())
-                    stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
             s.write(''.join(stageID_Name)[:-1])
+
+    with open('seedHistory.txt', 'a+') as h:
+        # Seed History file
+        h.seek(0)
+        now = datetime.now()
+        if len(h.read()) == 0:
+            h.write(str(now.strftime("%Y-%m-%d")) + '\n' + ''.join(stageID_Name)[:-1])
+        else:
+            stageID_Name[0] = '\n\n-------------------------------------------------------------\n\n' + str(now.strftime("%Y-%m-%d")) + '\n' + stageID_Name[0]
+            h.write(''.join(stageID_Name)[:-1])
 
     bar += 1
     dpg.configure_item("progress", default_value=bar / 174)
