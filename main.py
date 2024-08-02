@@ -521,6 +521,23 @@ def randomizer():
                         CourseSelectS1ZoneMapn[i - 4] = CourseSelectS1ZoneMapo[i - 4][:CourseSelectS1ZoneMapo[i - 4].index(':') + 2] + StageName
                     elif 'ModelName: Miniature' in CourseSelectS1ZoneMapo[i - 6] and CourseSelectS1ZoneMapo[i + 15][CourseSelectS1ZoneMapo[i + 15].index(':') + 2:] == str(worldNo):
                         CourseSelectS1ZoneMapn[i - 6] = CourseSelectS1ZoneMapo[i - 6][:CourseSelectS1ZoneMapo[i - 6].index(':') + 2] + StageName
+        """
+        if stageNo == 114:
+            changeTo = 'GoalPoleLast'
+        elif stageNo == 9 or stageNo == 20 or stageNo == 33 or stageNo == 37 or stageNo == 46 or stageNo == 61 or stageNo == 80 or stageNo == 85 or stageNo == 96 or stageNo == 113 or stageNo == 117 or stageNo == 118 or stageNo == 127 or stageNo == 137 or stageNo == 150 or stageNo == 151:
+            changeTo = 'GoalPoleSuper'
+        else:
+            changeTo = 'GoalPole'
+
+        if stageID == 114:
+            changeFrom = 'GoalPoleLast'
+        elif stageID == 9 or stageID == 20 or stageID == 33 or stageID == 37 or stageID == 46 or stageID == 61 or stageID == 80 or stageID == 85 or stageID == 96 or stageID == 113 or stageID == 117 or stageID == 118 or stageID == 127 or stageID == 150 or stageID == 151:
+            changeFrom = 'GoalPoleSuper'
+        else:
+            changeFrom = 'GoalPole'
+
+        goalPoleChanges(changeTo, changeFrom, StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8][StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8].index(':') + 2:], sPath, srPath)  # Correct the Goal Pole at the end of the stages if possible.
+        """
         bar += 1
         dpg.configure_item("progress", default_value=bar / 174)
 
@@ -780,9 +797,12 @@ def randomizer():
     else:
         stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n\n')
     for i in hashDict:
-        with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
-            hash_object = hashlib.md5(f.read())
-            stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
+        try:
+            with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
+                hash_object = hashlib.md5(f.read())
+                stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
+        except FileNotFoundError:
+            print(i[0] + ' not modified.')
 
     if dpg.get_value("spoil"):
         spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), GreenStarLockHistory2, user_data)
@@ -840,6 +860,1241 @@ def randomizer():
 
     print('Randomization complete!')
     dpg.configure_item("popup", show=True)
+
+
+# Goal pole changes
+def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath):
+    if changeTo != changeFrom:  # Only change the Goal Pole if needed.
+        # Dictionary keyed by the StageName from the StageList which then points to a list with the first index being the file name of the Goal Pole area with the second index being another list with every file within the file of the first index.
+        try:
+            stages = {'EnterCatMarioStage': ['EnterCatMarioStage.szs', ['DofParam_obj14.bagldof',
+                                                                        'DofParam_obj0.bagldof',
+                                                                        'EnterCatMarioStageDesign.byml',
+                                                                        'YFog.bagldof',
+                                                                        'EnterCatMarioStageSound.byml',
+                                                                        'DirectionalLight.bagldirlit',
+                                                                        'CameraParam2.byml',
+                                                                        'DofParam_obj2.bagldof',
+                                                                        'DefaultParam.baglblm',
+                                                                        'DefaultParam.baglexp',
+                                                                        'AreaParamList.baglapl',
+                                                                        'CubeMapMgr.baglcube',
+                                                                        'CategoryLightInfo.bagllitinfocharacter',
+                                                                        'CameraParam.byml',
+                                                                        'DofParam_obj7.bagldof',
+                                                                        'DepthShadow.bagldptsdw',
+                                                                        'DofParam_obj17.bagldof',
+                                                                        'EnterCatMarioStageMap.byml',
+                                                                        'CategoryLightInfo.bagllitinfostandard',
+                                                                        'Fog.baglfog',
+                                                                        'UnitPointIlluminant.baglcube']],
+                      'NokonokoCaveStage': ['NokonokoCaveStage.szs', ['NokonokoCaveStageSound.byml',
+                                                                      'NokonokoCaveStageDesign.byml',
+                                                                      'YFog.baglfog',
+                                                                      'DofParam_obj25.bagldof',
+                                                                      'DirectionalLight.bagldirlit',
+                                                                      'DofParam_obj6.bagldof',
+                                                                      'DofParam_obj36.bagldof',
+                                                                      'DofParam_obj26.bagldof',
+                                                                      'DofParam_obj32.bagldof',
+                                                                      'DefaultParam.baglblm',
+                                                                      'DefaultParam.baglexp',
+                                                                      'AreaParamList.baglapl',
+                                                                      'CubeMapMgr.baglcube',
+                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                      'CameraParam.byml',
+                                                                      'DepthShadow.bagldptsdw',
+                                                                      'DofParam_obj33.bagldof',
+                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                      'Fog.baglfog',
+                                                                      'NokonokoCaveStageMap.byml',
+                                                                      'CaveZone.baglssao',
+                                                                      'UnitPointIlluminant.baglcube',
+                                                                      'Default.baglssao',
+                                                                      'GraphicsStress.baglstress']],
+                      'ClimbMountainStage': ['ClimbMountainStage.szs', ['DofParam_obj4.bagldof',
+                                                                        'ClimbMountainStageDesign.byml',
+                                                                        'DofParam_obj10.bagldof',
+                                                                        'DofParam_obj9.bagldof',
+                                                                        'DofParam_obj5.bagldof',
+                                                                        'DofParam_obj1.bagldof',
+                                                                        'DirectionalLight.bagldirlit',
+                                                                        'DefaultParam.baglblm',
+                                                                        'DefaultParam.baglexp',
+                                                                        'AreaParamList.baglapl',
+                                                                        'CubeMapMgr.baglcube',
+                                                                        'CategoryLightInfo.bagllitinfocharacter',
+                                                                        'CameraParam.byml',
+                                                                        'ClimbMountainStageSound.byml',
+                                                                        'DepthShadow.bagldptsdw',
+                                                                        'CategoryLightInfo.bagllitinfostandard',
+                                                                        'ClimbMountainStageMap.byml',
+                                                                        'UnitPointIlluminant.baglcube']],
+                      'DownRiverStage': ['DownRiverStage.szs', ['DofParam_obj18.bagldof',
+                                                                'DofParam_obj4.bagldof',
+                                                                'DownRiverStageMap.byml',
+                                                                'DofParam_obj19.bagldof',
+                                                                'DofParam_obj5.bagldof',
+                                                                'DirectionalLight.bagldirlit',
+                                                                'LightStreak.baglgodray',
+                                                                'DownRiverStageSound.byml',
+                                                                'DefaultParam.baglblm',
+                                                                'DefaultParam.baglexp',
+                                                                'AreaParamList.baglapl',
+                                                                'CubeMapMgr.baglcube',
+                                                                'CategoryLightInfo.bagllitinfocharacter',
+                                                                'CameraParam.byml',
+                                                                'DepthShadow.bagldptsdw',
+                                                                'CategoryLightInfo.bagllitinfostandard',
+                                                                'UnitPointIlluminant.baglcube',
+                                                                'DownRiverStageDesign.byml']],
+                      'FlipCircusStage': ['FlipCircusStage.szs', ['DofParam_obj74.bagldof',
+                                                                  'MirrorRendering.baglmirror',
+                                                                  'YFog.baglfog',
+                                                                  'DirectionalLight.bagldirlit',
+                                                                  'FlipCircusStageDesign.byml',
+                                                                  'FlipCircusStageMap.byml',
+                                                                  'FlipCircusStageSound.byml',
+                                                                  'LightStreak.baglgodray',
+                                                                  'GodRay.baglgodray',
+                                                                  'DefaultParam.baglblm',
+                                                                  'DefaultParam.baglexp',
+                                                                  'AreaParamList.baglapl',
+                                                                  'CubeMapMgr.baglcube',
+                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                  'CameraParam.byml',
+                                                                  'DepthShadow.bagldptsdw',
+                                                                  'DofParam_obj33.bagldof',
+                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                  'DofParam_obj13.bagldof',
+                                                                  'Fog.baglfog',
+                                                                  'UnitPointIlluminant.baglcube',
+                                                                  'GraphicsStress.baglstress']],
+                      'SideWaveDesertStage': ['SideWaveDesertStage.szs', ['DofParam_obj0.bagldof',
+                                                                          'DofParam_obj9.bagldof',
+                                                                          'YFog.baglfog',
+                                                                          'BonusRoom.baglssao',
+                                                                          'DirectionalLight.bagldirlit',
+                                                                          'DofParam_obj11.bagldof',
+                                                                          'SideWaveDesertStageDesign.byml',
+                                                                          'SideWaveDesertStageSound.byml',
+                                                                          'DofParam_obj12.bagldof',
+                                                                          'DefaultParam.baglblm',
+                                                                          'DefaultParam.baglexp',
+                                                                          'AreaParamList.baglapl',
+                                                                          'CubeMapMgr.baglcube',
+                                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                                          'CameraParam.byml',
+                                                                          'DepthShadow.bagldptsdw',
+                                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                                          'DofParam_obj13.bagldof',
+                                                                          'Fog.baglfog',
+                                                                          'SideWaveDesertStageMap.byml',
+                                                                          'UnitPointIlluminant.baglcube',
+                                                                          'Default.baglssao',
+                                                                          'DofParam_obj8.bagldof']],
+                      'TouchAndMikeStage': ['TouchAndMikeSecondZone.szs', ['DofParam_obj1.bagldof',
+                                                                           'TouchAndMikeSecondZoneMap.byml',
+                                                                           'CameraParam.byml',
+                                                                           'TouchAndMikeSecondZoneDesign.byml']],
+                      'ShadowTunnelStage': ['ShadowTunnelStage.szs', ['DofParam_obj10.bagldof',
+                                                                      'YFog.baglfog',
+                                                                      'ShadowTunnelStageDesign.byml',
+                                                                      'DirectionalLight.bagldirlit',
+                                                                      'DofParam_obj11.bagldof',
+                                                                      'GoalArea.baglcc',
+                                                                      'ShadowTunnelStageSound.byml',
+                                                                      'ShadowTunnelStageMap.byml',
+                                                                      'DefaultParam.baglamp',
+                                                                      'DefaultParam.baglblm',
+                                                                      'DefaultParam.baglexp',
+                                                                      'Default.baglcc',
+                                                                      'AreaParamList.baglapl',
+                                                                      'CubeMapMgr.baglcube',
+                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                      'CameraParam.byml',
+                                                                      'DepthShadow.bagldptsdw',
+                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                      'DofParam_obj13.bagldof',
+                                                                      'UnitPointIlluminant.baglcube',
+                                                                      'Default.baglssao']],
+                      'RotateFieldStage': ['RotateFieldGoalZone.szs', ['RotateFieldGoalZoneDesign.byml',
+                                                                       'RotateFieldGoalZoneMap.byml',
+                                                                       'DofParam_obj22.bagldof',
+                                                                       'CameraParam.byml',
+                                                                       'DofParam_obj23.bagldof']],
+                      'DoubleMarioFieldStage': ['DoubleMarioFieldStage.szs', ['DofParam_obj18.bagldof',
+                                                                              'YFog.baglfog',
+                                                                              'DirectionalLight.bagldirlit',
+                                                                              'DoubleMarioFieldStageSound.byml',
+                                                                              'DoubleMarioFieldStageDesign.byml',
+                                                                              'DefaultParam.baglblm',
+                                                                              'DefaultParam.baglexp',
+                                                                              'AreaParamList.baglapl',
+                                                                              'CubeMapMgr.baglcube',
+                                                                              'CategoryLightInfo.bagllitinfocharacter',
+                                                                              'CameraParam.byml',
+                                                                              'DoubleMarioFieldStageMap.byml',
+                                                                              'DofParam_obj7.bagldof',
+                                                                              'DepthShadow.bagldptsdw',
+                                                                              'DofParam_obj3.bagldof',
+                                                                              'CategoryLightInfo.bagllitinfostandard',
+                                                                              'Fog.baglfog',
+                                                                              'UnitPointIlluminant.baglcube']],
+                      'SnowBallParkStage': ['SnowBallParkStage.szs', ['DofParam_obj5.bagldof',
+                                                                      'YFog.baglfog',
+                                                                      'DirectionalLight.bagldirlit',
+                                                                      'LightStreak.baglgodray',
+                                                                      'SnowBallParkStageMap.byml',
+                                                                      'DefaultParam.baglblm',
+                                                                      'DefaultParam.baglexp',
+                                                                      'AreaParamList.baglapl',
+                                                                      'CubeMapMgr.baglcube',
+                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                      'HdrCompose.baglhdrcompose',
+                                                                      'SnowBallParkStageDesign.byml',
+                                                                      'CameraParam.byml',
+                                                                      'DepthShadow.bagldptsdw',
+                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                      'SnowBallParkStageSound.byml',
+                                                                      'Fog.baglfog',
+                                                                      'GraphicsStress.baglstress',
+                                                                      'DofParam_obj8.bagldof']],
+                      'ClimbWirenetStage': ['ClimbWirenetStage.szs', ['DofParam_obj4.bagldof',
+                                                                      'ClimbWirenetStageSound.byml',
+                                                                      'DofParam_obj1.bagldof',
+                                                                      'DirectionalLight.bagldirlit',
+                                                                      'DefaultParam.baglblm',
+                                                                      'AreaParamList.baglapl',
+                                                                      'CubeMapMgr.baglcube',
+                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                      'ClimbWirenetStageMap.byml',
+                                                                      'CameraParam.byml',
+                                                                      'ClimbWirenetStageDesign.byml',
+                                                                      'DepthShadow.bagldptsdw',
+                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                      'UnitPointIlluminant.baglcube',
+                                                                      'Default.baglssao']],
+                      'TeresaConveyorStage': ['TeresaConveyorStage.szs', ['MirrorRendering.baglmirror',
+                                                                          'TeresaConveyorStageSound.byml',
+                                                                          'BonusArea.baglssao',
+                                                                          'YFog.baglfog',
+                                                                          'DirectionalLight.bagldirlit',
+                                                                          'DofParam_obj204.bagldof',
+                                                                          'GodRay.baglgodray',
+                                                                          'DefaultParam.baglblm',
+                                                                          'DefaultParam.baglexp',
+                                                                          'Default.baglcc',
+                                                                          'AreaParamList.baglapl',
+                                                                          'CubeMapMgr.baglcube',
+                                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                                          'HdrCompose.baglhdrcompose',
+                                                                          'TeresaConveyorStageDesign.byml',
+                                                                          'CameraParam.byml',
+                                                                          'DofParam_obj201.bagldof',
+                                                                          'DepthShadow.bagldptsdw',
+                                                                          'TeresaConveyorStageMap.byml',
+                                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                                          'Fog.baglfog',
+                                                                          'UnitPointIlluminant.baglcube',
+                                                                          'Default.baglssao',
+                                                                          'GraphicsStress.baglstress',
+                                                                          'DofParam_obj206.bagldof']],
+                      'ShortGardenStage': ['ShortGardenStage.szs', ['DofParam_obj4.bagldof',
+                                                                    'DofParam_obj556.bagldof',
+                                                                    'YFog.baglfog',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'ShortGardenStageMap.byml',
+                                                                    'ShortGardenStageSound.byml',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'ShortGardenStageDesign.byml',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'DofParam_obj7.bagldof',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'Fog.baglfog',
+                                                                    'UnitPointIlluminant.baglcube',
+                                                                    'DofParam_obj8.bagldof']],
+                      'DokanAquariumStage': ['DokanAquariumGoalZone.szs', ['DofParam_obj29.bagldof',
+                                                                           'DokanAquariumGoalZoneMap.byml',
+                                                                           'CameraParam.byml',
+                                                                           'DokanAquariumGoalZoneDesign.byml']],
+                      'DashRidgeStage': ['DashRidgeGoalZone.szs', ['DashRidgeGoalZoneMap.byml',
+                                                                   'DashRidgeGoalZoneSound.byml',
+                                                                   'DofParam_obj2.bagldof',
+                                                                   'CameraParam.byml',
+                                                                   'DashRidgeGoalZoneDesign.byml']],
+                      'TruckWaterfallStage': ['TruckWaterfallStage.szs', ['DofParam_obj4.bagldof',
+                                                                          'DofParam_obj14.bagldof',
+                                                                          'DofParam_obj9.bagldof',
+                                                                          'DirectionalLight.bagldirlit',
+                                                                          'DefaultParam.baglblm',
+                                                                          'DefaultParam.baglexp',
+                                                                          'AreaParamList.baglapl',
+                                                                          'CubeMapMgr.baglcube',
+                                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                                          'TruckWaterfallStageMap.byml',
+                                                                          'CameraParam.byml',
+                                                                          'DofParam_obj7.bagldof',
+                                                                          'DepthShadow.bagldptsdw',
+                                                                          'DofParam_obj3.bagldof',
+                                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                                          'TruckWaterfallStageDesign.byml',
+                                                                          'UnitPointIlluminant.baglcube',
+                                                                          'TruckWaterfallStageSound.byml']],
+                      'CrawlerHillStage': ['CrawlerHillStage.szs', ['DofParam_obj14.bagldof',
+                                                                    'DofParam_obj10.bagldof',
+                                                                    'CrawlerHillStageDesign.byml',
+                                                                    'DofParam_obj5.bagldof',
+                                                                    'YFog.baglfog',
+                                                                    'DofParam_obj15.bagldof',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'CrawlerHillStageMap.byml',
+                                                                    'DofParam_obj16.bagldof',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CrawlerHillStageSound.byml',
+                                                                    'HdrCompose.baglhdrcompose',
+                                                                    'CameraParam.byml',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'Fog.baglfog',
+                                                                    'UnitPointIlluminant.baglcube']],
+                      'PipePackunDenStage': ['PipePackunDenGoalZone.szs', ['DofParam_obj1.bagldof',
+                                                                           'PipePackunDenGoalZoneMap.byml',
+                                                                           'CameraParam.byml',
+                                                                           'PipePackunDenGoalZoneDesign.byml']],
+                      'ChikaChikaBoomerangStage': ['ChikaChikaBoomerangCZone.szs', ['DofParam_obj0.bagldof',
+                                                                                    'ChikaChikaBoomerangCZoneDesign.byml',
+                                                                                    'CameraParam.byml',
+                                                                                    'ChikaChikaBoomerangCZoneMap.byml']],
+                      'TrampolineHighlandStage': ['TrampolineHighlandStage.szs', ['DofParam_obj18.bagldof',
+                                                                                  'DofParam_obj4.bagldof',
+                                                                                  'TrampolineHighlandStageDesign.byml',
+                                                                                  'DofParam_obj5.bagldof',
+                                                                                  'BonusArea.baglssao',
+                                                                                  'DirectionalLight.bagldirlit',
+                                                                                  'TrampolineHighlandStageMap.byml',
+                                                                                  'DofParam_obj6.bagldof',
+                                                                                  'DefaultParam.baglblm',
+                                                                                  'DefaultParam.baglexp',
+                                                                                  'AreaParamList.baglapl',
+                                                                                  'CubeMapMgr.baglcube',
+                                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                                  'CameraParam.byml',
+                                                                                  'DepthShadow.bagldptsdw',
+                                                                                  'TrampolineHighlandStageSound.byml',
+                                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                                  'UnitPointIlluminant.baglcube',
+                                                                                  'Default.baglssao',
+                                                                                  'DofParam_obj889.bagldof']],
+                      'GabonMountainStage': ['GabonMountainStage.szs', ['DofParam_obj14.bagldof',
+                                                                        'DofParam_obj9.bagldof',
+                                                                        'GabonMountainStageDesign.byml',
+                                                                        'DirectionalLight.bagldirlit',
+                                                                        'GabonMountainStageSound.byml',
+                                                                        'DefaultParam.baglblm',
+                                                                        'DefaultParam.baglexp',
+                                                                        'AreaParamList.baglapl',
+                                                                        'CubeMapMgr.baglcube',
+                                                                        'CategoryLightInfo.bagllitinfocharacter',
+                                                                        'GabonMountainStageMap.byml',
+                                                                        'CameraParam.byml',
+                                                                        'DepthShadow.bagldptsdw',
+                                                                        'CategoryLightInfo.bagllitinfostandard',
+                                                                        'UnitPointIlluminant.baglcube',
+                                                                        'DofParam_obj8.bagldof']],
+                      'NokonokoBeachStage': ['NokonokoBeachStage.szs', ['NokonokoBeachStageDesign.byml',
+                                                                        'DofParam_obj19.bagldof',
+                                                                        'YFog.baglfog',
+                                                                        'DofParam_obj1.bagldof',
+                                                                        'DirectionalLight.bagldirlit',
+                                                                        'DofParam_obj11.bagldof',
+                                                                        'NokonokoBeachStageMap.byml',
+                                                                        'LightStreak.baglgodray',
+                                                                        'DefaultParam.baglblm',
+                                                                        'DefaultParam.baglexp',
+                                                                        'AreaParamList.baglapl',
+                                                                        'CubeMapMgr.baglcube',
+                                                                        'CategoryLightInfo.bagllitinfocharacter',
+                                                                        'NokonokoBeachStageSound.byml',
+                                                                        'CameraParam.byml',
+                                                                        'DepthShadow.bagldptsdw',
+                                                                        'DofParam_obj17.bagldof',
+                                                                        'CategoryLightInfo.bagllitinfostandard',
+                                                                        'UnitPointIlluminant.baglcube',
+                                                                        'DofParam_obj8.bagldof']],
+                      'SwingCircusStage': ['SwingCircusStage.szs', ['DofParam_obj64.bagldof',
+                                                                    'SwingCircusStageSound.byml',
+                                                                    'DofParam_obj65.bagldof',
+                                                                    'YFog.baglfog',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'LightStreak.baglgodray',
+                                                                    'SwingCircusStageMap.byml',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'DofParam_obj77.bagldof',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'DofParam_obj63.bagldof',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'Fog.baglfog',
+                                                                    'UnitPointIlluminant.baglcube',
+                                                                    'SwingCircusStageDesign.byml',
+                                                                    'GraphicsStress.baglstress']],
+                      'ShortMultiLiftStage:': ['ShortMultiLiftStage.szs', ['DofParam_obj18.bagldof',
+                                                                           'DofParam_obj10.bagldof',
+                                                                           'YFog.baglfog',
+                                                                           'DirectionalLight.bagldirlit',
+                                                                           'ShortMultiLiftStageMap.byml',
+                                                                           'DefaultParam.baglblm',
+                                                                           'DefaultParam.baglexp',
+                                                                           'AreaParamList.baglapl',
+                                                                           'CubeMapMgr.baglcube',
+                                                                           'CategoryLightInfo.bagllitinfocharacter',
+                                                                           'CameraParam.byml',
+                                                                           'DepthShadow.bagldptsdw',
+                                                                           'CategoryLightInfo.bagllitinfostandard',
+                                                                           'Fog.baglfog',
+                                                                           'ShortMultiLiftStageDesign.byml',
+                                                                           'ShortMultiLiftStageSound.byml']],
+                      'SavannaRockStage': ['SavannaRockStage.szs', ['DofParam_obj4.bagldof',
+                                                                    'SavannaRockStageSound.byml',
+                                                                    'DofParam_obj10.bagldof',
+                                                                    'SavannaRockStageMap.byml',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'SavannaRockStageDesign.byml',
+                                                                    'DofParam_obj2.bagldof',
+                                                                    'DofParam_obj12.bagldof',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'DofParam_obj17.bagldof',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'UnitPointIlluminant.baglcube',
+                                                                    'DofParam_obj8.bagldof']],
+                      'BombCaveStage': ['BombCaveStage.szs', ['InsideArea.baglssao',
+                                                              'DofParam_obj10.bagldof',
+                                                              'YFog.baglfog',
+                                                              'DirectionalLight.bagldirlit',
+                                                              'DofParam_obj11.bagldof',
+                                                              'DofParam_obj12.bagldof',
+                                                              'DefaultParam.baglblm',
+                                                              'DefaultParam.baglexp',
+                                                              'AreaParamList.baglapl',
+                                                              'CubeMapMgr.baglcube',
+                                                              'CategoryLightInfo.bagllitinfocharacter',
+                                                              'CameraParam.byml',
+                                                              'DepthShadow.bagldptsdw',
+                                                              'BombCaveStageDesign.byml',
+                                                              'CategoryLightInfo.bagllitinfostandard',
+                                                              'DofParam_obj13.bagldof',
+                                                              'UnitPointIlluminant.baglcube',
+                                                              'Default.baglssao',
+                                                              'BombCaveStageSound.byml',
+                                                              'BombCaveStageMap.byml']],
+                      'JumpFlipSweetsStage': ['JumpFlipSweetsStage.szs', ['JumpFlipSweetsStageSound.byml',
+                                                                          'DofParam_obj9.bagldof',
+                                                                          'BonusArea.baglssao',
+                                                                          'DirectionalLight.bagldirlit',
+                                                                          'DofParam_obj21.bagldof',
+                                                                          'DofParam_obj11.bagldof',
+                                                                          'JumpFlipSweetsStageDesign.byml',
+                                                                          'LightStreak.baglgodray',
+                                                                          'DefaultParam.baglblm',
+                                                                          'DefaultParam.baglexp',
+                                                                          'AreaParamList.baglapl',
+                                                                          'CubeMapMgr.baglcube',
+                                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                                          'CameraParam.byml',
+                                                                          'DofParam_obj7.bagldof',
+                                                                          'DepthShadow.bagldptsdw',
+                                                                          'JumpFlipSweetsStageMap.byml',
+                                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                                          'DofParam_obj13.bagldof',
+                                                                          'UnitPointIlluminant.baglcube',
+                                                                          'Default.baglssao',
+                                                                          'GraphicsStress.baglstress']],
+                      'SneakingLightStage': ['SneakingLightStage.szs', ['DofParam_obj20.bagldof',
+                                                                        'BonusArea.baglssao',
+                                                                        'YFog.baglfog',
+                                                                        'DofParam_obj25.bagldof',
+                                                                        'DirectionalLight.bagldirlit',
+                                                                        'DofParam_obj21.bagldof',
+                                                                        'DofParam_obj26.bagldof',
+                                                                        'DefaultParam.baglblm',
+                                                                        'DefaultParam.baglexp',
+                                                                        'SneakingLightStageMap.byml',
+                                                                        'AreaParamList.baglapl',
+                                                                        'CubeMapMgr.baglcube',
+                                                                        'SneakingLightStageSound.byml',
+                                                                        'CategoryLightInfo.bagllitinfocharacter',
+                                                                        'CameraParam.byml',
+                                                                        'DepthShadow.bagldptsdw',
+                                                                        'CategoryLightInfo.bagllitinfostandard',
+                                                                        'UnitPointIlluminant.baglcube',
+                                                                        'Default.baglssao',
+                                                                        'SneakingLightStageDesign.byml']],
+                      'RouteDokanTourStage': ['RouteDokanTourStage.szs', ['RouteDokanTourStageMap.byml',
+                                                                          'DofParam_obj5.bagldof',
+                                                                          'DirectionalLight.bagldirlit',
+                                                                          'RouteDokanTourStageSound.byml',
+                                                                          'DefaultParam.baglblm',
+                                                                          'DefaultParam.baglexp',
+                                                                          'AreaParamList.baglapl',
+                                                                          'CubeMapMgr.baglcube',
+                                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                                          'RouteDokanTourStageDesign.byml',
+                                                                          'CameraParam.byml',
+                                                                          'DepthShadow.bagldptsdw',
+                                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                                          'UnitPointIlluminant.baglcube',
+                                                                          'DofParam_obj8.bagldof']],
+                      'WeavingShipStage': ['WeavingShipGoalZone.szs', ['DofParam_obj0.bagldof',
+                                                                       'WeavingShipGoalZoneMap.byml',
+                                                                       'WeavingShipGoalZoneDesign.byml',
+                                                                       'CameraParam.byml']],
+                      'KarakuriCastleStage': ['KarakuriCastleStage.szs', ['DofParam_obj18.bagldof',
+                                                                          'DofParam_obj118.bagldof',
+                                                                          'DofParam_obj120.bagldof',
+                                                                          'KarakuriCastleStageMap.byml',
+                                                                          'CastleInside.baglssao',
+                                                                          'DofParam_obj119.bagldof',
+                                                                          'YFog.baglfog',
+                                                                          'DirectionalLight.bagldirlit',
+                                                                          'DofParam_obj121.bagldof',
+                                                                          'KarakuriCastleStageDesign.byml',
+                                                                          'DefaultParam.baglblm',
+                                                                          'DefaultParam.baglexp',
+                                                                          'AreaParamList.baglapl',
+                                                                          'CubeMapMgr.baglcube',
+                                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                                          'CameraParam.byml',
+                                                                          'DepthShadow.bagldptsdw',
+                                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                                          'UnitPointIlluminant.baglcube',
+                                                                          'Default.baglssao',
+                                                                          'KarakuriCastleStageSound.byml']],
+                      'JungleCruiseStage': ['JungleCruiseStage.szs', ['DofParam_obj4.bagldof',
+                                                                      'JungleCruiseStageDesign.byml',
+                                                                      'YFog.baglfog',
+                                                                      'DofParam_obj35.bagldof',
+                                                                      'DirectionalLight.bagldirlit',
+                                                                      'JungleCruiseStageSound.byml',
+                                                                      'ShadowMask.baglsdw_mask',
+                                                                      'DefaultParam.baglblm',
+                                                                      'DefaultParam.baglexp',
+                                                                      'AreaParamList.baglapl',
+                                                                      'CubeMapMgr.baglcube',
+                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                      'CameraParam.byml',
+                                                                      'DepthShadow.bagldptsdw',
+                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                      'Fog.baglfog',
+                                                                      'UnitPointIlluminant.baglcube',
+                                                                      'GraphicsStress.baglstress',
+                                                                      'JungleCruiseStageMap.byml']],
+                      'BlastSnowFieldStage': ['BlastSnowFieldStage.szs', ['DirectionalLight.bagldirlit',
+                                                                          'LightStreak.baglgodray',
+                                                                          'DofParam_obj2.bagldof',
+                                                                          'BlastSnowFieldStageDesign.byml',
+                                                                          'DofParam_obj12.bagldof',
+                                                                          'DefaultParam.baglblm',
+                                                                          'DefaultParam.baglexp',
+                                                                          'BlastSnowFieldStageSound.byml',
+                                                                          'AreaParamList.baglapl',
+                                                                          'CubeMapMgr.baglcube',
+                                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                                          'HdrCompose.baglhdrcompose',
+                                                                          'CameraParam.byml',
+                                                                          'BlastSnowFieldStageMap.byml',
+                                                                          'DepthShadow.bagldptsdw',
+                                                                          'DofParam_obj3.bagldof',
+                                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                                          'UnitPointIlluminant.baglcube',
+                                                                          'GraphicsStress.baglstress',
+                                                                          'DofParam_obj8.bagldof']],
+                      'ClimbFortressStage': ['ClimbFortressStage.szs', ['DofParam_obj4.bagldof',
+                                                                        'DofParam_obj10.bagldof',
+                                                                        'ClimbFortressStageSound.byml',
+                                                                        'DirectionalLight.bagldirlit',
+                                                                        'ClimbFortressStageMap.byml',
+                                                                        'DofParam_obj6.bagldof',
+                                                                        'DofParam_obj2.bagldof',
+                                                                        'ClimbFortressStageDesign.byml',
+                                                                        'DefaultParam.baglblm',
+                                                                        'DefaultParam.baglexp',
+                                                                        'AreaParamList.baglapl',
+                                                                        'CubeMapMgr.baglcube',
+                                                                        'CategoryLightInfo.bagllitinfocharacter',
+                                                                        'CameraParam.byml',
+                                                                        'DepthShadow.bagldptsdw',
+                                                                        'CategoryLightInfo.bagllitinfostandard',
+                                                                        'Fog.baglfog',
+                                                                        'UnitPointIlluminant.baglcube']],
+                      'ChorobonTowerStage': ['ChorobonTowerStage.szs', ['ChorobonTowerStageSound.byml',
+                                                                        'DofParam_obj25.bagldof',
+                                                                        'ChorobonTowerStageMap.byml',
+                                                                        'DirectionalLight.bagldirlit',
+                                                                        'ChorobonTowerStageDesign.byml',
+                                                                        'DofParam_obj26.bagldof',
+                                                                        'DefaultParam.baglblm',
+                                                                        'DefaultParam.baglexp',
+                                                                        'AreaParamList.baglapl',
+                                                                        'CubeMapMgr.baglcube',
+                                                                        'CategoryLightInfo.bagllitinfocharacter',
+                                                                        'CameraParam.byml',
+                                                                        'DepthShadow.bagldptsdw',
+                                                                        'CategoryLightInfo.bagllitinfostandard',
+                                                                        'UnitPointIlluminant.baglcube',
+                                                                        'DofParam_obj28.bagldof']],
+                      'FireBrosFortressStage': ['FireBrosFortressStage.szs', ['FireBrosFortressStageMap.byml',
+                                                                              'FireBrosFortressStageSound.byml',
+                                                                              'DofParam_obj50.bagldof',
+                                                                              'DirectionalLight.bagldirlit',
+                                                                              'DofParam_obj867.bagldof',
+                                                                              'DofParam_obj2.bagldof',
+                                                                              'DofParam_obj62.bagldof',
+                                                                              'DefaultParam.baglblm',
+                                                                              'DefaultParam.baglexp',
+                                                                              'AreaParamList.baglapl',
+                                                                              'CubeMapMgr.baglcube',
+                                                                              'CategoryLightInfo.bagllitinfocharacter',
+                                                                              'FireBrosFortressStageDesign.byml',
+                                                                              'CameraParam.byml',
+                                                                              'DepthShadow.bagldptsdw',
+                                                                              'CategoryLightInfo.bagllitinfostandard',
+                                                                              'Fog.baglfog',
+                                                                              'UnitPointIlluminant.baglcube',
+                                                                              'GraphicsStress.baglstress',
+                                                                              'DofParam_obj68.bagldof']],
+                      'DarkFlipPanelStage': ['DarkFlipPanelStage.szs', ['DofParam_obj80.bagldof',
+                                                                        'DarkFlipPanelStageSound.byml',
+                                                                        'DarkFlipPanelStageDesign.byml',
+                                                                        'DofParam_obj59.bagldof',
+                                                                        'Default.baglflarefilter',
+                                                                        'YFog.baglfog',
+                                                                        'SSII.baglssii',
+                                                                        'DirectionalLight.bagldirlit',
+                                                                        'DofParam_obj82.bagldof',
+                                                                        'GodRay.baglgodray',
+                                                                        'DefaultParam.baglblm',
+                                                                        'DefaultParam.baglexp',
+                                                                        'AreaParamList.baglapl',
+                                                                        'CubeMapMgr.baglcube',
+                                                                        'CategoryLightInfo.bagllitinfocharacter',
+                                                                        'HdrCompose.baglhdrcompose',
+                                                                        'Dark.baglflarefilter',
+                                                                        'CameraParam.byml',
+                                                                        'DofParam_obj57.bagldof',
+                                                                        'DepthShadow.bagldptsdw',
+                                                                        'DarkFlipPanelStageMap.byml',
+                                                                        'DofParam_obj83.bagldof',
+                                                                        'CategoryLightInfo.bagllitinfostandard',
+                                                                        'UnitPointIlluminant.baglcube',
+                                                                        'DofParam_obj58.bagldof']],
+                      'ShortAmidaStage': ['ShortAmidaStage.szs', ['DofParam_obj0.bagldof',
+                                                                  'DofParam_obj10.bagldof',
+                                                                  'DofParam_obj9.bagldof',
+                                                                  'YFog.baglfog',
+                                                                  'DirectionalLight.bagldirlit',
+                                                                  'ShortAmidaStageDesign.byml',
+                                                                  'DefaultParam.baglblm',
+                                                                  'DefaultParam.baglexp',
+                                                                  'AreaParamList.baglapl',
+                                                                  'CubeMapMgr.baglcube',
+                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                  'CameraParam.byml',
+                                                                  'ShortAmidaStageSound.byml',
+                                                                  'DepthShadow.bagldptsdw',
+                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                  'Fog.baglfog',
+                                                                  'UnitPointIlluminant.baglcube',
+                                                                  'ShortAmidaStageMap.byml']],
+                      'DonketsuArrowStepStage': ['DonketsuArrowStepGoalZone.szs', ['DonketsuArrowStepGoalZoneDesign.byml',
+                                                                                   'DofParam_obj0.bagldof',
+                                                                                   'DonketsuArrowStepGoalZoneMap.byml',
+                                                                                   'DonketsuArrowStepGoalZoneSound.byml',
+                                                                                   'CameraParam.byml']],
+                      'ZigzagBuildingStage': ['ZigzagBuildingStage.szs', ['DofParam_obj4.bagldof',
+                                                                          'ZigzagBuildingStageSound.byml',
+                                                                          'DofParam_obj5.bagldof',
+                                                                          'ZigzagBuildingStageDesign.byml',
+                                                                          'DofParam_obj1.bagldof',
+                                                                          'DirectionalLight.bagldirlit',
+                                                                          'ZigzagBuildingStageMap.byml',
+                                                                          'DofParam_obj6.bagldof',
+                                                                          'DefaultParam.baglamp',
+                                                                          'DefaultParam.baglblm',
+                                                                          'DefaultParam.baglexp',
+                                                                          'AreaParamList.baglapl',
+                                                                          'CubeMapMgr.baglcube',
+                                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                                          'CameraParam.byml',
+                                                                          'DepthShadow.bagldptsdw',
+                                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                                          'UnitPointIlluminant.baglcube']],
+                      'SyumockSpotStage': ['SyumockSpotGoalZone.szs', ['SyumockSpotGoalZoneSound.byml',
+                                                                       'DofParam_obj2.bagldof',
+                                                                       'CameraParam.byml',
+                                                                       'SyumockSpotGoalZoneMap.byml',
+                                                                       'SyumockSpotGoalZoneDesign.byml']],
+                      'RagingMagmaStage': ['RagingMagmaStage.szs', ['DofParam_obj0.bagldof',
+                                                                    'DofParam_obj1.bagldof',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'DofParam_obj1424.bagldof',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'UnitPointIlluminant.baglcube',
+                                                                    'RagingMagmaStageMap.byml',
+                                                                    'RagingMagmaStageDesign.byml']],
+                      'NeedleBridgeStage': ['NeedleBridgeStage.szs', ['NeedleBridgeStageSound.byml',
+                                                                      'BonusArea.baglssao',
+                                                                      'YFog.baglfog',
+                                                                      'DirectionalLight.bagldirlit',
+                                                                      'DofParam_obj6.bagldof',
+                                                                      'DefaultParam.baglblm',
+                                                                      'DefaultParam.baglexp',
+                                                                      'AreaParamList.baglapl',
+                                                                      'CubeMapMgr.baglcube',
+                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                      'HdrCompose.baglhdrcompose',
+                                                                      'NeedleBridgeStageMap.byml',
+                                                                      'CameraParam.byml',
+                                                                      'DofParam_obj7.bagldof',
+                                                                      'DepthShadow.bagldptsdw',
+                                                                      'DofParam_obj3.bagldof',
+                                                                      'NeedleBridgeStageDesign.byml',
+                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                      'Fog.baglfog',
+                                                                      'UnitPointIlluminant.baglcube',
+                                                                      'Default.baglssao']],
+                      'DownDesertStage': ['DownDesertStage.szs', ['DofParam_obj5.bagldof',
+                                                                  'DofParam_obj1.bagldof',
+                                                                  'DirectionalLight.bagldirlit',
+                                                                  'DownDesertStageMap.byml',
+                                                                  'DofParam_obj6.bagldof',
+                                                                  'DownDesertStageSound.byml',
+                                                                  'DefaultParam.baglblm',
+                                                                  'DefaultParam.baglexp',
+                                                                  'AreaParamList.baglapl',
+                                                                  'CubeMapMgr.baglcube',
+                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                  'CameraParam.byml',
+                                                                  'DofParam_obj7.bagldof',
+                                                                  'DepthShadow.bagldptsdw',
+                                                                  'DofParam_obj3.bagldof',
+                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                  'Fog.baglfog',
+                                                                  'UnitPointIlluminant.baglcube',
+                                                                  'DownDesertStageDesign.byml']],
+                      'GearSweetsStage': ['GearSweetsStage.szs', ['DofParam_obj9.bagldof',
+                                                                  'DofParam_obj1.bagldof',
+                                                                  'DirectionalLight.bagldirlit',
+                                                                  'LightStreak.baglgodray',
+                                                                  'DofParam_obj2.bagldof',
+                                                                  'DefaultParam.baglexp',
+                                                                  'GearSweetsStageSound.byml',
+                                                                  'AreaParamList.baglapl',
+                                                                  'CubeMapMgr.baglcube',
+                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                  'CameraParam.byml',
+                                                                  'GearSweetsStageMap.byml',
+                                                                  'DepthShadow.bagldptsdw',
+                                                                  'GearSweetsStageDesign.byml',
+                                                                  'DofParam_obj17.bagldof',
+                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                  'UnitPointIlluminant.baglcube']],
+                      'EchoRoadStage': ['EchoRoadStage.szs', ['DofParam_obj4.bagldof',
+                                                              'EchoRoadStageSound.byml',
+                                                              'YFog.baglfog',
+                                                              'DirectionalLight.bagldirlit',
+                                                              'DofParam_obj121.bagldof',
+                                                              'EchoRoadStageDesign.byml',
+                                                              'DefaultParam.baglblm',
+                                                              'DefaultParam.baglexp',
+                                                              'AreaParamList.baglapl',
+                                                              'CubeMapMgr.baglcube',
+                                                              'CategoryLightInfo.bagllitinfocharacter',
+                                                              'EchoRoadStageMap.byml',
+                                                              'CameraParam.byml',
+                                                              'DepthShadow.bagldptsdw',
+                                                              'CategoryLightInfo.bagllitinfostandard',
+                                                              'Fog.baglfog',
+                                                              'UnitPointIlluminant.baglcube']],
+                      'WaterElevatorCaveStage': ['WaterElevatorCaveStage.szs', ['DofParam_obj30.bagldof',
+                                                                                'DofParam_obj29.bagldof',
+                                                                                'YFog.baglfog',
+                                                                                'DofParam_obj35.bagldof',
+                                                                                'WaterElevatorCaveStageMap.byml',
+                                                                                'DirectionalLight.bagldirlit',
+                                                                                'DofParam_obj31.bagldof',
+                                                                                'WaterElevatorCaveStageSound.byml',
+                                                                                'DefaultParam.baglblm',
+                                                                                'DefaultParam.baglexp',
+                                                                                'AreaParamList.baglapl',
+                                                                                'CubeMapMgr.baglcube',
+                                                                                'CategoryLightInfo.bagllitinfocharacter',
+                                                                                'CameraParam.byml',
+                                                                                'WaterElevatorCaveStageDesign.byml',
+                                                                                'DepthShadow.bagldptsdw',
+                                                                                'DofParam_obj27.bagldof',
+                                                                                'CategoryLightInfo.bagllitinfostandard',
+                                                                                'UnitPointIlluminant.baglcube',
+                                                                                'DofParam_obj28.bagldof']],
+                      'DarknessHauntedHouseStage': ['DarknessHauntedHouseStage.szs', ['DofParam_obj277.bagldof',
+                                                                                      'MirrorRendering.baglmirror',
+                                                                                      'DofParam_obj273.bagldof',
+                                                                                      'BonusArea.baglssao',
+                                                                                      'SSII.baglssii',
+                                                                                      'DirectionalLight.bagldirlit',
+                                                                                      'DofParam_obj274.bagldof',
+                                                                                      'DofParam_obj280.bagldof',
+                                                                                      'DofParam_obj230.bagldof',
+                                                                                      'DefaultParam.baglamp',
+                                                                                      'DefaultParam.baglblm',
+                                                                                      'DefaultParam.baglexp',
+                                                                                      'AreaParamList.baglapl',
+                                                                                      'CubeMapMgr.baglcube',
+                                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                                      'DofParam_obj275.bagldof',
+                                                                                      'CameraParam.byml',
+                                                                                      'DofParam_obj261.bagldof',
+                                                                                      'DepthShadow.bagldptsdw',
+                                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                                      'UnitPointIlluminant.baglcube',
+                                                                                      'Default.baglssao',
+                                                                                      'DarknessHauntedHouseStageSound.byml',
+                                                                                      'GraphicsStress.baglstress',
+                                                                                      'DarknessHauntedHouseStageDesign.byml',
+                                                                                      'DarknessHauntedHouseStageMap.byml']],
+                      'GotogotonValleyStage': ['GotogotonValleyStage.szs', ['DofParam_obj20.bagldof',
+                                                                            'GotogotonValleyStageDesign.byml',
+                                                                            'DirectionalLight.bagldirlit',
+                                                                            'DofParam_obj21.bagldof',
+                                                                            'GotogotonValleyStageSound.byml',
+                                                                            'DefaultParam.baglblm',
+                                                                            'DefaultParam.baglexp',
+                                                                            'CubeMapMgr.baglcube',
+                                                                            'CategoryLightInfo.bagllitinfocharacter',
+                                                                            'CameraParam.byml',
+                                                                            'CategoryLightInfo.bagllitinfostandard',
+                                                                            'UnitPointIlluminant.baglcube',
+                                                                            'GotogotonValleyStageMap.byml']],
+                      'KoopaLastStage': ['KoopaLastBZone.szs', ['DofParam_obj0.bagldof',
+                                                                'KoopaLastBZoneMap.byml',
+                                                                'DofParam_obj1.bagldof',
+                                                                'KoopaLastBZoneDesign.byml',
+                                                                'KoopaLastBZoneSound.byml',
+                                                                'CubeMapMgr.baglcube',
+                                                                'CameraParam.byml']],
+                      'RainbowRoadStage': ['RainbowRoadStage.szs', ['DofParam_obj40.bagldof',
+                                                                    'RainbowRoadStageMap.byml',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'DofParam_obj31.bagldof',
+                                                                    'RainbowRoadStageSound.byml',
+                                                                    'DofParam_obj42.bagldof',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'RainbowRoadStageDesign.byml',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'UnitPointIlluminant.baglcube',
+                                                                    'DofParam_obj8.bagldof',
+                                                                    'DofParam_obj38.bagldof']],
+                      'GalaxyRoadStage': ['GalaxyRoadStage.szs', ['DofParam_obj79.bagldof',
+                                                                  'DofParam_obj1.bagldof',
+                                                                  'DirectionalLight.bagldirlit',
+                                                                  'GalaxyRoadStageDesign.byml',
+                                                                  'DofParam_obj106.bagldof',
+                                                                  'DefaultParam.baglblm',
+                                                                  'DefaultParam.baglexp',
+                                                                  'AreaParamList.baglapl',
+                                                                  'CubeMapMgr.baglcube',
+                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                  'GalaxyRoadStageMap.byml',
+                                                                  'CameraParam.byml',
+                                                                  'DepthShadow.bagldptsdw',
+                                                                  'DofParam_obj107.bagldof',
+                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                  'UnitPointIlluminant.baglcube',
+                                                                  'GalaxyRoadStageSound.byml']],
+                      'WheelCanyonStage': ['WheelCanyonStage.szs', ['DofParam_obj0.bagldof',
+                                                                    'DofParam_obj10.bagldof',
+                                                                    'WheelCanyonStageMap.byml',
+                                                                    'DofParam_obj1.bagldof',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'WheelCanyonStageDesign.byml',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'WheelCanyonStageSound.byml']],
+                      'BlockLandStage': ['BlockLandStage.szs', ['DofParam_obj4.bagldof',
+                                                                'BlockLandStageDesign.byml',
+                                                                'DirectionalLight.bagldirlit',
+                                                                'BlockLandStageSound.byml',
+                                                                'DofParam_obj12.bagldof',
+                                                                'DefaultParam.baglblm',
+                                                                'DefaultParam.baglexp',
+                                                                'AreaParamList.baglapl',
+                                                                'CubeMapMgr.baglcube',
+                                                                'CategoryLightInfo.bagllitinfocharacter',
+                                                                'CameraParam.byml',
+                                                                'DepthShadow.bagldptsdw',
+                                                                'CategoryLightInfo.bagllitinfostandard',
+                                                                'DofParam_obj13.bagldof',
+                                                                'UnitPointIlluminant.baglcube',
+                                                                'BlockLandStageMap.byml']],
+                      'HexScrollStage': ['HexScrollStage.szs', ['DofParam_obj4.bagldof',
+                                                                'DofParam_obj5.bagldof',
+                                                                'YFog.baglfog',
+                                                                'HexScrollStageDesign.byml',
+                                                                'DirectionalLight.bagldirlit',
+                                                                'HexScrollStageSound.byml',
+                                                                'DofParam_obj2.bagldof',
+                                                                'DefaultParam.baglblm',
+                                                                'DefaultParam.baglexp',
+                                                                'AreaParamList.baglapl',
+                                                                'CubeMapMgr.baglcube',
+                                                                'CategoryLightInfo.bagllitinfocharacter',
+                                                                'HexScrollStageMap.byml',
+                                                                'CameraParam.byml',
+                                                                'DepthShadow.bagldptsdw',
+                                                                'CategoryLightInfo.bagllitinfostandard',
+                                                                'UnitPointIlluminant.baglcube']],
+                      'GiantUnderGroundStage': ['GiantUnderGroundStage.szs', ['DofParam_obj39.bagldof',
+                                                                              'YFog.baglfog',
+                                                                              'DirectionalLight.bagldirlit',
+                                                                              'ShadowMask.baglsdw_mask',
+                                                                              'GodRay.baglgodray',
+                                                                              'DofParam_obj42.bagldof',
+                                                                              'DefaultParam.baglblm',
+                                                                              'DefaultParam.baglexp',
+                                                                              'GiantUnderGroundStageSound.byml',
+                                                                              'AreaParamList.baglapl',
+                                                                              'CubeMapMgr.baglcube',
+                                                                              'CategoryLightInfo.bagllitinfocharacter',
+                                                                              'CameraParam.byml',
+                                                                              'DepthShadow.bagldptsdw',
+                                                                              'GiantUnderGroundStageMap.byml',
+                                                                              'CategoryLightInfo.bagllitinfostandard',
+                                                                              'Fog.baglfog',
+                                                                              'UnitPointIlluminant.baglcube',
+                                                                              'GiantUnderGroundStageDesign.byml',
+                                                                              'DofParam_obj38.bagldof']],
+                      'TerenFogStage': ['TerenFogGoalZone.szs', ['DofParam_obj1.bagldof',
+                                                                 'CameraParam.byml',
+                                                                 'TerenFogGoalZoneDesign.byml',
+                                                                 'TerenFogGoalZoneMap.byml']],
+                      'BoxKillerStage': ['BoxKillerStage.szs', ['BoxKillerStageMap.byml',
+                                                                'DofParam_obj19.bagldof',
+                                                                'DofParam_obj1.bagldof',
+                                                                'DirectionalLight.bagldirlit',
+                                                                'DefaultParam.baglblm',
+                                                                'DefaultParam.baglexp',
+                                                                'BoxKillerStageSound.byml',
+                                                                'AreaParamList.baglapl',
+                                                                'CubeMapMgr.baglcube',
+                                                                'CategoryLightInfo.bagllitinfocharacter',
+                                                                'CameraParam.byml',
+                                                                'BoxKillerStageDesign.byml',
+                                                                'DepthShadow.bagldptsdw',
+                                                                'CategoryLightInfo.bagllitinfostandard',
+                                                                'UnitPointIlluminant.baglcube']],
+                      'ArrangeRotateFieldStage': ['ArrangeRotateFieldGoalZone.szs', ['ArrangeRotateFieldGoalZoneDesign.byml',
+                                                                                     'ArrangeRotateFieldGoalZoneMap.byml',
+                                                                                     'DofParam_obj22.bagldof',
+                                                                                     'CameraParam.byml']],
+                      'ArrangeClimbMountainStage': ['ArrangeClimbMountainStage.szs', ['ArrangeClimbMountainStageDesign.byml',
+                                                                                      'DofParam_obj0.bagldof',
+                                                                                      'ArrangeClimbMountainStageSound.byml',
+                                                                                      'YFog.baglfog',
+                                                                                      'DirectionalLight.bagldirlit',
+                                                                                      'DofParam_obj6.bagldof',
+                                                                                      'ArrangeClimbMountainStageMap.byml',
+                                                                                      'DefaultParam.baglblm',
+                                                                                      'DefaultParam.baglexp',
+                                                                                      'AreaParamList.baglapl',
+                                                                                      'CubeMapMgr.baglcube',
+                                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                                      'CameraParam.byml',
+                                                                                      'DofParam_obj7.bagldof',
+                                                                                      'DepthShadow.bagldptsdw',
+                                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                                      'Fog.baglfog',
+                                                                                      'UnitPointIlluminant.baglcube',
+                                                                                      'DofParam_obj8.bagldof']],
+                      'ArrangeJungleCruiseStage': ['ArrangeJungleCruiseStage.szs', ['DofParam_obj9.bagldof',
+                                                                                    'DirectionalLight.bagldirlit',
+                                                                                    'ArrangeJungleCruiseStageDesign.byml',
+                                                                                    'ArrangeJungleCruiseStageSound.byml',
+                                                                                    'DefaultParam.baglblm',
+                                                                                    'DefaultParam.baglexp',
+                                                                                    'AreaParamList.baglapl',
+                                                                                    'CubeMapMgr.baglcube',
+                                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                                    'CameraParam.byml',
+                                                                                    'DepthShadow.bagldptsdw',
+                                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                                    'Fog.baglfog',
+                                                                                    'UnitPointIlluminant.baglcube',
+                                                                                    'ArrangeJungleCruiseStageMap.byml',
+                                                                                    'DofParam_obj8.bagldof']],
+                      'ArrangeShadowTunnelStage': ['ArrangeShadowTunnelStage.szs', ['DofParam_obj14.bagldof',
+                                                                                    'DofParam_obj15.bagldof',
+                                                                                    'DirectionalLight.bagldirlit',
+                                                                                    'GoalArea.baglcc',
+                                                                                    'ArrangeShadowTunnelStageMap.byml',
+                                                                                    'DefaultParam.baglexp',
+                                                                                    'Default.baglcc',
+                                                                                    'AreaParamList.baglapl',
+                                                                                    'CubeMapMgr.baglcube',
+                                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                                    'ArrangeShadowTunnelStageDesign.byml',
+                                                                                    'CameraParam.byml',
+                                                                                    'ArrangeShadowTunnelStageSound.byml',
+                                                                                    'DepthShadow.bagldptsdw',
+                                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                                    'DofParam_obj13.bagldof',
+                                                                                    'UnitPointIlluminant.baglcube']],
+                      'ArrangeWeavingShipStage': ['ArrangeWeavingShipGoalZone.szs', ['DofParam_obj0.bagldof',
+                                                                                     'ArrangeWeavingShipGoalZoneMap.byml',
+                                                                                     'ArrangeWeavingShipGoalZoneDesign.byml',
+                                                                                     'CameraParam.byml']],
+                      'ArrangeDonketsuArrowStepStage': ['ArrangeDonketsuArrowStepZone.szs', ['ArrangeDonketsuArrowStepZoneMap.byml',
+                                                                                             'DofParam_obj0.bagldof',
+                                                                                             'CameraParam.byml',
+                                                                                             'ArrangeDonketsuArrowStepZoneDesign.byml']],
+                      'ArrangeFlipCircusStage': ['ArrangeFlipCircusStage.szs', ['ArrangeFlipCircusStageDesign.byml',
+                                                                                'MirrorRendering.baglmirror',
+                                                                                'YFog.baglfog',
+                                                                                'ArrangeFlipCircusStageMap.byml',
+                                                                                'DirectionalLight.bagldirlit',
+                                                                                'ArrangeFlipCircusStageSound.byml',
+                                                                                'DofParam_obj16.bagldof',
+                                                                                'LightStreak.baglgodray',
+                                                                                'GodRay.baglgodray',
+                                                                                'DefaultParam.baglblm',
+                                                                                'DefaultParam.baglexp',
+                                                                                'AreaParamList.baglapl',
+                                                                                'CubeMapMgr.baglcube',
+                                                                                'CategoryLightInfo.bagllitinfocharacter',
+                                                                                'CameraParam.byml',
+                                                                                'DofParam_obj77.bagldof',
+                                                                                'DepthShadow.bagldptsdw',
+                                                                                'DofParam_obj83.bagldof',
+                                                                                'CategoryLightInfo.bagllitinfostandard',
+                                                                                'Fog.baglfog',
+                                                                                'UnitPointIlluminant.baglcube',
+                                                                                'GraphicsStress.baglstress']],
+                      'ArrangeChorobonTower': ['ArrangeChorobonTowerStage.szs', ['ArrangeChorobonTowerStageMap.byml',
+                                                                                 'DofParam_obj24.bagldof',
+                                                                                 'DofParam_obj25.bagldof',
+                                                                                 'DirectionalLight.bagldirlit',
+                                                                                 'DofParam_obj11.bagldof',
+                                                                                 'ArrangeChorobonTowerStageDesign.byml',
+                                                                                 'DefaultParam.baglblm',
+                                                                                 'DefaultParam.baglexp',
+                                                                                 'AreaParamList.baglapl',
+                                                                                 'ArrangeChorobonTowerStageSound.byml',
+                                                                                 'CubeMapMgr.baglcube',
+                                                                                 'CategoryLightInfo.bagllitinfocharacter',
+                                                                                 'CameraParam.byml',
+                                                                                 'DepthShadow.bagldptsdw',
+                                                                                 'CategoryLightInfo.bagllitinfostandard',
+                                                                                 'UnitPointIlluminant.baglcube']],
+                      'ArrangePipePackunDenStage': ['ArrangePipePackunDenGoalZone.szs', ['ArrangePipePackunDenGoalZoneDesign.byml',
+                                                                                         'DofParam_obj1.bagldof',
+                                                                                         'DirectionalLight.bagldirlit',
+                                                                                         'ArrangePipePackunDenGoalZoneMap.byml',
+                                                                                         'CubeMapMgr.baglcube',
+                                                                                         'CameraParam.byml']],
+                      'ArrangeFireBrosFortressStage': ['ArrangeFireBrosFortressStage.szs', ['ArrangeFireBrosFortressStageDesign.byml',
+                                                                                            'DirectionalLight.bagldirlit',
+                                                                                            'DofParam_obj867.bagldof',
+                                                                                            'ArrangeFireBrosFortressStageSound.byml',
+                                                                                            'DofParam_obj36.bagldof',
+                                                                                            'DofParam_obj2.bagldof',
+                                                                                            'DefaultParam.baglblm',
+                                                                                            'DefaultParam.baglexp',
+                                                                                            'AreaParamList.baglapl',
+                                                                                            'CubeMapMgr.baglcube',
+                                                                                            'CategoryLightInfo.bagllitinfocharacter',
+                                                                                            'CameraParam.byml',
+                                                                                            'DepthShadow.bagldptsdw',
+                                                                                            'DofParam_obj37.bagldof',
+                                                                                            'CategoryLightInfo.bagllitinfostandard',
+                                                                                            'Fog.baglfog',
+                                                                                            'UnitPointIlluminant.baglcube',
+                                                                                            'GraphicsStress.baglstress',
+                                                                                            'ArrangeFireBrosFortressStageMap.byml']],
+                      'ArrangeSavannaRockStage': ['ArrangeSavannaRockStage.szs', ['DofParam_obj4.bagldof',
+                                                                                  'DofParam_obj10.bagldof',
+                                                                                  'DirectionalLight.bagldirlit',
+                                                                                  'DofParam_obj2.bagldof',
+                                                                                  'DofParam_obj12.bagldof',
+                                                                                  'DefaultParam.baglblm',
+                                                                                  'DefaultParam.baglexp',
+                                                                                  'AreaParamList.baglapl',
+                                                                                  'ArrangeSavannaRockStageDesign.byml',
+                                                                                  'CubeMapMgr.baglcube',
+                                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                                  'CameraParam.byml',
+                                                                                  'DepthShadow.bagldptsdw',
+                                                                                  'ArrangeSavannaRockStageMap.byml',
+                                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                                  'DofParam_obj13.bagldof',
+                                                                                  'UnitPointIlluminant.baglcube',
+                                                                                  'ArrangeSavannaRockStageSound.byml',
+                                                                                  'DofParam_obj8.bagldof']],
+                      'ArrangeTeresaConveorStage': ['ArrangeTeresaConveorStage.szs', ['ArrangeTeresaConveorStageDesign.byml',
+                                                                                      'DofParam_obj195.bagldof',
+                                                                                      'YFog.baglfog',
+                                                                                      'DirectionalLight.bagldirlit',
+                                                                                      'DofParam_obj196.bagldof',
+                                                                                      'ArrangeTeresaConveorStageMap.byml',
+                                                                                      'DefaultParam.baglblm',
+                                                                                      'DefaultParam.baglexp',
+                                                                                      'Default.baglcc',
+                                                                                      'AreaParamList.baglapl',
+                                                                                      'CubeMapMgr.baglcube',
+                                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                                      'ArrangeTeresaConveorStageSound.byml',
+                                                                                      'CameraParam.byml',
+                                                                                      'DepthShadow.bagldptsdw',
+                                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                                      'Fog.baglfog',
+                                                                                      'UnitPointIlluminant.baglcube']],
+                      'ArrangeDokanAquariumStage': ['ArrangeAquariumCZone.szs', ['DirectionalLight.bagldirlit',
+                                                                                 'ArrangeAquariumCZoneDesign.byml',
+                                                                                 'CubeMapMgr.baglcube',
+                                                                                 'CameraParam.byml',
+                                                                                 'ArrangeAquariumCZoneMap.byml',
+                                                                                 'DofParam_obj28.bagldof']],
+                      'ArrangeChikaChikaBoomerangStage': ['ArrangeChikaCZone.szs', ['DofParam_obj0.bagldof',
+                                                                                    'ArrangeChikaCZoneDesign.byml',
+                                                                                    'ArrangeChikaCZoneMap.byml',
+                                                                                    'CameraParam.byml']],
+                      'ArrangeNokonokoBeachStage': ['ArrangeNokonokoBeachStage.szs', ['ArrangeNokonokoBeachStageSound.byml',
+                                                                                      'ArrangeNokonokoBeachStageDesign.byml',
+                                                                                      'ArrangeNokonokoBeachStageMap.byml',
+                                                                                      'YFog.baglfog',
+                                                                                      'DofParam_obj1.bagldof',
+                                                                                      'DirectionalLight.bagldirlit',
+                                                                                      'LightStreak.baglgodray',
+                                                                                      'DofParam_obj2.bagldof',
+                                                                                      'GodRay.baglgodray',
+                                                                                      'DefaultParam.baglblm',
+                                                                                      'Default.baglcc',
+                                                                                      'AreaParamList.baglapl',
+                                                                                      'CubeMapMgr.baglcube',
+                                                                                      'CategoryLightInfo.bagllitinfocharacter',
+                                                                                      'CameraParam.byml',
+                                                                                      'DepthShadow.bagldptsdw',
+                                                                                      'CategoryLightInfo.bagllitinfostandard',
+                                                                                      'Fog.baglfog',
+                                                                                      'UnitPointIlluminant.baglcube',
+                                                                                      'GraphicsStress.baglstress',
+                                                                                      'DofParam_obj8.bagldof']],
+                      'ArrangeHexScrollStage': ['ArrangeHexScrollStage.szs', ['ArrangeHexScrollStageMap.byml',
+                                                                              'ArrangeHexScrollStageDesign.byml',
+                                                                              'DirectionalLight.bagldirlit',
+                                                                              'DofParam_obj6.bagldof',
+                                                                              'DofParam_obj2.bagldof',
+                                                                              'DefaultParam.baglblm',
+                                                                              'DefaultParam.baglexp',
+                                                                              'AreaParamList.baglapl',
+                                                                              'CubeMapMgr.baglcube',
+                                                                              'CategoryLightInfo.bagllitinfocharacter',
+                                                                              'CameraParam.byml',
+                                                                              'DepthShadow.bagldptsdw',
+                                                                              'DofParam_obj3.bagldof',
+                                                                              'CategoryLightInfo.bagllitinfostandard',
+                                                                              'UnitPointIlluminant.baglcube']],
+                      'ArrangeNeedleBridgeStage': ['ArrangeNeedleBridgeStage.szs', ['ArrangeNeedleBridgeStageDesign.byml',
+                                                                                    'DofParam_obj5.bagldof',
+                                                                                    'DirectionalLight.bagldirlit',
+                                                                                    'ArrangeNeedleBridgeStageSound.byml',
+                                                                                    'DofParam_obj2.bagldof',
+                                                                                    'DefaultParam.baglexp',
+                                                                                    'AreaParamList.baglapl',
+                                                                                    'CubeMapMgr.baglcube',
+                                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                                    'HdrCompose.baglhdrcompose',
+                                                                                    'ArrangeNeedleBridgeStageMap.byml',
+                                                                                    'CameraParam.byml',
+                                                                                    'DepthShadow.bagldptsdw',
+                                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                                    'UnitPointIlluminant.baglcube']],
+                      'ChampionshipStage': ['ChampionshipGoalZone.szs', ['DofParam_obj0.bagldof',
+                                                                         'ChampionshipGoalZoneMap.byml',
+                                                                         'CameraParam.byml',
+                                                                         'ChampionshipGoalZoneDesign.byml']]
+                      }
+
+            print('Opening ' + stages[StageName][0])
+            with open(os.path.join(sPath, stages[StageName][0]), 'rb') as f:
+                archive = Sarc(yaz0.decompress(f.read()))
+            files = []
+            # Loop through the file list to get all the files within the archive.
+            for i in stages[StageName][1]:
+                files.append(archive.get_file(i).data)
+            mapIndex = stages[StageName][1].index(stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml')
+            mapYML = byml.to_text(byml.from_binary(files[mapIndex])).split('\n')  # Stack Overflow occurs with some files when running byml.from_binary(<file>)
+            mapYML.pop()
+            print('Opened ' + stages[StageName][0])
+
+            # Loop through the YML to find and replace the proper Goal Pole
+            for line in mapYML:
+                if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
+                    mapYML[mapYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
+                    print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
+            print(str(StageName) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
+
+            print('Writing ' + stages[StageName][0])
+            writer = SarcWriter()
+            for i in stages[StageName][1]:
+                if i == stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml':
+                    writer.files[i] = byml.to_binary(byml.from_text('\n'.join(mapYML)), False, 2)
+                else:
+                    writer.files[i] = Bytes(files[stages[StageName][1].index(i)])
+            data = writer.write()
+
+            with open(os.path.join(srPath, stages[StageName][0]), 'wb') as f:
+                f.write(yaz0.compress(data[1]))
+            print('Written ' + stages[StageName][0])
+        except KeyError:
+            print('No Goal Pole present.')
+    else:
+        print('Goal Pole change unneeded.')
 
 
 # Music randomizer
@@ -1267,9 +2522,12 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
 
     stageID_Name[-1] = stageID_Name[-1] + '\n\n'
     for i in hashDict:
-        with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
-            hash_object = hashlib.md5(f.read())
-            stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
+        try:
+            with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
+                hash_object = hashlib.md5(f.read())
+                stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
+        except FileNotFoundError:
+            pass
 
     spoiler = ''.join(stageID_Name)[:-1]
     # Making sure levels have the correct names.
@@ -1279,109 +2537,6 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
         s.write(rep)  # Writing the corrected level slots back to the file.
 
     print('Generated spoiler file!')
-
-
-# Main Program Window
-class GUI:
-    def __init__(self, p_title, p_size, p_settings):
-        # DearPyGUI setup
-        dpg.create_context()
-        dpg.create_viewport(title=p_title, width=p_size[0], height=p_size[1])
-        dpg.set_viewport_small_icon("ico.ico")
-        dpg.set_viewport_large_icon("ico.ico")
-
-        with dpg.window(tag="Main Window", label="Program"):
-            with dpg.tab_bar():  # Add tabs which the user can change between
-                with dpg.tab(tag="t1", label="Program"):  # The main, default tab
-                    dpg.add_text("Hello, welcome to the Super Mario 3D World Randomizer!")
-                    dpg.add_text(tag="dirtext", default_value=str(p_settings['dir']))  # Selected Directory
-                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=directory, default_path=str(dpg.get_value('dirtext')))  # Directory Selector
-                    self.dir = dpg.add_button(tag="dirbutt", label="Load Input Directory", callback=lambda: dpg.show_item("dir"))  # Load Directory Button
-                    dpg.add_text(tag="rdirtext", default_value=str(p_settings['rdir']))  # Selected Directory
-                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=str(dpg.get_value('rdirtext')))  # Directory Selector
-                    self.rdir = dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
-                    self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory)  # Seed Input Text
-                    self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
-                    dpg.add_progress_bar(tag="progress", label="progress", default_value=0)
-                    dpg.add_text("This randomizer only effects Super Mario 3D World (Switch), not Bowser's Fury.")
-                    self.test = dpg.add_button(tag="test", label="test", callback=lambda: dpg.configure_item("progress", default_value=1), show=False)
-                    with dpg.tooltip("dirbutt"):
-                        dpg.add_text("The directory selected must be the root directory of an unmodified dump of the game:\n" +
-                                     "\"" + os.path.join("010028600EBDA000", "romfs") + "\" - Super Mario 3D World + Bowser's Fury")
-                    with dpg.tooltip("rdirbutt"):
-                        dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
-                                     "be your mods folder:\n" +
-                                     "\"" + os.path.join("sd:", "atmosphere", "contents", "010028600EBDA000") + "\"* - Atmosphere (Switch)\n"
-                                     "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury", "<name of your choice>", "contents", "010028600EBDA000") + "\"* - SMM (Switch)\n"
-                                     "\"" + os.path.join("Ryujinx", "mods", "contents", "010028600EBDA000") + "\" - Ryujinx (Switch)\n\n"
-                                     "*The \"romfs\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
-                                     "specified Atmosphere or SimpleModManager (SMM) folder.\n\n"
-                                     "Note: Yuzu is not officially supported and you may encounter issues if you use it.")
-                    with dpg.tooltip('randoinit'):
-                        dpg.add_text('To be able to start the randomizer, select a valid input directory.', tag='randotip')
-                checkDirectory()
-                with dpg.tab(tag="t2", label="Misc. Settings"):  # Settings tab
-                    self.speedrun = dpg.add_checkbox(tag='speedrun', label='Speedrunner mode', default_value=bool(p_settings['speedrun']), callback=speedrunner)
-                    self.spoil = dpg.add_checkbox(tag="spoil", label="Generate spoiler file?", default_value=bool(p_settings['spoil']))
-                    self.music = dpg.add_checkbox(tag="music", label="Randomize music?", default_value=bool(p_settings['music']))
-                    self.lang = dpg.add_checkbox(tag="lang", label="Randomize language?", default_value=bool(p_settings['lang']))
-                    dpg.add_text('Green star locks:')
-                    self.star = dpg.add_radio_button(('Fully random', 'Random values', 'Disabled'), tag='star', horizontal=True, default_value=str(p_settings['star']), callback=showSlider)
-                    self.pslider = dpg.add_slider_float(tag='pslider', label='Green star lock probability', default_value=float(p_settings['pslider']), min_value=0, max_value=1, show=True, clamped=True)
-                    self.sslider = dpg.add_slider_float(tag='sslider', label='Green star lock strictness', default_value=float(p_settings['sslider']), min_value=0, max_value=1, show=True, clamped=True)
-                    self.save = dpg.add_button(tag='save', label='Save Settings', callback=saveSettings)
-                    with dpg.tooltip('speedrun'):
-                        dpg.add_text('Lock the settings to be compatible with the official speedrun leaderboards.')
-                    with dpg.tooltip('spoil'):
-                        dpg.add_text('Generate a text file which contains the full list of levels and what they have\n'
-                                     'been randomized to, along with any green star lock values.')
-                    with dpg.tooltip('star'):
-                        dpg.add_text('Fully random: The green star locks can be placed anywhere and their\n'
-                                     'requirement value will change accordingly.\n'
-                                     'Random values: The green star locks are in their vanilla positions\n'
-                                     'but their requirement value will change depending on the levels\n'
-                                     'generated beforehand.\n'
-                                     'Disabled: All green star locks will be removed from the game.')
-                    with dpg.tooltip('music'):
-                        dpg.add_text('Randomize the filenames for the music files.')
-                    with dpg.tooltip('lang'):
-                        dpg.add_text('Randomize the selected language. Will be the same language for everything.')
-                    with dpg.tooltip('pslider'):
-                        dpg.add_text('CTRL+Left Click to enter a specific value.\n'
-                                     'Control how often green star locks should appear.\n'
-                                     'Setting the slider to 1 (maximum) will not make every level have a star lock to avoid softlocks.')
-                    with dpg.tooltip('sslider'):
-                        dpg.add_text('CTRL+Left Click to enter a specific value.\n'
-                                     'Control the strictness for how many green stars you need to have to open the green star locks.')
-                    showSlider()
-                speedrunner()
-                with dpg.tab(tag="t3", label="Credits"):  # Credits tab
-                    dpg.add_text("Super Mario 3D World Randomizer credits:\n\n"
-                                 "Developer:\n"
-                                 "Skipper93653\n\n"
-                                 "Module Credits:\n"
-                                 "ZeldaMods for oead.\n"
-                                 "Jonathan Hoffstadt for Dear PyGUI.\n"
-                                 "Nuitka for Nuitka.\n"
-                                 "Built-in Pythod modules.\n"
-                                 "...And all of their contributors.\n\n"
-                                 "Special Thanks:\n"
-                                 "Nintendo EAD/EPD for creating the game.\n"
-                                 "Members of the ZeldaMods Discord server for oead help.\n"
-                                 "Members of the 3D World Modding Community Discord server for general help.\n"
-                                 "All testers.")
-        with dpg.window(label="Finished!", modal=True, tag="popup", show=False, autosize=True):
-            dpg.add_text("Randomization complete!")
-            dpg.add_text("", tag='popupSeed')
-            dpg.add_text("Settings:")
-            dpg.add_text('Speedrunner mode: '+str(dpg.get_value('speedrun')), tag='popupSpeedrun')
-            dpg.add_text("Generate spoiler file?: "+str(dpg.get_value('spoil')), tag='popupSpoil')
-            dpg.add_text("Randomize music?: "+str(dpg.get_value('music')), tag='popupMusic')
-            dpg.add_text("Randomize language?: "+str(dpg.get_value('lang')), tag='popupLang')
-            dpg.add_text("Green star locks: "+str(dpg.get_value('star')), tag='popupStar')
-            dpg.add_text("", tag='popupPslider')
-            dpg.add_text("", tag='popupSslider')
-            dpg.add_button(label="Close", callback=lambda: dpg.configure_item("popup", show=False))
 
 
 def directory(sender, app_data):
@@ -1497,6 +2652,109 @@ def show():
     dpg.destroy_context()
 
 
+# Main Program Window
+class GUI:
+    def __init__(self, p_title, p_size, p_settings):
+        # DearPyGUI setup
+        dpg.create_context()
+        dpg.create_viewport(title=p_title, width=p_size[0], height=p_size[1])
+        dpg.set_viewport_small_icon("ico.ico")
+        dpg.set_viewport_large_icon("ico.ico")
+
+        with dpg.window(tag="Main Window", label="Program"):
+            with dpg.tab_bar():  # Add tabs which the user can change between
+                with dpg.tab(tag="t1", label="Program"):  # The main, default tab
+                    dpg.add_text("Hello, welcome to the Super Mario 3D World Randomizer!")
+                    dpg.add_text(tag="dirtext", default_value=str(p_settings['dir']))  # Selected Directory
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=directory, default_path=str(dpg.get_value('dirtext')))  # Directory Selector
+                    self.dir = dpg.add_button(tag="dirbutt", label="Load Input Directory", callback=lambda: dpg.show_item("dir"))  # Load Directory Button
+                    dpg.add_text(tag="rdirtext", default_value=str(p_settings['rdir']))  # Selected Directory
+                    dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=str(dpg.get_value('rdirtext')))  # Directory Selector
+                    self.rdir = dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
+                    self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory)  # Seed Input Text
+                    self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
+                    dpg.add_progress_bar(tag="progress", label="progress", default_value=0)
+                    dpg.add_text("This randomizer only effects Super Mario 3D World (Switch), not Bowser's Fury.")
+                    self.test = dpg.add_button(tag="test", label="test", callback=lambda: dpg.configure_item("progress", default_value=1), show=False)
+                    with dpg.tooltip("dirbutt"):
+                        dpg.add_text("The directory selected must be the root directory of an unmodified dump of the game:\n" +
+                                     "\"" + os.path.join("010028600EBDA000", "romfs") + "\" - Super Mario 3D World + Bowser's Fury")
+                    with dpg.tooltip("rdirbutt"):
+                        dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
+                                     "be your mods folder:\n" +
+                                     "\"" + os.path.join("sd:", "atmosphere", "contents", "010028600EBDA000") + "\"* - Atmosphere (Switch)\n"
+                                     "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury", "<name of your choice>", "contents", "010028600EBDA000") + "\"* - SMM (Switch)\n"
+                                     "\"" + os.path.join("Ryujinx", "mods", "contents", "010028600EBDA000") + "\" - Ryujinx (Switch)\n\n"
+                                     "*The \"romfs\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
+                                     "specified Atmosphere or SimpleModManager (SMM) folder.\n\n"
+                                     "Note: Yuzu is not officially supported and you may encounter issues if you use it.")
+                    with dpg.tooltip('randoinit'):
+                        dpg.add_text('To be able to start the randomizer, select a valid input directory.', tag='randotip')
+                checkDirectory()
+                with dpg.tab(tag="t2", label="Misc. Settings"):  # Settings tab
+                    self.speedrun = dpg.add_checkbox(tag='speedrun', label='Speedrunner mode', default_value=bool(p_settings['speedrun']), callback=speedrunner)
+                    self.spoil = dpg.add_checkbox(tag="spoil", label="Generate spoiler file?", default_value=bool(p_settings['spoil']))
+                    self.music = dpg.add_checkbox(tag="music", label="Randomize music?", default_value=bool(p_settings['music']))
+                    self.lang = dpg.add_checkbox(tag="lang", label="Randomize language?", default_value=bool(p_settings['lang']))
+                    dpg.add_text('Green star locks:')
+                    self.star = dpg.add_radio_button(('Fully random', 'Random values', 'Disabled'), tag='star', horizontal=True, default_value=str(p_settings['star']), callback=showSlider)
+                    self.pslider = dpg.add_slider_float(tag='pslider', label='Green star lock probability', default_value=float(p_settings['pslider']), min_value=0, max_value=1, show=True, clamped=True)
+                    self.sslider = dpg.add_slider_float(tag='sslider', label='Green star lock strictness', default_value=float(p_settings['sslider']), min_value=0, max_value=1, show=True, clamped=True)
+                    self.save = dpg.add_button(tag='save', label='Save Settings', callback=saveSettings)
+                    with dpg.tooltip('speedrun'):
+                        dpg.add_text('Lock the settings to be compatible with the official speedrun leaderboards.')
+                    with dpg.tooltip('spoil'):
+                        dpg.add_text('Generate a text file which contains the full list of levels and what they have\n'
+                                     'been randomized to, along with any green star lock values.')
+                    with dpg.tooltip('star'):
+                        dpg.add_text('Fully random: The green star locks can be placed anywhere and their\n'
+                                     'requirement value will change accordingly.\n'
+                                     'Random values: The green star locks are in their vanilla positions\n'
+                                     'but their requirement value will change depending on the levels\n'
+                                     'generated beforehand.\n'
+                                     'Disabled: All green star locks will be removed from the game.')
+                    with dpg.tooltip('music'):
+                        dpg.add_text('Randomize the filenames for the music files.')
+                    with dpg.tooltip('lang'):
+                        dpg.add_text('Randomize the selected language. Will be the same language for everything.')
+                    with dpg.tooltip('pslider'):
+                        dpg.add_text('CTRL+Left Click to enter a specific value.\n'
+                                     'Control how often green star locks should appear.\n'
+                                     'Setting the slider to 1 (maximum) will not make every level have a star lock to avoid softlocks.')
+                    with dpg.tooltip('sslider'):
+                        dpg.add_text('CTRL+Left Click to enter a specific value.\n'
+                                     'Control the strictness for how many green stars you need to have to open the green star locks.')
+                    showSlider()
+                speedrunner()
+                with dpg.tab(tag="t3", label="Credits"):  # Credits tab
+                    dpg.add_text("Super Mario 3D World Randomizer credits:\n\n"
+                                 "Developer:\n"
+                                 "Skipper93653\n\n"
+                                 "Module Credits:\n"
+                                 "ZeldaMods for oead.\n"
+                                 "Jonathan Hoffstadt for Dear PyGUI.\n"
+                                 "Nuitka for Nuitka.\n"
+                                 "Built-in Pythod modules.\n"
+                                 "...And all of their contributors.\n\n"
+                                 "Special Thanks:\n"
+                                 "Nintendo EAD/EPD for creating the game.\n"
+                                 "Members of the ZeldaMods Discord server for oead help.\n"
+                                 "Members of the 3D World Modding Community Discord server for general help.\n"
+                                 "All testers.")
+        with dpg.window(label="Finished!", modal=True, tag="popup", show=False, autosize=True):
+            dpg.add_text("Randomization complete!")
+            dpg.add_text("", tag='popupSeed')
+            dpg.add_text("Settings:")
+            dpg.add_text('Speedrunner mode: '+str(dpg.get_value('speedrun')), tag='popupSpeedrun')
+            dpg.add_text("Generate spoiler file?: "+str(dpg.get_value('spoil')), tag='popupSpoil')
+            dpg.add_text("Randomize music?: "+str(dpg.get_value('music')), tag='popupMusic')
+            dpg.add_text("Randomize language?: "+str(dpg.get_value('lang')), tag='popupLang')
+            dpg.add_text("Green star locks: "+str(dpg.get_value('star')), tag='popupStar')
+            dpg.add_text("", tag='popupPslider')
+            dpg.add_text("", tag='popupSslider')
+            dpg.add_button(label="Close", callback=lambda: dpg.configure_item("popup", show=False))
+
+
 def main():
     global settings, interface, version, hashDict
     version = 'v3.0.0'
@@ -1512,7 +2770,83 @@ def main():
                 [os.path.join('StageData', 'CourseSelectW7Zone.szs'), 'e95a6fd9162f5eeefb06fb461e9ad514'],
                 [os.path.join('StageData', 'CourseSelectW8Zone.szs'), '0c93355dd9a30287006d97a90b2fc9c1'],
                 [os.path.join('StageData', 'CourseSelectS1Zone.szs'), '5e534b8ea2068faa1cba9d0e124135e6'],
-                [os.path.join('StageData', 'KoopaLastBZone.szs'), '4146dbdd3200ca39f100a02253e4b5d6']]
+                [os.path.join('StageData', 'EnterCatMarioStage.szs'), 'af8dcf610c34e5bd64fb8344062a24fd'],
+                [os.path.join('StageData', 'NokonokoCaveStage.szs'), '9a4d24f348bb7c4d52748d8bb3849245'],
+                [os.path.join('StageData', 'ClimbMountainStage.szs'), '6507f04bf7e6b8cefe8db7c89aaa3d66'],
+                [os.path.join('StageData', 'DownRiverStage.szs'), 'f705560b0befa8eb403fce9681f2766c'],
+                [os.path.join('StageData', 'FlipCircusStage.szs'), 'd3b65824e48df2c20f36cf88457fba07'],
+                [os.path.join('StageData', 'SideWaveDesertStage.szs'), 'db058aabcf057c7e22d7b86b84331550'],
+                [os.path.join('StageData', 'TouchAndMikeSecondZone.szs'), '716248ef3b7342b1957cdc02f264bf39'],
+                [os.path.join('StageData', 'ShadowTunnelStage.szs'), 'cff0484f5df61f53adda6ba00a7de22a'],
+                [os.path.join('StageData', 'RotateFieldGoalZone.szs'), '10edd81cd378dd38d8029a03c3c9b13c'],
+                [os.path.join('StageData', 'DoubleMarioFieldStage.szs'), '476b0ed08205b201d7e4ce48791a8b6b'],
+                [os.path.join('StageData', 'SnowBallParkStage.szs'), '4d156d72768e7af2349633bb0002d6c0'],
+                [os.path.join('StageData', 'ClimbWirenetStage.szs'), '9566a5d3efed98459623be0519bb8922'],
+                [os.path.join('StageData', 'TeresaConveyorStage.szs'), 'c734a9133dc75d116693f37f8fb8967e'],
+                [os.path.join('StageData', 'ShortGardenStage.szs'), 'a38c6383e82fe80f095119c243240a07'],
+                [os.path.join('StageData', 'DokanAquariumGoalZone.szs'), '4a9610b02a249c3f51897b690f5c51de'],
+                [os.path.join('StageData', 'DashRidgeGoalZone.szs'), '5d38430abef73e734bb16b1768a6a8db'],
+                [os.path.join('StageData', 'TruckWaterfallStage.szs'), 'a65c4858a04c898b8797265c56f90e9d'],
+                [os.path.join('StageData', 'CrawlerHillStage.szs'), '283bd56ba10751165ec0ffb2c8a429a1'],
+                [os.path.join('StageData', 'PipePackunDenGoalZone.szs'), '0659d312297da35639371ee8b232f261'],
+                [os.path.join('StageData', 'ChikaChikaBoomerangCZone.szs'), '22461f6f2e7e419840ea5e6ae2bcc1c7'],
+                [os.path.join('StageData', 'TrampolineHighlandStage.szs'), '811bf2091826a35df319317253144dd0'],
+                [os.path.join('StageData', 'GabonMountainStage.szs'), '5b1f5678cbe47860de1d7b671d8d1f46'],
+                [os.path.join('StageData', 'NokonokoBeachStage.szs'), '0ddbd3cc3863db4fff7fe8660e3e8b7a'],
+                [os.path.join('StageData', 'SwingCircusStage.szs'), '73838e44253443b9aa74429197470109'],
+                [os.path.join('StageData', 'ShortMultiLiftStage.szs'), '02cf1c2d5c7e87949e5dc54b5ece0aa1'],
+                [os.path.join('StageData', 'SavannaRockStage.szs'), 'b788f07122974d3b4bb4645fda6b9b9c'],
+                [os.path.join('StageData', 'BombCaveStage.szs'), '0e9b4c10f4055a71ad4e2f0c01f6e5e2'],
+                [os.path.join('StageData', 'JumpFlipSweetsStage.szs'), '42634042934091cc3535c080fd309ec7'],
+                [os.path.join('StageData', 'SneakingLightStage.szs'), '965dafa390180456cf13cad6e3d54045'],
+                [os.path.join('StageData', 'RouteDokanTourStage.szs'), '97aa1f39863f800b063b249b4a8f450c'],
+                [os.path.join('StageData', 'WeavingShipGoalZone.szs'), '99c0dbf5c3a3895c43d7719f490b5d4c'],
+                [os.path.join('StageData', 'KarakuriCastleStage.szs'), 'f935189ad818b1c79c99f725171be01e'],
+                [os.path.join('StageData', 'JungleCruiseStage.szs'), 'd133ee09acf25ff0d7717075ac9044d0'],
+                [os.path.join('StageData', 'BlastSnowFieldStage.szs'), '1c4b703322345a4356fd2d662bec4b66'],
+                [os.path.join('StageData', 'ClimbFortressStage.szs'), '1c3e981f58997376e975022dcf0b8f55'],
+                [os.path.join('StageData', 'ChorobonTowerStage.szs'), '146216d73b521cbc89661968b6a2aa78'],
+                [os.path.join('StageData', 'FireBrosFortressStage.szs'), '719f42e796d70f5763ed81ff478f6db9'],
+                [os.path.join('StageData', 'DarkFlipPanelStage.szs'), '1dc1b6241522f5fb2b3b9b3667ee3bea'],
+                [os.path.join('StageData', 'ShortAmidaStage.szs'), '7658cafe08abf7eeb6bc513d1c1f48ef'],
+                [os.path.join('StageData', 'DonketsuArrowStepGoalZone.szs'), '358672426df75ef2b065d9741c51880c'],
+                [os.path.join('StageData', 'ZigzagBuildingStage.szs'), '5e2af872e6ccb1e5a5fa2cab6356b6df'],
+                [os.path.join('StageData', 'SyumockSpotGoalZone.szs'), 'b1f9f4545071a29b90ac99b082e3a8ad'],
+                [os.path.join('StageData', 'RagingMagmaStage.szs'), '70223364916c33d01a58a194e1858295'],
+                [os.path.join('StageData', 'NeedleBridgeStage.szs'), 'd02912a80bc1db3ed7746d47b9e8d994'],
+                [os.path.join('StageData', 'DownDesertStage.szs'), 'ceca66363c25623ea9e4c78bf2d3b7aa'],
+                [os.path.join('StageData', 'GearSweetsStage.szs'), 'b53e6e2b38d6582995fa71ac596990c6'],
+                [os.path.join('StageData', 'EchoRoadStage.szs'), 'c373e9ec48d243f53f56c043c178d642'],
+                [os.path.join('StageData', 'WaterElevatorCaveStage.szs'), 'ccda4a7f1295f8b4ff38263f19a78c34'],
+                [os.path.join('StageData', 'DarknessHauntedHouseStage.szs'), '849623e724d6a7d9e3ce65137743f691'],
+                [os.path.join('StageData', 'GotogotonValleyStage.szs'), 'c92c8bd7516043870bafcd397186d6a0'],
+                [os.path.join('StageData', 'KoopaLastBZone.szs'), '4146dbdd3200ca39f100a02253e4b5d6'],
+                [os.path.join('StageData', 'RainbowRoadStage.szs'), '9c112b9a88b2736a3147bd34d7e9b885'],
+                [os.path.join('StageData', 'GalaxyRoadStage.szs'), '7c42386b3ae84188cd3d97354e03f334'],
+                [os.path.join('StageData', 'WheelCanyonStage.szs'), '184cfc1fb0087c3cfb95c47ea8508dd9'],
+                [os.path.join('StageData', 'BlockLandStage.szs'), '69c602419d7e47d8b6b383f92694c9b5'],
+                [os.path.join('StageData', 'HexScrollStage.szs'), '23401c2a1ffb4fb2574fb8c87c37b903'],
+                [os.path.join('StageData', 'GiantUnderGroundStage.szs'), '7eea69679f0d95d34320b1021d0ce77e'],
+                [os.path.join('StageData', 'TerenFogGoalZone.szs'), '6bf73f54e26e537a935ba07ba7748470'],
+                [os.path.join('StageData', 'BoxKillerStage.szs'), '62b28d84ab8f9c3bb9f8a44ffda2db85'],
+                [os.path.join('StageData', 'ArrangeRotateFieldGoalZone.szs'), 'ffaad5b488bc8d430459ffd83d30c455'],
+                [os.path.join('StageData', 'ArrangeClimbMountainStage.szs'), '949d29ca349bc1ab7c11eba74e8e5df1'],
+                [os.path.join('StageData', 'ArrangeJungleCruiseStage.szs'), '3df2810ac0fd0defa9c10d92c4587293'],
+                [os.path.join('StageData', 'ArrangeShadowTunnelStage.szs'), '3879b4249cfbd7c8f2015b911354e580'],
+                [os.path.join('StageData', 'ArrangeWeavingShipGoalZone.szs'), '7a7c7fe125ed6011fdd24dd5a9a212c3'],
+                [os.path.join('StageData', 'ArrangeDonketsuArrowStepZone.szs'), '7335f2663534b8e3912d70c45ce09495'],
+                [os.path.join('StageData', 'ArrangeFlipCircusStage.szs'), 'f393029262be02c578716645137e9eb0'],
+                [os.path.join('StageData', 'ArrangeChorobonTowerStage.szs'), 'f560dbc0505af477e8adbbd771cd05c4'],
+                [os.path.join('StageData', 'ArrangePipePackunDenGoalZone.szs'), 'ab1a0dfe429b44c93bf5798381f5a746'],
+                [os.path.join('StageData', 'ArrangeFireBrosFortressStage.szs'), '51f89626e0420d5a6577af33f08ba36d'],
+                [os.path.join('StageData', 'ArrangeSavannaRockStage.szs'), '92c85014d500785205d00b6ef0309c7b'],
+                [os.path.join('StageData', 'ArrangeTeresaConveorStage.szs'), '02415855a845d388b9f01868ea0730f8'],
+                [os.path.join('StageData', 'ArrangeAquariumCZone.szs'), '58b57ab9baa1cee7a2c337ad8fe35e4f'],
+                [os.path.join('StageData', 'ArrangeChikaCZone.szs'), 'df40bcfc25142721a1f9cf3fea788d1a'],
+                [os.path.join('StageData', 'ArrangeNokonokoBeachStage.szs'), 'ca7d07aa341d9f62c3edc40bab035be8'],
+                [os.path.join('StageData', 'ArrangeHexScrollStage.szs'), '6afac4848b5eeab1a05d5d569049823d'],
+                [os.path.join('StageData', 'ArrangeNeedleBridgeStage.szs'), '94d4f54b266a69c9abb3d5e048f001a3'],
+                [os.path.join('StageData', 'ChampionshipGoalZone.szs'), '4e32514bf17a4d2627c3119382910454']]
 
     if os.path.isfile('settings.json'):
         with open('settings.json', 'r') as s:
