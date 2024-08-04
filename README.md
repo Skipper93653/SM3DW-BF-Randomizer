@@ -37,13 +37,15 @@ Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if
 
 ## Known Issues
 
-* Stamps do not randomize with stage so the stamp screen is not fully functional.
-* The course list may crash the game.
-* Some stage numbers are glitched.
+* Stamps do not randomize with stage so the stamp screen is not fully functional. Stamps retain their original stage slot and do not follow the stage they were present in before randomization e.g. Super Bell Hill's stamp will stay at World 1-1 even if Super Bell Hill has been randomized to any other stage. For stage slots that didn't originally contain stamps but do after randomization, the collected stamp does not get added to the stamp screen.
+* The course list may crash the game due to the modified StageList.byml.
+* Some stage numbers are glitched due to the modified StageList.byml.
 * The World Warp Pipes which should take you to the next world do not work and just kick you out of the stage if the stages containing them are not on World 1-2 or World 4-2.
 * Sometimes, with randomized music, the music may sometimes cut out abruptly.
-* Lucky Houses do not disappear after use, but they cannot be re-entered.
-* If a blockade is locked behind a Bowser statue, the music does not play. However, it does start to play if it is a fight against Hisstocrat or Motley Bossblob.
+* Lucky Houses may not disappear after use, but they cannot be re-entered due to the stage type being used for it could be the Toad House under some circumstances.
+* If a blockade is locked behind a Bowser statue, the music does not play after you enter it. However, it does start to play when you start a fight against Hisstocrat or Motley Bossblob.
+* Super Bell Hill, Snowball Park, Pretty Plaza Panic, The Bullet Bill Express, Sprawling Savanna, Bob-ombs Below, Cookie Cogworks, The Bowser Express, and Sprawling Savanna Rabbit Run's Goal Poles can never change due to stack overflow errors.
+* The Great Goal Pole and Back to Hands-on Halls' Goal Poles can never be changed due to the runaway Goal Pole not being able to change its appearance to the castle Goal Pole or the ending Goal Pole.
 
 ## Potential future features in no particular order
 
