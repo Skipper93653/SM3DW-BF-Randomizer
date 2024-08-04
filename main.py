@@ -65,15 +65,12 @@ def randomizer():
     with open(os.path.join(oPath, "StageList.szs"), "rb") as f:
         archive = Sarc(yaz0.decompress(f.read()))  # Decompress and load SARC
     endianness = archive.get_endianness()
-    raw = archive.get_file("StageList.byml").data
-    raw_binary = byml.from_binary(raw)
-    doc = byml.to_text(raw_binary)  # Load BYML file (Wii U file breaks here)
-    StageListNew = doc.split('\n')
+    StageListNew = byml.to_text(byml.from_binary(archive.get_file("StageList.byml").data)).split('\n')  # Load BYML file (Wii U file breaks here)
     StageListNew.pop()
     StageListOld = StageListNew.copy()
     print('Opened StageList.szs')
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
 
     # StageData Path
     sPath = os.path.join(user_data[0], 'StageData')
@@ -82,177 +79,100 @@ def randomizer():
     os.makedirs(rPath)
     os.makedirs(srPath)
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
+
+    worlds = [['CourseSelectW1Zone.szs', ['DofParam_obj10.bagldof',
+                                          'DofParam_obj9.bagldof',
+                                          'DofParam_obj11.bagldof',
+                                          'CourseSelectW1ZoneDesign.byml',
+                                          'DofParam_obj6.bagldof',
+                                          'CourseSelectW1ZoneMap.byml',
+                                          'DofParam_obj12.bagldof',
+                                          'CameraParam.byml',
+                                          'DofParam_obj7.bagldof',
+                                          'CourseSelectW1ZoneSound.byml',
+                                          'DofParam_obj8.bagldof']],
+              ['CourseSelectW2Zone.szs', ['DofParam_obj4.bagldof',
+                                          'CourseSelectW2ZoneMap.byml',
+                                          'DofParam_obj9.bagldof',
+                                          'DofParam_obj5.bagldof',
+                                          'CourseSelectW2ZoneSound.byml',
+                                          'DofParam_obj6.bagldof',
+                                          'CameraParam.byml',
+                                          'DofParam_obj7.bagldof',
+                                          'DofParam_obj3.bagldof',
+                                          'CourseSelectW2ZoneDesign.byml',
+                                          'DofParam_obj8.bagldof']],
+              ['CourseSelectW3Zone.szs', ['CourseSelectW3ZoneDesign.byml',
+                                          'CourseSelectW3ZoneMap.byml',
+                                          'CameraParam.byml',
+                                          'DofParam_obj27.bagldof',
+                                          'CourseSelectW3ZoneSound.byml',
+                                          'DofParam_obj28.bagldof']],
+              ['CourseSelectW4Zone.szs', ['DofParam_obj4.bagldof',
+                                          'CourseSelectW4ZoneMap.byml',
+                                          'DofParam_obj5.bagldof',
+                                          'CourseSelectW4ZoneSound.byml',
+                                          'DofParam_obj6.bagldof',
+                                          'CameraParam.byml',
+                                          'CourseSelectW4ZoneDesign.byml']],
+              ['CourseSelectW5Zone.szs', ['DofParam_obj4.bagldof',
+                                          'CourseSelectW5ZoneDesign.byml',
+                                          'DofParam_obj5.bagldof',
+                                          'DofParam_obj6.bagldof',
+                                          'CameraParam.byml',
+                                          'CourseSelectW5ZoneMap.byml',
+                                          'DofParam_obj3.bagldof',
+                                          'CourseSelectW5ZoneSound.byml']],
+              ['CourseSelectW6Zone.szs', ['DofParam_obj18.bagldof',
+                                          'DofParam_obj14.bagldof',
+                                          'DofParam_obj10.bagldof',
+                                          'DofParam_obj9.bagldof',
+                                          'DofParam_obj19.bagldof',
+                                          'DofParam_obj15.bagldof',
+                                          'CourseSelectW6ZoneMap.byml',
+                                          'DofParam_obj11.bagldof',
+                                          'CourseSelectW6ZoneSound.byml',
+                                          'DofParam_obj6.bagldof',
+                                          'DofParam_obj16.bagldof',
+                                          'CourseSelectW6ZoneDesign.byml',
+                                          'DofParam_obj12.bagldof',
+                                          'CameraParam.byml',
+                                          'DofParam_obj17.bagldof',
+                                          'DofParam_obj13.bagldof',
+                                          'DofParam_obj8.bagldof']],
+              ['CourseSelectW7Zone.szs', ['CourseSelectW7ZoneDesign.byml',
+                                          'DofParam_obj19.bagldof',
+                                          'DofParam_obj22.bagldof',
+                                          'CameraParam.byml',
+                                          'DofParam_obj23.bagldof',
+                                          'CourseSelectW7ZoneMap.byml',
+                                          'CourseSelectW7ZoneSound.byml']],
+              ['CourseSelectW8Zone.szs', ['DofParam_obj130.bagldof',
+                                          'DofParam_obj129.bagldof',
+                                          'DofParam_obj131.bagldof',
+                                          'CourseSelectW8ZoneMap.byml',
+                                          'CourseSelectW8ZoneSound.byml',
+                                          'CourseSelectW8ZoneDesign.byml',
+                                          'DofParam_obj132.bagldof',
+                                          'CameraParam.byml',
+                                          'DofParam_obj133.bagldof']],
+              ['CourseSelectS1Zone.szs', ['CourseSelectS1ZoneSound.byml',
+                                          'CameraParam.byml',
+                                          'CourseSelectS1ZoneMap.byml']]]
+    worldArchives = []
+    mapYMLs = []
 
     # Open each world map file and convert the map BYML into a readable format.
-    print('Opening CourseSelectW1Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectW1Zone.szs'), 'rb') as f:
-        w1archive = Sarc(yaz0.decompress(f.read()))
-    w1archive1 = w1archive.get_file('DofParam_obj10.bagldof').data
-    w1archive2 = w1archive.get_file('DofParam_obj9.bagldof').data
-    w1archive3 = w1archive.get_file('DofParam_obj11.bagldof').data
-    w1archive4 = w1archive.get_file('CourseSelectW1ZoneDesign.byml').data
-    w1archive5 = w1archive.get_file('DofParam_obj6.bagldof').data
-    w1archive6 = byml.to_text(byml.from_binary(w1archive.get_file('CourseSelectW1ZoneMap.byml').data))
-    w1archive7 = w1archive.get_file('DofParam_obj12.bagldof').data
-    w1archive8 = w1archive.get_file('CameraParam.byml').data
-    w1archive9 = w1archive.get_file('DofParam_obj7.bagldof').data
-    w1archive10 = w1archive.get_file('CourseSelectW1ZoneSound.byml').data
-    w1archive11 = w1archive.get_file('DofParam_obj8.bagldof').data
-    CourseSelectW1ZoneMapn = w1archive6.split('\n')
-    CourseSelectW1ZoneMapn.pop()
-    CourseSelectW1ZoneMapo = CourseSelectW1ZoneMapn.copy()
-    print('Opened CourseSelectW1Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Opening CourseSelectW2Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectW2Zone.szs'), 'rb') as f:
-        w2archive = Sarc(yaz0.decompress(f.read()))
-    w2archive1 = w2archive.get_file('DofParam_obj4.bagldof').data
-    w2archive2 = byml.to_text(byml.from_binary(w2archive.get_file('CourseSelectW2ZoneMap.byml').data))
-    w2archive3 = w2archive.get_file('DofParam_obj9.bagldof').data
-    w2archive4 = w2archive.get_file('DofParam_obj5.bagldof').data
-    w2archive5 = w2archive.get_file('CourseSelectW2ZoneSound.byml').data
-    w2archive6 = w2archive.get_file('DofParam_obj6.bagldof').data
-    w2archive7 = w2archive.get_file('CameraParam.byml').data
-    w2archive8 = w2archive.get_file('DofParam_obj7.bagldof').data
-    w2archive9 = w2archive.get_file('DofParam_obj3.bagldof').data
-    w2archive10 = w2archive.get_file('CourseSelectW2ZoneDesign.byml').data
-    w2archive11 = w2archive.get_file('DofParam_obj8.bagldof').data
-    CourseSelectW2ZoneMapn = w2archive2.split('\n')
-    CourseSelectW2ZoneMapn.pop()
-    CourseSelectW2ZoneMapo = CourseSelectW2ZoneMapn.copy()
-    print('Opened CourseSelectW2Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Opening CourseSelectW3Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectW3Zone.szs'), 'rb') as f:
-        w3archive = Sarc(yaz0.decompress(f.read()))
-    w3archive1 = w3archive.get_file('CourseSelectW3ZoneDesign.byml').data
-    w3archive2 = byml.to_text(byml.from_binary(w3archive.get_file('CourseSelectW3ZoneMap.byml').data))
-    w3archive3 = w3archive.get_file('CameraParam.byml').data
-    w3archive4 = w3archive.get_file('DofParam_obj27.bagldof').data
-    w3archive5 = w3archive.get_file('CourseSelectW3ZoneSound.byml').data
-    w3archive6 = w3archive.get_file('DofParam_obj28.bagldof').data
-    CourseSelectW3ZoneMapn = w3archive2.split('\n')
-    CourseSelectW3ZoneMapn.pop()
-    CourseSelectW3ZoneMapo = CourseSelectW3ZoneMapn.copy()
-    print('Opened CourseSelectW3Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Opening CourseSelectW4Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectW4Zone.szs'), 'rb') as f:
-        w4archive = Sarc(yaz0.decompress(f.read()))
-    w4archive1 = w4archive.get_file('DofParam_obj4.bagldof').data
-    w4archive2 = byml.to_text(byml.from_binary(w4archive.get_file('CourseSelectW4ZoneMap.byml').data))
-    w4archive3 = w4archive.get_file('DofParam_obj5.bagldof').data
-    w4archive4 = w4archive.get_file('CourseSelectW4ZoneSound.byml').data
-    w4archive5 = w4archive.get_file('DofParam_obj6.bagldof').data
-    w4archive6 = w4archive.get_file('CameraParam.byml').data
-    w4archive7 = w4archive.get_file('CourseSelectW4ZoneDesign.byml').data
-    CourseSelectW4ZoneMapn = w4archive2.split('\n')
-    CourseSelectW4ZoneMapn.pop()
-    CourseSelectW4ZoneMapo = CourseSelectW4ZoneMapn.copy()
-    print('Opened CourseSelectW4Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Opening CourseSelectW5Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectW5Zone.szs'), 'rb') as f:
-        w5archive = Sarc(yaz0.decompress(f.read()))
-    w5archive1 = w5archive.get_file('DofParam_obj4.bagldof').data
-    w5archive2 = w5archive.get_file('CourseSelectW5ZoneDesign.byml').data
-    w5archive3 = w5archive.get_file('DofParam_obj5.bagldof').data
-    w5archive4 = w5archive.get_file('DofParam_obj6.bagldof').data
-    w5archive5 = w5archive.get_file('CameraParam.byml').data
-    w5archive6 = byml.to_text(byml.from_binary(w5archive.get_file('CourseSelectW5ZoneMap.byml').data))
-    w5archive7 = w5archive.get_file('DofParam_obj3.bagldof').data
-    w5archive8 = w5archive.get_file('CourseSelectW5ZoneSound.byml').data
-    CourseSelectW5ZoneMapn = w5archive6.split('\n')
-    CourseSelectW5ZoneMapn.pop()
-    CourseSelectW5ZoneMapo = CourseSelectW5ZoneMapn.copy()
-    print('Opened CourseSelectW5Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Opening CourseSelectW6Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectW6Zone.szs'), 'rb') as f:
-        w6archive = Sarc(yaz0.decompress(f.read()))
-    w6archive1 = w6archive.get_file('DofParam_obj18.bagldof').data
-    w6archive2 = w6archive.get_file('DofParam_obj14.bagldof').data
-    w6archive3 = w6archive.get_file('DofParam_obj10.bagldof').data
-    w6archive4 = w6archive.get_file('DofParam_obj9.bagldof').data
-    w6archive5 = w6archive.get_file('DofParam_obj19.bagldof').data
-    w6archive6 = w6archive.get_file('DofParam_obj15.bagldof').data
-    w6archive7 = byml.to_text(byml.from_binary(w6archive.get_file('CourseSelectW6ZoneMap.byml').data))
-    w6archive8 = w6archive.get_file('DofParam_obj11.bagldof').data
-    w6archive9 = w6archive.get_file('CourseSelectW6ZoneSound.byml').data
-    w6archive10 = w6archive.get_file('DofParam_obj6.bagldof').data
-    w6archive11 = w6archive.get_file('DofParam_obj16.bagldof').data
-    w6archive12 = w6archive.get_file('CourseSelectW6ZoneDesign.byml').data
-    w6archive13 = w6archive.get_file('DofParam_obj12.bagldof').data
-    w6archive14 = w6archive.get_file('CameraParam.byml').data
-    w6archive15 = w6archive.get_file('DofParam_obj17.bagldof').data
-    w6archive16 = w6archive.get_file('DofParam_obj13.bagldof').data
-    w6archive17 = w6archive.get_file('DofParam_obj8.bagldof').data
-    CourseSelectW6ZoneMapn = w6archive7.split('\n')
-    CourseSelectW6ZoneMapn.pop()
-    CourseSelectW6ZoneMapo = CourseSelectW6ZoneMapn.copy()
-    print('Opened CourseSelectW6Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Opening CourseSelectW7Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectW7Zone.szs'), 'rb') as f:
-        w7archive = Sarc(yaz0.decompress(f.read()))
-    w7archive1 = w7archive.get_file('CourseSelectW7ZoneDesign.byml').data
-    w7archive2 = w7archive.get_file('DofParam_obj19.bagldof').data
-    w7archive3 = w7archive.get_file('DofParam_obj22.bagldof').data
-    w7archive4 = w7archive.get_file('CameraParam.byml').data
-    w7archive5 = w7archive.get_file('DofParam_obj23.bagldof').data
-    w7archive6 = byml.to_text(byml.from_binary(w7archive.get_file('CourseSelectW7ZoneMap.byml').data))
-    w7archive7 = w7archive.get_file('CourseSelectW7ZoneSound.byml').data
-    CourseSelectW7ZoneMapn = w7archive6.split('\n')
-    CourseSelectW7ZoneMapn.pop()
-    CourseSelectW7ZoneMapo = CourseSelectW7ZoneMapn.copy()
-    print('Opened CourseSelectW7Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Opening CourseSelectW8Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectW8Zone.szs'), 'rb') as f:
-        w8archive = Sarc(yaz0.decompress(f.read()))
-    w8archive1 = w8archive.get_file('DofParam_obj130.bagldof').data
-    w8archive2 = w8archive.get_file('DofParam_obj129.bagldof').data
-    w8archive3 = w8archive.get_file('DofParam_obj131.bagldof').data
-    w8archive4 = byml.to_text(byml.from_binary(w8archive.get_file('CourseSelectW8ZoneMap.byml').data))
-    w8archive5 = w8archive.get_file('CourseSelectW8ZoneSound.byml').data
-    w8archive6 = w8archive.get_file('CourseSelectW8ZoneDesign.byml').data
-    w8archive7 = w8archive.get_file('DofParam_obj132.bagldof').data
-    w8archive8 = w8archive.get_file('CameraParam.byml').data
-    w8archive9 = w8archive.get_file('DofParam_obj133.bagldof').data
-    CourseSelectW8ZoneMapn = w8archive4.split('\n')
-    CourseSelectW8ZoneMapn.pop()
-    CourseSelectW8ZoneMapo = CourseSelectW8ZoneMapn.copy()
-    print('Opened CourseSelectW8Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Opening CourseSelectS1Zone.szs')
-    with open(os.path.join(sPath, 'CourseSelectS1Zone.szs'), 'rb') as f:
-        s1archive = Sarc(yaz0.decompress(f.read()))
-    s1archive1 = s1archive.get_file('CourseSelectS1ZoneSound.byml').data
-    s1archive2 = s1archive.get_file('CameraParam.byml').data
-    s1archive3 = byml.to_text(byml.from_binary(s1archive.get_file('CourseSelectS1ZoneMap.byml').data))
-    CourseSelectS1ZoneMapn = s1archive3.split('\n')
-    CourseSelectS1ZoneMapn.pop()
-    CourseSelectS1ZoneMapo = CourseSelectS1ZoneMapn.copy()
-    print('Opened CourseSelectS1Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    for i in worlds:
+        print('Opening ' + i[0])
+        with open(os.path.join(sPath, i[0]), 'rb') as f:
+            worldArchives.append(Sarc(yaz0.decompress(f.read())))
+        mapYMLs.append(byml.to_text(byml.from_binary(worldArchives[-1].get_file(i[0][:i[0].index('.')] + 'Map.byml').data)).split('\n'))
+        mapYMLs[-1].pop()
+        print('Opened ' + i[0])
+        bar += 1
+        dpg.configure_item("progress", default_value=bar / 172)
 
     # Creating base variables to be used and iterated on in the randomizer loop
     worldNo = 1
@@ -280,7 +200,7 @@ def randomizer():
     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
     ready = False
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
 
     # This loop happens when stageID generates a special level when stageNo is currently a castle stage and forces
     # stageID to randomize again until it's not a special level (basically until it gives you a stage where it's
@@ -299,7 +219,7 @@ def randomizer():
                     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
                     ready = False
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
 
     print('Random stage order:', rstageID_order)
 
@@ -435,76 +355,24 @@ def randomizer():
         else:
             MiniatureName = 'Miniature'+StageName[StageName.index(':')+2:-5]
 
+        if worldNo <= 8:
+            mapYMLs_index = worldNo - 1
+        else:
+            mapYMLs_index = 8
+
         # Enumerating the YML to replace world map models to show the randomized stage.
-        if worldNo == 1 and StageID[StageID.index(':') + 2:] != '70' and StageID[StageID.index(':') + 2:] != '35':
-            for i, elem in enumerate(CourseSelectW1ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem and '35' not in elem:
-                    if 'ModelName: Miniature' in CourseSelectW1ZoneMapo[i - 4]:
-                        CourseSelectW1ZoneMapn[i - 4] = CourseSelectW1ZoneMapo[i - 4][:CourseSelectW1ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectW1ZoneMapo[i - 6]:
-                        CourseSelectW1ZoneMapn[i - 6] = CourseSelectW1ZoneMapo[i - 6][:CourseSelectW1ZoneMapo[i - 6].index(':') + 2] + MiniatureName
-                    if StageID[StageID.index(':')+2:] == '1':
-                        if ' Rotate: ' in CourseSelectW1ZoneMapo[i - 2]:
-                            CourseSelectW1ZoneMapn[i - 2] = CourseSelectW1ZoneMapo[i - 2][:CourseSelectW1ZoneMapo[i - 2].index(':') + 2] + '{X: 0.0, Y: -0.0, Z: 0.0}'  # Fix rotation for World 1-1
-                        elif ' Rotate: ' in CourseSelectW1ZoneMapo[i - 4]:
-                            CourseSelectW1ZoneMapn[i - 4] = CourseSelectW1ZoneMapo[i - 4][:CourseSelectW1ZoneMapo[i - 4].index(':') + 2] + '{X: 0.0, Y: -0.0,'
-                            CourseSelectW1ZoneMapn[i - 3] = CourseSelectW1ZoneMapo[i - 3][:CourseSelectW1ZoneMapo[i - 3].index(':') + 2] + '0.0}'
-        elif worldNo == 2 and StageID[StageID.index(':') + 2:] != '70':
-            for i, elem in enumerate(CourseSelectW2ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem:
-                    if 'ModelName: Miniature' in CourseSelectW2ZoneMapo[i - 4]:
-                        CourseSelectW2ZoneMapn[i - 4] = CourseSelectW2ZoneMapo[i - 4][:CourseSelectW2ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectW2ZoneMapo[i - 6]:
-                        CourseSelectW2ZoneMapn[i - 6] = CourseSelectW2ZoneMapo[i - 6][:CourseSelectW2ZoneMapo[i - 6].index(':') + 2] + MiniatureName
-        elif worldNo == 3 and StageID[StageID.index(':') + 2:] != '70' and StageID[StageID.index(':') + 2:] != '101':
-            for i, elem in enumerate(CourseSelectW3ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem and '101' not in elem:
-                    if 'ModelName: Miniature' in CourseSelectW3ZoneMapo[i - 4]:
-                        CourseSelectW3ZoneMapn[i - 4] = CourseSelectW3ZoneMapo[i - 4][:CourseSelectW3ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectW3ZoneMapo[i - 6]:
-                        CourseSelectW3ZoneMapn[i - 6] = CourseSelectW3ZoneMapo[i - 6][:CourseSelectW3ZoneMapo[i - 6].index(':') + 2] + MiniatureName
-        elif worldNo == 4 and StageID[StageID.index(':') + 2:] != '70':
-            for i, elem in enumerate(CourseSelectW4ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem:
-                    if 'ModelName: Miniature' in CourseSelectW4ZoneMapo[i - 4]:
-                        CourseSelectW4ZoneMapn[i - 4] = CourseSelectW4ZoneMapo[i - 4][:CourseSelectW4ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectW4ZoneMapo[i - 6]:
-                        CourseSelectW4ZoneMapn[i - 6] = CourseSelectW4ZoneMapo[i - 6][:CourseSelectW4ZoneMapo[i - 6].index(':') + 2] + MiniatureName
-        elif worldNo == 5 and StageID[StageID.index(':') + 2:] != '70':
-            for i, elem in enumerate(CourseSelectW5ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem:
-                    if 'ModelName: Miniature' in CourseSelectW5ZoneMapo[i - 4]:
-                        CourseSelectW5ZoneMapn[i - 4] = CourseSelectW5ZoneMapo[i - 4][:CourseSelectW5ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectW5ZoneMapo[i - 6]:
-                        CourseSelectW5ZoneMapn[i - 6] = CourseSelectW5ZoneMapo[i - 6][:CourseSelectW5ZoneMapo[i - 6].index(':') + 2] + MiniatureName
-        elif worldNo == 6 and StageID[StageID.index(':') + 2:] != '70' and StageID[StageID.index(':') + 2:] != '102':
-            for i, elem in enumerate(CourseSelectW6ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem and '102' not in elem:
-                    if 'ModelName: Miniature' in CourseSelectW6ZoneMapo[i - 4]:
-                        CourseSelectW6ZoneMapn[i - 4] = CourseSelectW6ZoneMapo[i - 4][:CourseSelectW6ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectW6ZoneMapo[i - 6]:
-                        CourseSelectW6ZoneMapn[i - 6] = CourseSelectW6ZoneMapo[i - 6][:CourseSelectW6ZoneMapo[i - 6].index(':') + 2] + MiniatureName
-        elif worldNo == 7:
-            for i, elem in enumerate(CourseSelectW7ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower():
-                    if 'ModelName: Miniature' in CourseSelectW7ZoneMapo[i - 4]:
-                        CourseSelectW7ZoneMapn[i - 4] = CourseSelectW7ZoneMapo[i - 4][:CourseSelectW7ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectW7ZoneMapo[i - 6]:
-                        CourseSelectW7ZoneMapn[i - 6] = CourseSelectW7ZoneMapo[i - 6][:CourseSelectW7ZoneMapo[i - 6].index(':') + 2] + MiniatureName
-        elif worldNo == 8 and StageID[StageID.index(':') + 2:] != '35':
-            for i, elem in enumerate(CourseSelectW8ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower() and '35' not in elem:
-                    if 'ModelName: Miniature' in CourseSelectW8ZoneMapo[i - 4]:
-                        CourseSelectW8ZoneMapn[i - 4] = CourseSelectW8ZoneMapo[i - 4][:CourseSelectW8ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectW8ZoneMapo[i - 6]:
-                        CourseSelectW8ZoneMapn[i - 6] = CourseSelectW8ZoneMapo[i - 6][:CourseSelectW8ZoneMapo[i - 6].index(':') + 2] + MiniatureName
-        elif worldNo >= 9 and StageID[StageID.index(':') + 2:] != '70':
-            for i, elem in enumerate(CourseSelectS1ZoneMapo):
-                if StageID[StageID.index('S'):].lower() in elem.lower() and '70' not in elem:
-                    if 'ModelName: Miniature' in CourseSelectS1ZoneMapo[i - 4] and CourseSelectS1ZoneMapo[i + 11][CourseSelectS1ZoneMapo[i + 11].index(':') + 2:] == str(worldNo):
-                        CourseSelectS1ZoneMapn[i - 4] = CourseSelectS1ZoneMapo[i - 4][:CourseSelectS1ZoneMapo[i - 4].index(':') + 2] + MiniatureName
-                    elif 'ModelName: Miniature' in CourseSelectS1ZoneMapo[i - 6] and CourseSelectS1ZoneMapo[i + 15][CourseSelectS1ZoneMapo[i + 15].index(':') + 2:] == str(worldNo):
-                        CourseSelectS1ZoneMapn[i - 6] = CourseSelectS1ZoneMapo[i - 6][:CourseSelectS1ZoneMapo[i - 6].index(':') + 2] + MiniatureName
+        for i, elem in enumerate(mapYMLs[mapYMLs_index]):
+            if StageID[StageID.index('S'):].lower() in elem.lower() and ((worldNo == 1 and '70' not in elem and '35' not in elem) or ((worldNo == 2 or worldNo == 4 or worldNo == 5 or worldNo >= 9) and '70' not in elem) or (worldNo == 3 and '70' not in elem and '101' not in elem) or (worldNo == 6 and '70' not in elem and '102' not in elem) or worldNo == 7 or (worldNo == 8 and '35' not in elem)):
+                if 'ModelName: Miniature' in mapYMLs[mapYMLs_index][i - 4] and mapYMLs[mapYMLs_index][i + 11][mapYMLs[mapYMLs_index][i + 11].index(':') + 2:] == str(worldNo):
+                    mapYMLs[mapYMLs_index][i - 4] = mapYMLs[mapYMLs_index][i - 4][:mapYMLs[mapYMLs_index][i - 4].index(':') + 2] + MiniatureName
+                elif 'ModelName: Miniature' in mapYMLs[mapYMLs_index][i - 6] and mapYMLs[mapYMLs_index][i + 15][mapYMLs[mapYMLs_index][i + 15].index(':') + 2:] == str(worldNo):
+                    mapYMLs[mapYMLs_index][i - 6] = mapYMLs[mapYMLs_index][i - 6][:mapYMLs[mapYMLs_index][i - 6].index(':') + 2] + MiniatureName
+                if worldNo == 1 and StageID[StageID.index(':') + 2:] == '1':
+                    if ' Rotate: ' in mapYMLs[mapYMLs_index][i - 2]:
+                        mapYMLs[mapYMLs_index][i - 2] = mapYMLs[mapYMLs_index][i - 2][:mapYMLs[mapYMLs_index][i - 2].index(':') + 2] + '{X: 0.0, Y: -0.0, Z: 0.0}'  # Fix rotation for World 1-1
+                    elif ' Rotate: ' in mapYMLs[mapYMLs_index][i - 4]:
+                        mapYMLs[mapYMLs_index][i - 4] = mapYMLs[mapYMLs_index][i - 4][:mapYMLs[mapYMLs_index][i - 4].index(':') + 2] + '{X: 0.0, Y: -0.0,'
+                        mapYMLs[mapYMLs_index][i - 3] = mapYMLs[mapYMLs_index][i - 3][:mapYMLs[mapYMLs_index][i - 3].index(':') + 2] + '0.0}'
 
         if stageNo == 114:
             changeTo = 'GoalPoleLast'
@@ -520,7 +388,7 @@ def randomizer():
         else:
             changeFrom = 'GoalPole'
 
-        if StageName[StageName.index(':') + 2:] not in ['EnterCatMarioStage', 'SnowBallParkStage', 'ShortGardenStage', 'SavannaRockStage', 'BombCaveStage', 'GearSweetsStage', 'ArrangeSavannaRockStage']:  # These stages are avoided as opening them causes a stack error due to recursive loops within the map BYML
+        if StageName[StageName.index(':') + 2:] not in ['EnterCatMarioStage', 'SnowBallParkStage', 'ShortGardenStage', 'KillerExpressStage', 'SavannaRockStage', 'BombCaveStage', 'GearSweetsStage', 'EnemyExpressStage', 'ArrangeSavannaRockStage']:  # These stages are avoided as opening them causes a stack error due to recursive loops within the map BYML
             if changeFrom != changeTo:
                 goalPoleChanges(changeTo, changeFrom, StageName[StageName.index(':') + 2:], sPath, srPath, endianness)  # Correct the Goal Pole at the end of the stages if possible.
             else:
@@ -529,222 +397,51 @@ def randomizer():
             print('Skipped due to stack overflow.')
 
         bar += 1
-        dpg.configure_item("progress", default_value=bar / 174)
+        dpg.configure_item("progress", default_value=bar / 172)
 
     print('Total Green Star Count: ' + str(currentGreenStars))
     print('Randomized stages!')
 
-    doc = '\n'.join(StageListNew)
     # Creating new SZS filers with the modified files.
     print('Writing StageList.szs')
     writer = SarcWriter()
     writer.set_endianness(endianness)
-    writer.files['StageList.byml'] = byml.to_binary(byml.from_text(doc), False, 2)  # Adding to SARC.
+    writer.files['StageList.byml'] = byml.to_binary(byml.from_text('\n'.join(StageListNew)), False, 2)  # Adding to SARC.
     data = writer.write()  # Write to SARC
 
     with open(os.path.join(rPath, "StageList.szs"), "wb") as randoSZS:
         randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
     print('Written StageList.szs')
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
 
     print('Writing world files:')
 
-    print('Writing CourseSelectW1Zone.szs')
-    w1archive6 = '\n'.join(CourseSelectW1ZoneMapn)
-    w1writer = SarcWriter()
-    w1writer.set_endianness(endianness)
-    w1writer.files['DofParam_obj10.bagldof'] = Bytes(w1archive1)
-    w1writer.files['DofParam_obj9.bagldof'] = Bytes(w1archive2)
-    w1writer.files['DofParam_obj11.bagldof'] = Bytes(w1archive3)
-    w1writer.files['CourseSelectW1ZoneDesign.byml'] = Bytes(w1archive4)
-    w1writer.files['DofParam_obj6.bagldof'] = Bytes(w1archive5)
-    w1writer.files['CourseSelectW1ZoneMap.byml'] = byml.to_binary(byml.from_text(w1archive6), False, 2)
-    w1writer.files['DofParam_obj12.bagldof'] = Bytes(w1archive7)
-    w1writer.files['CameraParam.byml'] = Bytes(w1archive8)
-    w1writer.files['DofParam_obj7.bagldof'] = Bytes(w1archive9)
-    w1writer.files['CourseSelectW1ZoneSound.byml'] = Bytes(w1archive10)
-    w1writer.files['DofParam_obj8.bagldof'] = Bytes(w1archive11)
-    w1data = w1writer.write()
+    for i in worlds:
+        print('Writing ' + i[0])
+        writer = SarcWriter()
+        writer.set_endianness(endianness)
+        for j in i[1]:
+            if j == i[0][:i[0].index('.')] + 'Map.byml':
+                writer.files[j] = byml.to_binary(byml.from_text('\n'.join(mapYMLs[worlds.index(i)])), False, 2)
+            else:
+                writer.files[j] = Bytes(worldArchives[worlds.index(i)].get_file(j).data)
+        data = writer.write()
 
-    with open(os.path.join(srPath, 'CourseSelectW1Zone.szs'), 'wb') as w1:
-        w1.write(yaz0.compress(w1data[1]))
-    print('Written CourseSelectW1Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Writing CourseSelectW2Zone.szs')
-    w2archive2 = '\n'.join(CourseSelectW2ZoneMapn)
-    w2writer = SarcWriter()
-    w2writer.set_endianness(endianness)
-    w2writer.files['DofParam_obj4.bagldof'] = Bytes(w2archive1)
-    w2writer.files['CourseSelectW2ZoneMap.byml'] = byml.to_binary(byml.from_text(w2archive2), False, 2)
-    w2writer.files['DofParam_obj9.bagldof'] = Bytes(w2archive3)
-    w2writer.files['DofParam_obj5.bagldof'] = Bytes(w2archive4)
-    w2writer.files['CourseSelectW2ZoneSound.byml'] = Bytes(w2archive5)
-    w2writer.files['DofParam_obj6.bagldof'] = Bytes(w2archive6)
-    w2writer.files['CameraParam.byml'] = Bytes(w2archive7)
-    w2writer.files['DofParam_obj7.bagldof'] = Bytes(w2archive8)
-    w2writer.files['DofParam_obj3.bagldof'] = Bytes(w2archive9)
-    w2writer.files['CourseSelectW2ZoneDesign.byml'] = Bytes(w2archive10)
-    w2writer.files['DofParam_obj8.bagldof'] = Bytes(w2archive11)
-    w2data = w2writer.write()
-
-    with open(os.path.join(srPath, 'CourseSelectW2Zone.szs'), 'wb') as w2:
-        w2.write(yaz0.compress(w2data[1]))
-    print('Written CourseSelectW2Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Writing CourseSelectW3Zone.szs')
-    w3archive2 = '\n'.join(CourseSelectW3ZoneMapn)
-    w3writer = SarcWriter()
-    w3writer.set_endianness(endianness)
-    w3writer.files['CourseSelectW3ZoneDesign.byml'] = Bytes(w3archive1)
-    w3writer.files['CourseSelectW3ZoneMap.byml'] = byml.to_binary(byml.from_text(w3archive2), False, 2)
-    w3writer.files['CameraParam.byml'] = Bytes(w3archive3)
-    w3writer.files['DofParam_obj27.bagldof'] = Bytes(w3archive4)
-    w3writer.files['CourseSelectW3ZoneSound.byml'] = Bytes(w3archive5)
-    w3writer.files['DofParam_obj28.bagldof'] = Bytes(w3archive6)
-    w3data = w3writer.write()
-
-    with open(os.path.join(srPath, 'CourseSelectW3Zone.szs'), 'wb') as w3:
-        w3.write(yaz0.compress(w3data[1]))
-    print('Written CourseSelectW3Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Writing CourseSelectW4Zone.szs')
-    w4archive2 = '\n'.join(CourseSelectW4ZoneMapn)
-    w4writer = SarcWriter()
-    w4writer.set_endianness(endianness)
-    w4writer.files['DofParam_obj4.bagldof'] = Bytes(w4archive1)
-    w4writer.files['CourseSelectW4ZoneMap.byml'] = byml.to_binary(byml.from_text(w4archive2), False, 2)
-    w4writer.files['DofParam_obj5.bagldof'] = Bytes(w4archive3)
-    w4writer.files['CourseSelectW4ZoneSound.byml'] = Bytes(w4archive4)
-    w4writer.files['DofParam_obj6.bagldof'] = Bytes(w4archive5)
-    w4writer.files['CameraParam.byml'] = Bytes(w4archive6)
-    w4writer.files['CourseSelectW4ZoneDesign.byml'] = Bytes(w4archive7)
-    w4data = w4writer.write()
-
-    with open(os.path.join(srPath, 'CourseSelectW4Zone.szs'), 'wb') as w4:
-        w4.write(yaz0.compress(w4data[1]))
-    print('Written CourseSelectW4Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Writing CourseSelectW5Zone.szs')
-    w5archive6 = '\n'.join(CourseSelectW5ZoneMapn)
-    w5writer = SarcWriter()
-    w5writer.set_endianness(endianness)
-    w5writer.files['DofParam_obj4.bagldof'] = Bytes(w5archive1)
-    w5writer.files['CourseSelectW5ZoneDesign.byml'] = Bytes(w5archive2)
-    w5writer.files['DofParam_obj5.bagldof'] = Bytes(w5archive3)
-    w5writer.files['DofParam_obj6.bagldof'] = Bytes(w5archive4)
-    w5writer.files['CameraParam.byml'] = Bytes(w5archive5)
-    w5writer.files['CourseSelectW5ZoneMap.byml'] = byml.to_binary(byml.from_text(w5archive6), False, 2)
-    w5writer.files['DofParam_obj3.bagldof'] = Bytes(w5archive7)
-    w5writer.files['CourseSelectW5ZoneSound.byml'] = Bytes(w5archive8)
-    w5data = w5writer.write()
-
-    with open(os.path.join(srPath, 'CourseSelectW5Zone.szs'), 'wb') as w5:
-        w5.write(yaz0.compress(w5data[1]))
-    print('Written CourseSelectW5Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Writing CourseSelectW6Zone.szs')
-    w6archive7 = '\n'.join(CourseSelectW6ZoneMapn)
-    w6writer = SarcWriter()
-    w6writer.set_endianness(endianness)
-    w6writer.files['DofParam_obj18.bagldof'] = Bytes(w6archive1)
-    w6writer.files['DofParam_obj14.bagldof'] = Bytes(w6archive2)
-    w6writer.files['DofParam_obj10.bagldof'] = Bytes(w6archive3)
-    w6writer.files['DofParam_obj9.bagldof'] = Bytes(w6archive4)
-    w6writer.files['DofParam_obj19.bagldof'] = Bytes(w6archive5)
-    w6writer.files['DofParam_obj15.bagldof'] = Bytes(w6archive6)
-    w6writer.files['CourseSelectW6ZoneMap.byml'] = byml.to_binary(byml.from_text(w6archive7), False, 2)
-    w6writer.files['DofParam_obj11.bagldof'] = Bytes(w6archive8)
-    w6writer.files['CourseSelectW6ZoneSound.byml'] = Bytes(w6archive9)
-    w6writer.files['DofParam_obj6.bagldof'] = Bytes(w6archive10)
-    w6writer.files['DofParam_obj16.bagldof'] = Bytes(w6archive11)
-    w6writer.files['CourseSelectW6ZoneDesign.byml'] = Bytes(w6archive12)
-    w6writer.files['DofParam_obj12.bagldof'] = Bytes(w6archive13)
-    w6writer.files['CameraParam.byml'] = Bytes(w6archive14)
-    w6writer.files['DofParam_obj17.bagldof'] = Bytes(w6archive15)
-    w6writer.files['DofParam_obj13.bagldof'] = Bytes(w6archive16)
-    w6writer.files['DofParam_obj8.bagldof'] = Bytes(w6archive17)
-    w6data = w6writer.write()
-
-    with open(os.path.join(srPath, 'CourseSelectW6Zone.szs'), 'wb') as w6:
-        w6.write(yaz0.compress(w6data[1]))
-    print('Written CourseSelectW6Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Writing CourseSelectW7Zone.szs')
-    w7archive6 = '\n'.join(CourseSelectW7ZoneMapn)
-    w7writer = SarcWriter()
-    w7writer.set_endianness(endianness)
-    w7writer.files['CourseSelectW7ZoneDesign.byml'] = Bytes(w7archive1)
-    w7writer.files['DofParam_obj19.bagldof'] = Bytes(w7archive2)
-    w7writer.files['DofParam_obj22.bagldof'] = Bytes(w7archive3)
-    w7writer.files['CameraParam.byml'] = Bytes(w7archive4)
-    w7writer.files['DofParam_obj23.bagldof'] = Bytes(w7archive5)
-    w7writer.files['CourseSelectW7ZoneMap.byml'] = byml.to_binary(byml.from_text(w7archive6), False, 2)
-    w7writer.files['CourseSelectW7ZoneSound.byml'] = Bytes(w7archive7)
-    w7data = w7writer.write()
-
-    with open(os.path.join(srPath, 'CourseSelectW7Zone.szs'), 'wb') as w7:
-        w7.write(yaz0.compress(w7data[1]))
-    print('Written CourseSelectW7Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Writing CourseSelectW8Zone.szs')
-    w8archive4 = '\n'.join(CourseSelectW8ZoneMapn)
-    w8writer = SarcWriter()
-    w8writer.set_endianness(endianness)
-    w8writer.files['DofParam_obj130.bagldof'] = Bytes(w8archive1)
-    w8writer.files['DofParam_obj129.bagldof'] = Bytes(w8archive2)
-    w8writer.files['DofParam_obj131.bagldof'] = Bytes(w8archive3)
-    w8writer.files['CourseSelectW8ZoneMap.byml'] = byml.to_binary(byml.from_text(w8archive4), False, 2)
-    w8writer.files['CourseSelectW8ZoneSound.byml'] = Bytes(w8archive5)
-    w8writer.files['CourseSelectW8ZoneDesign.byml'] = Bytes(w8archive6)
-    w8writer.files['DofParam_obj132.bagldof'] = Bytes(w8archive7)
-    w8writer.files['CameraParam.byml'] = Bytes(w8archive8)
-    w8writer.files['DofParam_obj133.bagldof'] = Bytes(w8archive9)
-    w8data = w8writer.write()
-
-    with open(os.path.join(srPath, 'CourseSelectW8Zone.szs'), 'wb') as w8:
-        w8.write(yaz0.compress(w8data[1]))
-    print('Written CourseSelectW8Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
-
-    print('Writing CourseSelectS1Zone.szs')
-    s1archive3 = '\n'.join(CourseSelectS1ZoneMapn)
-    s1writer = SarcWriter()
-    s1writer.set_endianness(endianness)
-    s1writer.files['CourseSelectS1ZoneSound.byml'] = Bytes(s1archive1)
-    s1writer.files['CameraParam.byml'] = Bytes(s1archive2)
-    s1writer.files['CourseSelectS1ZoneMap.byml'] = byml.to_binary(byml.from_text(s1archive3), False, 2)
-    s1data = s1writer.write()
-
-    with open(os.path.join(srPath, 'CourseSelectS1Zone.szs'), 'wb') as s1:
-        s1.write(yaz0.compress(s1data[1]))
-    print('Written CourseSelectS1Zone.szs')
-    bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+        with open(os.path.join(srPath, i[0]), 'wb') as f:
+            f.write(yaz0.compress(data[1]))
+        print('Written ' + i[0])
+        bar += 1
+        dpg.configure_item("progress", default_value=bar / 172)
 
     print('Finished writing stage files.')
 
     musicRandomizer(rng, seedRNG, user_data)
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
     langRandomizer(rng, seedRNG, user_data)
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
 
     # For seed history and non-spoiler text file
     if len(str(dpg.get_value('seed'))) == 0:
@@ -779,7 +476,7 @@ def randomizer():
             s.write(''.join(stageID_Name)[:-1])
 
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
 
     with open('seedHistory.txt', 'a+') as h:
         # Seed History file
@@ -792,7 +489,7 @@ def randomizer():
             h.write(''.join(stageID_Name)[:-1])
 
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 174)
+    dpg.configure_item("progress", default_value=bar / 172)
 
     dpg.configure_item("progress", default_value=1)
     dpg.configure_item('dirbutt', enabled=True)
@@ -935,6 +632,27 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                               'Fog.baglfog',
                                                               'UnitPointIlluminant.baglcube',
                                                               'GraphicsStress.baglstress']],
+                  'KoopaChaseLv1Stage': ['KoopaChaseLv1Stage.szs', ['KoopaChaseLv1StageSound.byml',
+                                                                    'DofParam_obj14.bagldof',
+                                                                    'DofParam_obj20.bagldof',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'KoopaChaseLv1StageMap.byml',
+                                                                    'KoopaChaseLv1StageDesign.byml',
+                                                                    'LightStreak.baglgodray',
+                                                                    'DofParam_obj2.bagldof',
+                                                                    'GodRay.baglgodray',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'DofParam_obj13.bagldof',
+                                                                    'Fog.baglfog',
+                                                                    'UnitPointIlluminant.baglcube',
+                                                                    'GraphicsStress.baglstress']],
                   'SideWaveDesertStage': ['SideWaveDesertStage.szs', ['DofParam_obj0.bagldof',
                                                                       'DofParam_obj9.bagldof',
                                                                       'YFog.baglfog',
@@ -1006,6 +724,28 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                           'CategoryLightInfo.bagllitinfostandard',
                                                                           'Fog.baglfog',
                                                                           'UnitPointIlluminant.baglcube']],
+                  'KillerTankStage': ['KillerTankStage.szs', ['DofParam_obj18.bagldof',
+                                                              'KillerTankStageSound.byml',
+                                                              'KillerTankStageMap.byml',
+                                                              'DofParam_obj9.bagldof',
+                                                              'KillerTankStageDesign.byml',
+                                                              'YFog.baglfog',
+                                                              'DofParam_obj15.bagldof',
+                                                              'DirectionalLight.bagldirlit',
+                                                              'GodRay.baglgodray',
+                                                              'DefaultParam.baglblm',
+                                                              'DefaultParam.baglexp',
+                                                              'AreaParamList.baglapl',
+                                                              'CubeMapMgr.baglcube',
+                                                              'CategoryLightInfo.bagllitinfocharacter',
+                                                              'CameraParam.byml',
+                                                              'DofParam_obj7.bagldof',
+                                                              'DepthShadow.bagldptsdw',
+                                                              'DofParam_obj17.bagldof',
+                                                              'CategoryLightInfo.bagllitinfostandard',
+                                                              'Fog.baglfog',
+                                                              'UnitPointIlluminant.baglcube',
+                                                              'GraphicsStress.baglstress']],
                   'SnowBallParkStage': ['SnowBallParkStage.szs', ['DofParam_obj5.bagldof',
                                                                   'YFog.baglfog',
                                                                   'DirectionalLight.bagldirlit',
@@ -1111,6 +851,50 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                       'TruckWaterfallStageDesign.byml',
                                                                       'UnitPointIlluminant.baglcube',
                                                                       'TruckWaterfallStageSound.byml']],
+                  'KillerExpressStage': ['KillerExpressStage.szs', ['DofParam_obj18.bagldof',
+                                                                    'DofParam_obj4.bagldof',
+                                                                    'DofParam_obj14.bagldof',
+                                                                    'DofParam_obj20.bagldof',
+                                                                    'DofParam_obj10.bagldof',
+                                                                    'DofParam_obj9.bagldof',
+                                                                    'KillerExpressStageSound.byml',
+                                                                    'YFog.baglfog',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'DofParam_obj16.bagldof',
+                                                                    'GodRay.baglgodray',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'KillerExpressStageDesign.byml',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'Fog.baglfog',
+                                                                    'UnitPointIlluminant.baglcube',
+                                                                    'KillerExpressStageMap.byml',
+                                                                    'GraphicsStress.baglstress']],
+                  'GateKeeperTentackLv1Stage': ['GateKeeperTentackLv1Stage.szs', ['GateKeeperTentackLv1StageDesign.byml',
+                                                                                  'DofParam_obj79.bagldof',
+                                                                                  'DofParam_obj65.bagldof',
+                                                                                  'YFog.baglfog',
+                                                                                  'DirectionalLight.bagldirlit',
+                                                                                  'DofParam_obj151.bagldof',
+                                                                                  'GateKeeperTentackLv1StageSound.byml',
+                                                                                  'GateKeeperTentackLv1StageMap.byml',
+                                                                                  'DofParam_obj152.bagldof',
+                                                                                  'DefaultParam.baglblm',
+                                                                                  'DefaultParam.baglexp',
+                                                                                  'AreaParamList.baglapl',
+                                                                                  'CubeMapMgr.baglcube',
+                                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                                  'CameraParam.byml',
+                                                                                  'DepthShadow.bagldptsdw',
+                                                                                  'DofParam_obj147.bagldof',
+                                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                                  'Fog.baglfog',
+                                                                                  'UnitPointIlluminant.baglcube']],
                   'CrawlerHillStage': ['CrawlerHillStage.szs', ['DofParam_obj14.bagldof',
                                                                 'DofParam_obj10.bagldof',
                                                                 'CrawlerHillStageDesign.byml',
@@ -1176,6 +960,30 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                     'CategoryLightInfo.bagllitinfostandard',
                                                                     'UnitPointIlluminant.baglcube',
                                                                     'DofParam_obj8.bagldof']],
+                  'BossGorobonStage': ['BossGorobonStage.szs', ['BossGorobonStagePosY.bntx',
+                                                                'DirectionalLight.bagldirlit',
+                                                                'DofParam_obj31.bagldof',
+                                                                'BossGorobonStageNegZ.bntx',
+                                                                'BossGorobonStageNegX.bntx',
+                                                                'DofParam_obj2.bagldof',
+                                                                'DefaultParam.baglblm',
+                                                                'DefaultParam.baglexp',
+                                                                'AreaParamList.baglapl',
+                                                                'CubeMapMgr.baglcube',
+                                                                'CategoryLightInfo.bagllitinfocharacter',
+                                                                'CameraParam.byml',
+                                                                'BossGorobonStagePosZ.bntx',
+                                                                'DepthShadow.bagldptsdw',
+                                                                'DofParam_obj33.bagldof',
+                                                                'BossGorobonStagePosX.bntx',
+                                                                'CategoryLightInfo.bagllitinfostandard',
+                                                                'Fog.baglfog',
+                                                                'BossGorobonStageMap.byml',
+                                                                'UnitPointIlluminant.baglcube',
+                                                                'BossGorobonStageSound.byml',
+                                                                'GraphicsStress.baglstress',
+                                                                'BossGorobonStageDesign.byml',
+                                                                'BossGorobonStageNegY.bntx']],
                   'NokonokoBeachStage': ['NokonokoBeachStage.szs', ['NokonokoBeachStageDesign.byml',
                                                                     'DofParam_obj19.bagldof',
                                                                     'YFog.baglfog',
@@ -1314,6 +1122,23 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                     'UnitPointIlluminant.baglcube',
                                                                     'Default.baglssao',
                                                                     'SneakingLightStageDesign.byml']],
+                  'BossWackunFortressStage': ['BossWackunFortressStage.szs', ['DofParam_obj0.bagldof',
+                                                                              'YFog.baglfog',
+                                                                              'BossWackunFortressStageMap.byml',
+                                                                              'DirectionalLight.bagldirlit',
+                                                                              'DofParam_obj11.bagldof',
+                                                                              'DefaultParam.baglblm',
+                                                                              'DefaultParam.baglexp',
+                                                                              'BossWackunFortressStageDesign.byml',
+                                                                              'BossWackunFortressStageSound.byml',
+                                                                              'AreaParamList.baglapl',
+                                                                              'CubeMapMgr.baglcube',
+                                                                              'CategoryLightInfo.bagllitinfocharacter',
+                                                                              'CameraParam.byml',
+                                                                              'DepthShadow.bagldptsdw',
+                                                                              'CategoryLightInfo.bagllitinfostandard',
+                                                                              'Fog.baglfog',
+                                                                              'UnitPointIlluminant.baglcube']],
                   'RouteDokanTourStage': ['RouteDokanTourStage.szs', ['RouteDokanTourStageMap.byml',
                                                                       'DofParam_obj5.bagldof',
                                                                       'DirectionalLight.bagldirlit',
@@ -1427,6 +1252,46 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                     'CategoryLightInfo.bagllitinfostandard',
                                                                     'UnitPointIlluminant.baglcube',
                                                                     'DofParam_obj28.bagldof']],
+                  'BombTankStage': ['BombTankStage.szs', ['DofParam_obj54.bagldof',
+                                                          'DofParam_obj30.bagldof',
+                                                          'BombTankStageSound.byml',
+                                                          'YFog.baglfog',
+                                                          'DirectionalLight.bagldirlit',
+                                                          'BombTankStageDesign.byml',
+                                                          'DofParam_obj26.bagldof',
+                                                          'DefaultParam.baglblm',
+                                                          'DefaultParam.baglexp',
+                                                          'AreaParamList.baglapl',
+                                                          'CubeMapMgr.baglcube',
+                                                          'CategoryLightInfo.bagllitinfocharacter',
+                                                          'BossArea.baglssao',
+                                                          'CameraParam.byml',
+                                                          'DepthShadow.bagldptsdw',
+                                                          'DofParam_obj27.bagldof',
+                                                          'CategoryLightInfo.bagllitinfostandard',
+                                                          'UnitPointIlluminant.baglcube',
+                                                          'Default.baglssao',
+                                                          'GraphicsStress.baglstress',
+                                                          'BombTankStageMap.byml',
+                                                          'DofParam_obj28.bagldof']],
+                  'GateKeeperBossBunretsuLv1Stage': ['GateKeeperBossBunretsuLv1Stage.szs', ['DofParam_obj79.bagldof',
+                                                                                            'DofParam_obj65.bagldof',
+                                                                                            'YFog.baglfog',
+                                                                                            'DirectionalLight.bagldirlit',
+                                                                                            'DofParam_obj146.bagldof',
+                                                                                            'DefaultParam.baglblm',
+                                                                                            'DefaultParam.baglexp',
+                                                                                            'AreaParamList.baglapl',
+                                                                                            'CubeMapMgr.baglcube',
+                                                                                            'CategoryLightInfo.bagllitinfocharacter',
+                                                                                            'CameraParam.byml',
+                                                                                            'GateKeeperBossBunretsuLv1StageDesign.byml',
+                                                                                            'DepthShadow.bagldptsdw',
+                                                                                            'CategoryLightInfo.bagllitinfostandard',
+                                                                                            'Fog.baglfog',
+                                                                                            'UnitPointIlluminant.baglcube',
+                                                                                            'GateKeeperBossBunretsuLv1StageSound.byml',
+                                                                                            'GateKeeperBossBunretsuLv1StageMap.byml']],
                   'FireBrosFortressStage': ['FireBrosFortressStage.szs', ['FireBrosFortressStageMap.byml',
                                                                           'FireBrosFortressStageSound.byml',
                                                                           'DofParam_obj50.bagldof',
@@ -1533,6 +1398,30 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                 'UnitPointIlluminant.baglcube',
                                                                 'RagingMagmaStageMap.byml',
                                                                 'RagingMagmaStageDesign.byml']],
+                  'KoopaChaseLv2Stage': ['KoopaChaseLv2Stage.szs', ['DofParam_obj10.bagldof',
+                                                                    'YFog.baglfog',
+                                                                    'DofParam_obj1.bagldof',
+                                                                    'DirectionalLight.bagldirlit',
+                                                                    'DofParam_obj11.bagldof',
+                                                                    'KoopaChaseLv2StageSound.byml',
+                                                                    'GodRay.baglgodray',
+                                                                    'DofParam_obj12.bagldof',
+                                                                    'DefaultParam.baglblm',
+                                                                    'DefaultParam.baglexp',
+                                                                    'AreaParamList.baglapl',
+                                                                    'CubeMapMgr.baglcube',
+                                                                    'CategoryLightInfo.bagllitinfocharacter',
+                                                                    'CameraParam.byml',
+                                                                    'DofParam_obj7.bagldof',
+                                                                    'DepthShadow.bagldptsdw',
+                                                                    'KoopaChaseLv2StageDesign.byml',
+                                                                    'CategoryLightInfo.bagllitinfostandard',
+                                                                    'DofParam_obj13.bagldof',
+                                                                    'Fog.baglfog',
+                                                                    'KoopaChaseLv2StageMap.byml',
+                                                                    'UnitPointIlluminant.baglcube',
+                                                                    'GraphicsStress.baglstress',
+                                                                    'DofParam_obj8.bagldof']],
                   'NeedleBridgeStage': ['NeedleBridgeStage.szs', ['NeedleBridgeStageSound.byml',
                                                                   'BonusArea.baglssao',
                                                                   'YFog.baglfog',
@@ -1666,6 +1555,29 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                         'CategoryLightInfo.bagllitinfostandard',
                                                                         'UnitPointIlluminant.baglcube',
                                                                         'GotogotonValleyStageMap.byml']],
+                  'EnemyExpressStage': ['EnemyExpressStage.szs', ['EnemyExpressStageMap.byml',
+                                                                  'DofParam_obj40.bagldof',
+                                                                  'EnemyExpressStageDesign.byml',
+                                                                  'EnemyExpressStageSound.byml',
+                                                                  'DofParam_obj39.bagldof',
+                                                                  'DofParam_obj29.bagldof',
+                                                                  'YFog.baglfog',
+                                                                  'DofParam_obj45.bagldof',
+                                                                  'DirectionalLight.bagldirlit',
+                                                                  'LightStreak.baglgodray',
+                                                                  'DofParam_obj42.bagldof',
+                                                                  'DefaultParam.baglblm',
+                                                                  'DefaultParam.baglexp',
+                                                                  'AreaParamList.baglapl',
+                                                                  'CubeMapMgr.baglcube',
+                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                  'CameraParam.byml',
+                                                                  'DepthShadow.bagldptsdw',
+                                                                  'DofParam_obj23.bagldof',
+                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                  'Fog.baglfog',
+                                                                  'UnitPointIlluminant.baglcube',
+                                                                  'DofParam_obj38.bagldof']],
                   'KoopaLastStage': ['KoopaLastBZone.szs', ['DofParam_obj0.bagldof',
                                                             'KoopaLastBZoneMap.byml',
                                                             'DofParam_obj1.bagldof',
@@ -1673,6 +1585,42 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                             'KoopaLastBZoneSound.byml',
                                                             'CubeMapMgr.baglcube',
                                                             'CameraParam.byml']],
+                  'GateKeeperBossBunretsuLv2Stage': ['GateKeeperBossBunretsuLv2Stage.szs', ['DofParam_obj79.bagldof',
+                                                                                            'DofParam_obj65.bagldof',
+                                                                                            'YFog.baglfog',
+                                                                                            'DirectionalLight.bagldirlit',
+                                                                                            'GateKeeperBossBunretsuLv2StageSound.byml',
+                                                                                            'GateKeeperBossBunretsuLv2StageMap.byml',
+                                                                                            'DofParam_obj146.bagldof',
+                                                                                            'DefaultParam.baglblm',
+                                                                                            'DefaultParam.baglexp',
+                                                                                            'AreaParamList.baglapl',
+                                                                                            'CubeMapMgr.baglcube',
+                                                                                            'CategoryLightInfo.bagllitinfocharacter',
+                                                                                            'CameraParam.byml',
+                                                                                            'DepthShadow.bagldptsdw',
+                                                                                            'CategoryLightInfo.bagllitinfostandard',
+                                                                                            'Fog.baglfog',
+                                                                                            'UnitPointIlluminant.baglcube',
+                                                                                            'GateKeeperBossBunretsuLv2StageDesign.byml']],
+                  'GateKeeperTentackLv2Stage': ['GateKeeperTentackLv2Stage.szs', ['DofParam_obj79.bagldof',
+                                                                                  'DofParam_obj65.bagldof',
+                                                                                  'YFog.baglfog',
+                                                                                  'DirectionalLight.bagldirlit',
+                                                                                  'GateKeeperTentackLv2StageDesign.byml',
+                                                                                  'DofParam_obj146.bagldof',
+                                                                                  'DefaultParam.baglblm',
+                                                                                  'DefaultParam.baglexp',
+                                                                                  'AreaParamList.baglapl',
+                                                                                  'CubeMapMgr.baglcube',
+                                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                                  'CameraParam.byml',
+                                                                                  'DepthShadow.bagldptsdw',
+                                                                                  'GateKeeperTentackLv2StageSound.byml',
+                                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                                  'Fog.baglfog',
+                                                                                  'UnitPointIlluminant.baglcube',
+                                                                                  'GateKeeperTentackLv2StageMap.byml']],
                   'RainbowRoadStage': ['RainbowRoadStage.szs', ['DofParam_obj40.bagldof',
                                                                 'RainbowRoadStageMap.byml',
                                                                 'DirectionalLight.bagldirlit',
@@ -2019,6 +1967,35 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                                 'DepthShadow.bagldptsdw',
                                                                                 'CategoryLightInfo.bagllitinfostandard',
                                                                                 'UnitPointIlluminant.baglcube']],
+                  'ArrangeBossParadeStage': ['ArrangeBossParadeStage.szs', ['DofParam_obj44.bagldof',
+                                                                            'ArrangeBossParadeStageDesign.byml',
+                                                                            'DofParam_obj59.bagldof',
+                                                                            'YFog.baglfog',
+                                                                            'ArrangeBossParadeStageMap.byml',
+                                                                            'DofParam_obj45.bagldof',
+                                                                            'ArrangeBossParadeStageSound.byml',
+                                                                            'DirectionalLight.bagldirlit',
+                                                                            'ShadowMask.baglsdw_mask',
+                                                                            'DofParam_obj46.bagldof',
+                                                                            'LightStreak.baglgodray',
+                                                                            'GodRay.baglgodray',
+                                                                            'DofParam_obj42.bagldof',
+                                                                            'DefaultParam.baglblm',
+                                                                            'DefaultParam.baglexp',
+                                                                            'AreaParamList.baglapl',
+                                                                            'CubeMapMgr.baglcube',
+                                                                            'CategoryLightInfo.bagllitinfocharacter',
+                                                                            'CameraParam.byml',
+                                                                            'DofParam_obj57.bagldof',
+                                                                            'DepthShadow.bagldptsdw',
+                                                                            'DofParam_obj47.bagldof',
+                                                                            'DofParam_obj43.bagldof',
+                                                                            'CategoryLightInfo.bagllitinfostandard',
+                                                                            'Fog.baglfog',
+                                                                            'UnitPointIlluminant.baglcube',
+                                                                            'GraphicsStress.baglstress',
+                                                                            'DofParam_obj8.bagldof',
+                                                                            'DofParam_obj58.bagldof']],
                   'ChampionshipStage': ['ChampionshipGoalZone.szs', ['DofParam_obj0.bagldof',
                                                                      'ChampionshipGoalZoneMap.byml',
                                                                      'CameraParam.byml',
@@ -2028,21 +2005,77 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
         print('Opening ' + stages[StageName][0])
         with open(os.path.join(sPath, stages[StageName][0]), 'rb') as f:
             archive = Sarc(yaz0.decompress(f.read()))
-        files = []
-        # Loop through the file list to get all the files within the archive.
-        for i in stages[StageName][1]:
-            files.append(archive.get_file(i).data)
-        mapIndex = stages[StageName][1].index(stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml')
-        mapYML = byml.to_text(byml.from_binary(files[mapIndex])).split('\n')  # Stack Overflow occurs with some files when running byml.from_binary(<file>)
+        mapYML = byml.to_text(byml.from_binary(archive.get_file(stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml').data)).split('\n')  # Stack Overflow occurs with some files when running byml.from_binary(<file>), hence the affected stages are blocked from using this function.
         mapYML.pop()
         print('Opened ' + stages[StageName][0])
 
         # Loop through the YML to find and replace the proper Goal Pole
-        for line in mapYML:
-            if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
-                mapYML[mapYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
-                print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
-        print(str(StageName) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
+        if StageName in ['KoopaChaseLv1Stage', 'KillerTankStage', 'KillerExpressStage', 'GateKeeperTentackLv1Stage', 'BossGorobonStage', 'BossWackunFortressStage', 'BombTankStage', 'GateKeeperBossBunretsuLv1Stage', 'KoopaChaseLv2Stage', 'EnemyExpressStage', 'GateKeeperBossBunretsuLv2Stage', 'GateKeeperTentackLv2Stage', 'ArrangeBossParadeStage']:
+            # Stages which share goal zones
+            shared = {'CastleGoalZone': ['CastleGoalZone.szs', ['DofParam_obj0.bagldof',
+                                                                'CastleGoalZoneDesign.byml',
+                                                                'DofParam_obj1.bagldof',
+                                                                'DofParam_obj2.bagldof',
+                                                                'CameraParam.byml',
+                                                                'CastleGoalZoneMap.byml']],
+                      'GKCastleGoalZone': ['GKCastleGoalZone.szs', ['DofParam_obj0.bagldof',
+                                                                    'DofParam_obj1.bagldof',
+                                                                    'GKCastleGoalZoneMap.byml',
+                                                                    'DofParam_obj2.bagldof',
+                                                                    'CameraParam.byml',
+                                                                    'GKCastleGoalZoneDesign.byml']]
+                      }
+            if 'GateKeeper' in StageName:
+                zone = 'GKCastleGoalZone'
+            else:
+                zone = 'CastleGoalZone'
+            zoneName = zone[:-8] + changeTo + 'Zone'
+            if not os.path.isfile(os.path.join(srPath, zoneName + '.szs')):
+                print('Opening ' + shared[zone][0])
+                with open(os.path.join(sPath, shared[zone][0]), 'rb') as f:
+                    archive1 = Sarc(yaz0.decompress(f.read()))
+                zoneYML = byml.to_text(byml.from_binary(archive1.get_file(shared[zone][0][:shared[zone][0].index('.')] + 'Map.byml').data)).split('\n')
+                zoneYML.pop()
+                print('Opened ' + shared[zone][0])
+
+                for line in zoneYML:
+                    if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
+                        zoneYML[zoneYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
+                        print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
+                print(str(zone) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
+
+                print('Writing ' + zoneName + '.szs')
+                writer = SarcWriter()
+                writer.set_endianness(endianness)
+                for i in shared[zone][1]:
+                    if zone in i:
+                        if 'Map' in i:
+                            writer.files[zoneName + i[len(zone):]] = byml.to_binary(byml.from_text('\n'.join(zoneYML)), False, 2)
+                        else:
+                            writer.files[zoneName + i[len(zone):]] = Bytes(archive1.get_file(i).data)
+                    else:
+                        writer.files[i] = Bytes(archive1.get_file(i).data)
+                data = writer.write()
+
+                with open(os.path.join(srPath, zoneName + '.szs'), 'wb') as f:
+                    f.write(yaz0.compress(data[1]))
+                print('Written ' + zoneName + '.szs')
+            else:
+                print('New zone file already exists.')
+
+            for line in mapYML:
+                if line[line.index(':') + 2:] == str(zone) and 'UnitConfigName: ' in line:
+                    mapYML[mapYML.index(line)] = line[:line.index(':') + 2] + str(zoneName)
+                    print(str(StageName) + ': Changing from ' + str(zone) + ' to ' + str(zoneName))
+            print(str(StageName) + ': Changed from ' + str(zone) + ' to ' + str(zoneName))
+
+        else:
+            # All other stages
+            for line in mapYML:
+                if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
+                    mapYML[mapYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
+                    print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
+            print(str(StageName) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
 
         print('Writing ' + stages[StageName][0])
         writer = SarcWriter()
@@ -2051,7 +2084,7 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
             if i == stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml':
                 writer.files[i] = byml.to_binary(byml.from_text('\n'.join(mapYML)), False, 2)
             else:
-                writer.files[i] = Bytes(files[stages[StageName][1].index(i)])
+                writer.files[i] = Bytes(archive.get_file(i).data)
         data = writer.write()
 
         with open(os.path.join(srPath, stages[StageName][0]), 'wb') as f:
@@ -2150,7 +2183,7 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
         stageID_Name.append('Green star lock strictness: ' + str(dpg.get_value('sslider')))
     else:
         stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')))
-    stageID_Name.append('\n\nLevel slot, Level name (Original level slot) (Green Stars required, if needed)\n\nWorld ' + str(worldIndex) + '\n')
+    stageID_Name.append('\n\nLevel slot: Level name (Original level slot) (Green Stars required to unlock)\n\nWorld ' + str(worldIndex) + '\n')
 
     # Appending the name of each stage to stageID_name.
     while overallIndex <= 154:
@@ -2418,18 +2451,18 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
             if dpg.get_value("star") == 'Random values':
                 try:
                     if int(GreenStarLockHistory[overallIndex]) > 1:
-                        stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory[overallIndex]) + ' Green Stars)\n'
+                        stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory[overallIndex]) + ' Green Stars to unlock)\n'
                     else:
-                        stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory[overallIndex]) + ' Green Star)\n'
+                        stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory[overallIndex]) + ' Green Star to unlock)\n'
                 except KeyError:
                     pass
             elif dpg.get_value("star") == 'Fully random':
                 try:
                     if GreenStarLockHistory2[overallIndex2 - 1][1] != 0 and GreenStarLockHistory2[overallIndex2 - 1][0] and overallIndex != 34 and overallIndex != 62 and overallIndex != 63 and overallIndex != 64 and overallIndex != 65 and overallIndex != 66 and overallIndex != 81 and overallIndex != 97 and overallIndex != 115:
                         if int(GreenStarLockHistory2[overallIndex2 - 1][1]) > 1:
-                            stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory2[overallIndex2 - 1][1]) + ' Green Stars)\n'
+                            stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory2[overallIndex2 - 1][1]) + ' Green Stars to unlock)\n'
                         else:
-                            stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory2[overallIndex2 - 1][1]) + ' Green Star)\n'
+                            stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory2[overallIndex2 - 1][1]) + ' Green Star to unlock)\n'
                 except KeyError:
                     pass
 
@@ -2540,6 +2573,7 @@ def checkDirectory():
                     dpg.configure_item("dirbutt", label="Load Input Directory")
                     dpg.configure_item('dirtext', color=(255, 0, 0, 255))
                     valid = False
+                    break
         else:
             dpg.configure_item("dirbutt", label="Load Input Directory")
             dpg.configure_item('dirtext', color=(255, 0, 0, 255))
@@ -2739,11 +2773,13 @@ def main():
                 [os.path.join('StageData', 'ClimbMountainStage.szs'), '6507f04bf7e6b8cefe8db7c89aaa3d66'],
                 [os.path.join('StageData', 'DownRiverStage.szs'), 'f705560b0befa8eb403fce9681f2766c'],
                 [os.path.join('StageData', 'FlipCircusStage.szs'), 'd3b65824e48df2c20f36cf88457fba07'],
+                [os.path.join('StageData', 'KoopaChaseLv1Stage.szs'), 'd771745e10a450c4c418760f58f132fd'],
                 [os.path.join('StageData', 'SideWaveDesertStage.szs'), 'db058aabcf057c7e22d7b86b84331550'],
                 [os.path.join('StageData', 'TouchAndMikeSecondZone.szs'), '716248ef3b7342b1957cdc02f264bf39'],
                 [os.path.join('StageData', 'ShadowTunnelStage.szs'), 'cff0484f5df61f53adda6ba00a7de22a'],
                 [os.path.join('StageData', 'RotateFieldGoalZone.szs'), '10edd81cd378dd38d8029a03c3c9b13c'],
                 [os.path.join('StageData', 'DoubleMarioFieldStage.szs'), '476b0ed08205b201d7e4ce48791a8b6b'],
+                [os.path.join('StageData', 'KillerTankStage.szs'), '7b49f92b6d7cfc114caa7328a09a157f'],
                 [os.path.join('StageData', 'SnowBallParkStage.szs'), '4d156d72768e7af2349633bb0002d6c0'],
                 [os.path.join('StageData', 'ClimbWirenetStage.szs'), '9566a5d3efed98459623be0519bb8922'],
                 [os.path.join('StageData', 'TeresaConveyorStage.szs'), 'c734a9133dc75d116693f37f8fb8967e'],
@@ -2751,11 +2787,14 @@ def main():
                 [os.path.join('StageData', 'DokanAquariumGoalZone.szs'), '4a9610b02a249c3f51897b690f5c51de'],
                 [os.path.join('StageData', 'DashRidgeGoalZone.szs'), '5d38430abef73e734bb16b1768a6a8db'],
                 [os.path.join('StageData', 'TruckWaterfallStage.szs'), 'a65c4858a04c898b8797265c56f90e9d'],
+                [os.path.join('StageData', 'KillerExpressStage.szs'), 'a163415a0a334b4313f9f05985799743'],
+                [os.path.join('StageData', 'GateKeeperTentackLv1Stage.szs'), '1c0fdaf0c01cd6273e19434615e35d42'],
                 [os.path.join('StageData', 'CrawlerHillStage.szs'), '283bd56ba10751165ec0ffb2c8a429a1'],
                 [os.path.join('StageData', 'PipePackunDenGoalZone.szs'), '0659d312297da35639371ee8b232f261'],
                 [os.path.join('StageData', 'ChikaChikaBoomerangCZone.szs'), '22461f6f2e7e419840ea5e6ae2bcc1c7'],
                 [os.path.join('StageData', 'TrampolineHighlandStage.szs'), '811bf2091826a35df319317253144dd0'],
                 [os.path.join('StageData', 'GabonMountainStage.szs'), '5b1f5678cbe47860de1d7b671d8d1f46'],
+                [os.path.join('StageData', 'BossGorobonStage.szs'), '4a268c4dc6c3d561b72e07cfc2fdcbc4'],
                 [os.path.join('StageData', 'NokonokoBeachStage.szs'), '0ddbd3cc3863db4fff7fe8660e3e8b7a'],
                 [os.path.join('StageData', 'SwingCircusStage.szs'), '73838e44253443b9aa74429197470109'],
                 [os.path.join('StageData', 'ShortMultiLiftStage.szs'), '02cf1c2d5c7e87949e5dc54b5ece0aa1'],
@@ -2763,6 +2802,7 @@ def main():
                 [os.path.join('StageData', 'BombCaveStage.szs'), '0e9b4c10f4055a71ad4e2f0c01f6e5e2'],
                 [os.path.join('StageData', 'JumpFlipSweetsStage.szs'), '42634042934091cc3535c080fd309ec7'],
                 [os.path.join('StageData', 'SneakingLightStage.szs'), '965dafa390180456cf13cad6e3d54045'],
+                [os.path.join('StageData', 'BossWackunFortressStage.szs'), '9942855cb7167e2b8198c00ac9d7d156'],
                 [os.path.join('StageData', 'RouteDokanTourStage.szs'), '97aa1f39863f800b063b249b4a8f450c'],
                 [os.path.join('StageData', 'WeavingShipGoalZone.szs'), '99c0dbf5c3a3895c43d7719f490b5d4c'],
                 [os.path.join('StageData', 'KarakuriCastleStage.szs'), 'f935189ad818b1c79c99f725171be01e'],
@@ -2770,6 +2810,8 @@ def main():
                 [os.path.join('StageData', 'BlastSnowFieldStage.szs'), '1c4b703322345a4356fd2d662bec4b66'],
                 [os.path.join('StageData', 'ClimbFortressStage.szs'), '1c3e981f58997376e975022dcf0b8f55'],
                 [os.path.join('StageData', 'ChorobonTowerStage.szs'), '146216d73b521cbc89661968b6a2aa78'],
+                [os.path.join('StageData', 'BombTankStage.szs'), '8a8392bdf2330472ee343823c06a19a0'],
+                [os.path.join('StageData', 'GateKeeperBossBunretsuLv1Stage.szs'), 'c9e78cdbfe1d03deb8980fcd6bcddeba'],
                 [os.path.join('StageData', 'FireBrosFortressStage.szs'), '719f42e796d70f5763ed81ff478f6db9'],
                 [os.path.join('StageData', 'DarkFlipPanelStage.szs'), '1dc1b6241522f5fb2b3b9b3667ee3bea'],
                 [os.path.join('StageData', 'ShortAmidaStage.szs'), '7658cafe08abf7eeb6bc513d1c1f48ef'],
@@ -2777,6 +2819,7 @@ def main():
                 [os.path.join('StageData', 'ZigzagBuildingStage.szs'), '5e2af872e6ccb1e5a5fa2cab6356b6df'],
                 [os.path.join('StageData', 'SyumockSpotGoalZone.szs'), 'b1f9f4545071a29b90ac99b082e3a8ad'],
                 [os.path.join('StageData', 'RagingMagmaStage.szs'), '70223364916c33d01a58a194e1858295'],
+                [os.path.join('StageData', 'KoopaChaseLv2Stage.szs'), '55cbb6bc99e98259f2ad2e05dae70df5'],
                 [os.path.join('StageData', 'NeedleBridgeStage.szs'), 'd02912a80bc1db3ed7746d47b9e8d994'],
                 [os.path.join('StageData', 'DownDesertStage.szs'), 'ceca66363c25623ea9e4c78bf2d3b7aa'],
                 [os.path.join('StageData', 'GearSweetsStage.szs'), 'b53e6e2b38d6582995fa71ac596990c6'],
@@ -2784,7 +2827,10 @@ def main():
                 [os.path.join('StageData', 'WaterElevatorCaveStage.szs'), 'ccda4a7f1295f8b4ff38263f19a78c34'],
                 [os.path.join('StageData', 'DarknessHauntedHouseStage.szs'), '849623e724d6a7d9e3ce65137743f691'],
                 [os.path.join('StageData', 'GotogotonValleyStage.szs'), 'c92c8bd7516043870bafcd397186d6a0'],
+                [os.path.join('StageData', 'EnemyExpressStage.szs'), 'fbdb7032420186a14491643ac46591f0'],
                 [os.path.join('StageData', 'KoopaLastBZone.szs'), '4146dbdd3200ca39f100a02253e4b5d6'],
+                [os.path.join('StageData', 'GateKeeperBossBunretsuLv2Stage.szs'), '93f906bbce3459ea324649b111609a08'],
+                [os.path.join('StageData', 'GateKeeperTentackLv2Stage.szs'), 'c7866bd0bb637864e7f554df698742e1'],
                 [os.path.join('StageData', 'RainbowRoadStage.szs'), '9c112b9a88b2736a3147bd34d7e9b885'],
                 [os.path.join('StageData', 'GalaxyRoadStage.szs'), '7c42386b3ae84188cd3d97354e03f334'],
                 [os.path.join('StageData', 'WheelCanyonStage.szs'), '184cfc1fb0087c3cfb95c47ea8508dd9'],
@@ -2810,6 +2856,7 @@ def main():
                 [os.path.join('StageData', 'ArrangeNokonokoBeachStage.szs'), 'ca7d07aa341d9f62c3edc40bab035be8'],
                 [os.path.join('StageData', 'ArrangeHexScrollStage.szs'), '6afac4848b5eeab1a05d5d569049823d'],
                 [os.path.join('StageData', 'ArrangeNeedleBridgeStage.szs'), '94d4f54b266a69c9abb3d5e048f001a3'],
+                [os.path.join('StageData', 'ArrangeBossParadeStage.szs'), '9fdaca7ff79141026f303011434ddd56'],
                 [os.path.join('StageData', 'ChampionshipGoalZone.szs'), '4e32514bf17a4d2627c3119382910454']]
 
     if os.path.isfile('settings.json'):
