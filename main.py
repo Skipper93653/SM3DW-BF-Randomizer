@@ -235,21 +235,20 @@ def randomizer():
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 6] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 6]  # IllustItemNum
         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageID))) + 8]  # StageName
         currentGreenStarsOld += int(StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
+        GreenStarLockValue = int(currentGreenStars * int(GreenStarLock[GreenStarLock.index(':') + 2:]) / currentGreenStarsOld)  # For 'Random values'
+        GreenStarLockHistory.append([stageNo, GreenStarLockValue])
         GreenStarLockHistory2.append([rng.choice([True, False], size=1, p=[float(dpg.get_value('pslider')), float(1 - dpg.get_value('pslider'))], replace=True), int(currentGreenStars * float(dpg.get_value('sslider')))])
         if stageNo == 114:
             GreenStarLockHistory2[-1][0] = True  # Force Bowser-Castle to have a star lock when setting is on 'Fully random'
-        if dpg.get_value("star") == 'Disabled' or float(dpg.get_value('sslider')) == 0 or 'GateKeeper' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 49 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100 or stageNo == 113 or stageNo == 117 or stageNo == 118:
+        if dpg.get_value("star") == 'Disabled' or float(dpg.get_value('sslider')) == 0 or stageNo == 11 or stageNo == 22 or stageNo == 36 or stageNo == 48 or stageNo == 49 or stageNo == 68 or stageNo == 83 or stageNo == 99 or stageNo == 100 or stageNo == 113 or stageNo == 117 or stageNo == 118:
             # Remove all Green Star Locks when encountered
             print('Removing green star lock...')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
             GreenStarLockHistory2[-1][0] = False
         elif dpg.get_value("star") == 'Random values':
             # Calculate a new green star lock based on the vanilla lock value and multiply it by the ratio of the new star count to the old star count up to that point
-            GreenStarLockValue = int(currentGreenStars * int(GreenStarLock[GreenStarLock.index(':') + 2:]) / currentGreenStarsOld)
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = GreenStarLock[:GreenStarLock.index(':') + 2] + str(GreenStarLockValue)
             print('Changing green star lock value!')
-            if GreenStarLockValue != 0:
-                GreenStarLockHistory.append([stageNo, GreenStarLockValue])
         elif dpg.get_value("star") == 'Fully random':
             # Fully new star lock
             if GreenStarLockHistory2[-1][0]:
@@ -276,7 +275,7 @@ def randomizer():
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 妖精の家'  # StageType for Stamp Houses.
             elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType.
-                if stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130:
+                if (stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130) and ((GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (GreenStarLockHistory2[-1][1] == 0 and dpg.get_value('star') == 'Fully random')):
                     print('Roulette StageType fixed with Roulette StageType!')
                     StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: カジノ部屋'  # StageType for Roulettes.
                 # A lucky house where the golden express usually is gets it the golden express stage type.
@@ -303,11 +302,17 @@ def randomizer():
                 # If it is a boss blockade...
                 if StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv2Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage':
                     print('Boss Blockade StageType fixed!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー[GPあり]'  # StageType for Boss Blockades.
+                    if (GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (GreenStarLockHistory2[-1][1] == 0 and dpg.get_value('star') == 'Fully random'):
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー[GPあり]'  # StageType for Boss Blockades.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 通常'  # StageType for normal levels.
                 # If it is a normal boss blockade...
                 else:
                     print('Blockade StageType fixed!')
-                    StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー'  # StageType for Blockades.
+                    if (GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (GreenStarLockHistory2[-1][1] == 0 and dpg.get_value('star') == 'Fully random'):
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー'  # StageType for Blockades.
+                    else:
+                        StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ミステリーハウス'  # StageType for MysteryHouses.
             elif 'TouchAndMike' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] or 'KarakuriCastle' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 print('Gimmick stage StageType fixed!')
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: DRC専用'
@@ -434,7 +439,7 @@ def randomizer():
         bar += 1
         dpg.configure_item("progress", default_value=bar / 172)
 
-    print('Finished writing stage files.')
+    print('Finished writing world files.')
 
     musicRandomizer(rng, seedRNG, user_data)
     bar += 1
@@ -2452,7 +2457,7 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
                 try:
                     if int(GreenStarLockHistory[overallIndex]) > 1:
                         stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory[overallIndex]) + ' Green Stars to unlock)\n'
-                    else:
+                    elif int(GreenStarLockHistory[overallIndex]) == 1:
                         stageID_Name[-1] = stageID_Name[-1][:-1] + ' (requires ' + str(GreenStarLockHistory[overallIndex]) + ' Green Star to unlock)\n'
                 except KeyError:
                     pass
@@ -2536,16 +2541,19 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
     print('Generated spoiler file!')
 
 
+# Load input directory
 def directory(sender, app_data):
     dpg.set_value("dirtext", app_data['file_path_name'])  # Update directory text box with selected directory
     checkDirectory()
 
 
+# Load output directory
 def rdirectory(sender, app_data):
     dpg.set_value("rdirtext", app_data['file_path_name'])
     checkDirectory()
 
 
+# Check if selected directories are valid
 def checkDirectory():
     valid = True
 
@@ -2595,6 +2603,7 @@ def checkDirectory():
         dpg.set_value('randotip', 'To be able to start the randomizer, select a valid input and output directory.')
 
 
+# Show slider depending on green star setting
 def showSlider():
     if dpg.get_value('star') == 'Fully random':
         dpg.show_item('pslider')
@@ -2604,6 +2613,7 @@ def showSlider():
         dpg.hide_item('sslider')
 
 
+# Save settings to json
 def saveSettings():
     settings.update({'dir': str(dpg.get_value('dirtext')),
                      'rdir': str(dpg.get_value('rdirtext')),
@@ -2619,6 +2629,7 @@ def saveSettings():
         s.write(json.dumps(settings))
 
 
+# Speedrunner mode locking settings
 def speedrunner():
     if dpg.get_value('speedrun'):
         dpg.set_value('spoil', False)
@@ -2642,6 +2653,7 @@ def speedrunner():
         dpg.configure_item('sslider', enabled=True)
 
 
+# Render DearPyGUI
 def show():
     dpg.setup_dearpygui()
     dpg.show_viewport()
@@ -2722,7 +2734,7 @@ class GUI:
                     with dpg.tooltip('sslider'):
                         dpg.add_text('CTRL+Left Click to enter a specific value.\n'
                                      'Control the strictness for how many green stars you need to have to open the green star locks.')
-                    showSlider()
+                showSlider()
                 speedrunner()
                 with dpg.tab(tag="t3", label="Credits"):  # Credits tab
                     dpg.add_text("Super Mario 3D World Randomizer credits:\n\n"
@@ -2753,6 +2765,7 @@ class GUI:
             dpg.add_button(label="Close", callback=lambda: dpg.configure_item("popup", show=False))
 
 
+# Main program
 def main():
     global settings, interface, version, hashDict
     version = 'v3.0.0'
@@ -2879,7 +2892,7 @@ def main():
             settings.update({'pslider': 0.15000000596046448})
         if float(settings['sslider']) < 0 or float(settings['sslider']) > 1:
             settings.update({'sslider': 0.606080949306488})
-        if str(settings['star']) != 'Fully random' or str(settings['star']) != 'Random values' or str(settings['star']) != 'Disabled':
+        if str(settings['star']) != 'Fully random' and str(settings['star']) != 'Random values' and str(settings['star']) != 'Disabled':
             settings.update({'star': 'Fully random'})
         bool(settings['speedrun'])
         bool(settings['spoil'])
@@ -2897,7 +2910,7 @@ def main():
                         'pslider': 0.15000000596046448,
                         'sslider': 0.606080949306488}
             s.write(json.dumps(settings))
-
+    print(settings['star'])
     interface = GUI('Super Mario 3D World Randomizer', (800, 800), settings)  # Initialise the main window
     show()  # Show the main window
 
