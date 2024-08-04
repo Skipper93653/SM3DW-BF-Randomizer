@@ -40,16 +40,16 @@ Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if
 * Stamps do not randomize with stage so the stamp screen is not fully functional.
 * The course list may crash the game.
 * Some stage numbers are glitched.
-* The World Warp Pipes which should take you to the next world do not work and just kick you out of the stage.
+* The World Warp Pipes which should take you to the next world do not work and just kick you out of the stage if the stages containing them are not on World 1-2 or World 4-2.
 * Sometimes, with randomized music, the music may sometimes cut out abruptly.
 * Lucky Houses do not disappear after use, but they cannot be re-entered.
+* If a blockade is locked behind a Bowser statue, the music does not play. However, it does start to play if it is a fight against Hisstocrat or Motley Bossblob.
 
 ## Potential future features in no particular order
 
 * Wii U support
 * Bowser's Fury island randomizer
 * Character statistics randomizer
-* Adjusting the end-of-level Goal Poles to properly represent the new location of the level e.g. levels where a castle used to be will now have the castle Goal Pole, castles where a normal level used to be will now have the normal Goal Pole, etc.
 * Doing something with the World Warp Pipes in Koopa Troopa Cave and Piranha Creeper Creek.
 
 ## Building

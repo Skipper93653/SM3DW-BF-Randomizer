@@ -275,7 +275,7 @@ def randomizer():
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 妖精の家'  # StageType for Stamp Houses.
             elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
                 # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType.
-                if (stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130) and ((GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (GreenStarLockHistory2[-1][1] == 0 and dpg.get_value('star') == 'Fully random')):
+                if (stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130) and ((GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (((GreenStarLockHistory2[-1][1] == 0 and GreenStarLockHistory2[-1][0]) or not GreenStarLockHistory2[-1][0]) and dpg.get_value('star') == 'Fully random')):
                     print('Roulette StageType fixed with Roulette StageType!')
                     StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: カジノ部屋'  # StageType for Roulettes.
                 # A lucky house where the golden express usually is gets it the golden express stage type.
@@ -302,14 +302,14 @@ def randomizer():
                 # If it is a boss blockade...
                 if StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv2Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage':
                     print('Boss Blockade StageType fixed!')
-                    if (GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (GreenStarLockHistory2[-1][1] == 0 and dpg.get_value('star') == 'Fully random'):
+                    if (GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (((GreenStarLockHistory2[-1][1] == 0 and GreenStarLockHistory2[-1][0]) or not GreenStarLockHistory2[-1][0]) and dpg.get_value('star') == 'Fully random'):
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー[GPあり]'  # StageType for Boss Blockades.
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 通常'  # StageType for normal levels.
                 # If it is a normal boss blockade...
                 else:
                     print('Blockade StageType fixed!')
-                    if (GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (GreenStarLockHistory2[-1][1] == 0 and dpg.get_value('star') == 'Fully random'):
+                    if (GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (((GreenStarLockHistory2[-1][1] == 0 and GreenStarLockHistory2[-1][0]) or not GreenStarLockHistory2[-1][0]) and dpg.get_value('star') == 'Fully random'):
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー'  # StageType for Blockades.
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ミステリーハウス'  # StageType for MysteryHouses.
@@ -2910,7 +2910,6 @@ def main():
                         'pslider': 0.15000000596046448,
                         'sslider': 0.606080949306488}
             s.write(json.dumps(settings))
-    print(settings['star'])
     interface = GUI('Super Mario 3D World Randomizer', (800, 800), settings)  # Initialise the main window
     show()  # Show the main window
 
