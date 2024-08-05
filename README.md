@@ -12,6 +12,8 @@ You can also run from source if you are using macOS or Linux by opening [this pr
 
 Select a valid unmodified RomFS dump (the root of the RomFS directory - contains folders such as `StageData`, `SystemData`, etc.) of Super Mario 3D World + Bowser's Fury (either v1.0.0 or v1.1.0), enable any additional options and then hit the 'Randomize!' button and wait for the pop-up window to tell you the process has finished, this should generate a folder called `SM3DWR-<seed>` (with 'seed' being the seed used by the random number generator).
 
+Playing with a mismatched version (e.g. v1.0.0 RomFS randomizer base with the game on v1.1.0 or vice versa) may have unintended consequences.
+
 ### Playing with the newly generated files
 
 Note: enable with other mods at your own risk, as this mod is only designed to be compatible with the vanilla game.
@@ -48,7 +50,7 @@ Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if
 * If a non-boss blockade is locked behind a Bowser statue, the music does not play after you enter it.
 * The music may stop playing after dying on the Coin Express until reaching the roulette at the end of the stage under some circumstances.
 * The Goal Poles for 'Super Bell Hill', 'Snowball Park', 'Pretty Plaza Panic', 'The Bullet Bill Express', 'Sprawling Savanna', 'Bob-ombs Below', 'Cookie Cogworks', 'The Bowser Express', and 'Sprawling Savanna Rabbit Run' can never change due to stack overflow errors due to how oead parses their map files as they contain recursive nodes.
-* The Goal Poles for 'The Great Goal Pole' and 'Back to Hands-on Halls' can never be changed due to the runaway Goal Pole not being able to change its appearance to the castle Goal Pole or the ending Goal Pole.
+* The Goal Poles for 'The Great Goal Pole' and 'Back to Hands-on Hall' can never be changed due to the runaway Goal Pole not being able to change its appearance to the castle Goal Pole or the ending Goal Pole.
 
 ## Potential future features in no particular order
 

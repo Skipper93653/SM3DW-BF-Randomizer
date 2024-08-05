@@ -2570,6 +2570,27 @@ def checkDirectory():
                 else:
                     seedRNG *= ord(i)
 
+    # Use BuildInfo.txt to determine version.
+    if os.path.isfile(os.path.join(dpg.get_value('dirtext'), 'DebugData', 'BuildInfo.txt')):
+        with open(os.path.join(dpg.get_value('dirtext'), 'DebugData', 'BuildInfo.txt'), 'rb') as ver:
+            verHash = hashlib.md5(ver.read())
+            if len(hashDict) == 100:  # If it has not been appended to yet.
+                if verHash.hexdigest() == '426587d8d4f6353f2ae31b31f9b8bc43':  # v1.1.0
+                    hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), '7b49f92b6d7cfc114caa7328a09a157f'])
+                    hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'fbdb7032420186a14491643ac46591f0'])
+                else:  # v1.0.0
+                    hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), 'b64dd19b581055fcc8e9a05b457deac8'])
+                    hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'c70160743002c8736c6ba6537bdbba98'])
+            else:
+                if verHash.hexdigest() == '426587d8d4f6353f2ae31b31f9b8bc43':
+                    hashDict[-2][1] = '7b49f92b6d7cfc114caa7328a09a157f'
+                    hashDict[-1][1] = 'fbdb7032420186a14491643ac46591f0'
+                else:
+                    hashDict[-2][1] = 'b64dd19b581055fcc8e9a05b457deac8'
+                    hashDict[-1][1] = 'c70160743002c8736c6ba6537bdbba98'
+    else:
+        valid = False
+
     for i in hashDict:  # Loop through the array to compare the hash, if one file fails, the entire check fails.
         if os.path.isfile(os.path.join(dpg.get_value('dirtext'), i[0])):
             with open(os.path.join(dpg.get_value('dirtext'), i[0]), 'rb') as f:
@@ -2799,7 +2820,6 @@ def main():
                 [os.path.join('StageData', 'ShadowTunnelStage.szs'), 'cff0484f5df61f53adda6ba00a7de22a'],
                 [os.path.join('StageData', 'RotateFieldGoalZone.szs'), '10edd81cd378dd38d8029a03c3c9b13c'],
                 [os.path.join('StageData', 'DoubleMarioFieldStage.szs'), '476b0ed08205b201d7e4ce48791a8b6b'],
-                [os.path.join('StageData', 'KillerTankStage.szs'), '7b49f92b6d7cfc114caa7328a09a157f'],
                 [os.path.join('StageData', 'SnowBallParkStage.szs'), '4d156d72768e7af2349633bb0002d6c0'],
                 [os.path.join('StageData', 'ClimbWirenetStage.szs'), '9566a5d3efed98459623be0519bb8922'],
                 [os.path.join('StageData', 'TeresaConveyorStage.szs'), 'c734a9133dc75d116693f37f8fb8967e'],
@@ -2847,7 +2867,6 @@ def main():
                 [os.path.join('StageData', 'WaterElevatorCaveStage.szs'), 'ccda4a7f1295f8b4ff38263f19a78c34'],
                 [os.path.join('StageData', 'DarknessHauntedHouseStage.szs'), '849623e724d6a7d9e3ce65137743f691'],
                 [os.path.join('StageData', 'GotogotonValleyStage.szs'), 'c92c8bd7516043870bafcd397186d6a0'],
-                [os.path.join('StageData', 'EnemyExpressStage.szs'), 'fbdb7032420186a14491643ac46591f0'],
                 [os.path.join('StageData', 'KoopaLastBZone.szs'), '4146dbdd3200ca39f100a02253e4b5d6'],
                 [os.path.join('StageData', 'GateKeeperBossBunretsuLv2Stage.szs'), '93f906bbce3459ea324649b111609a08'],
                 [os.path.join('StageData', 'GateKeeperTentackLv2Stage.szs'), 'c7866bd0bb637864e7f554df698742e1'],
