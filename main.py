@@ -302,14 +302,14 @@ def randomizer():
                 # If it is a boss blockade...
                 if StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperTentackLv2Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv1Stage' or StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8] == '    StageName: GateKeeperBossBunretsuLv2Stage':
                     print('Boss Blockade StageType fixed!')
-                    if (GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (((GreenStarLockHistory2[-1][1] == 0 and GreenStarLockHistory2[-1][0]) or not GreenStarLockHistory2[-1][0]) and dpg.get_value('star') == 'Fully random'):
+                    if ((GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (((GreenStarLockHistory2[-1][1] == 0 and GreenStarLockHistory2[-1][0]) or not GreenStarLockHistory2[-1][0]) and dpg.get_value('star') == 'Fully random')) and (stageNo != 7 and stageNo != 110):
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー[GPあり]'  # StageType for Boss Blockades.
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 通常'  # StageType for normal levels.
                 # If it is a normal boss blockade...
                 else:
                     print('Blockade StageType fixed!')
-                    if (GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (((GreenStarLockHistory2[-1][1] == 0 and GreenStarLockHistory2[-1][0]) or not GreenStarLockHistory2[-1][0]) and dpg.get_value('star') == 'Fully random'):
+                    if ((GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (((GreenStarLockHistory2[-1][1] == 0 and GreenStarLockHistory2[-1][0]) or not GreenStarLockHistory2[-1][0]) and dpg.get_value('star') == 'Fully random')) and (stageNo != 7 and stageNo != 110):
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ゲートキーパー'  # StageType for Blockades.
                     else:
                         StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: ミステリーハウス'  # StageType for MysteryHouses.
@@ -2738,19 +2738,26 @@ class GUI:
                 speedrunner()
                 with dpg.tab(tag="t3", label="Credits"):  # Credits tab
                     dpg.add_text("Super Mario 3D World Randomizer credits:\n\n"
+                                 "Executable built using Nuitka.\n\n"
                                  "Developer:\n"
-                                 "Skipper93653\n\n"
+                                 "Skipper93653 (Toby Bailey)\n\n"
                                  "Module Credits:\n"
-                                 "ZeldaMods for oead.\n"
-                                 "Jonathan Hoffstadt for Dear PyGUI.\n"
-                                 "Nuitka for Nuitka.\n"
-                                 "Built-in Pythod modules.\n"
+                                 "ZeldaMods for oead. oead is licensed under GPL-v2.0. Copyright (c) 2024 ZeldaMods\n"
+                                 "Jonathan Hoffstadt for Dear PyGUI. Dear PyGUI is licensed under MIT. Copyright (c) 2024 Dear PyGui, LLC\n"
+                                 "Built-in Python modules.\n"
                                  "...And all of their contributors.\n\n"
+                                 "Testers:\n"
+                                 "Skipper93653\n"
+                                 "Nintensive\n"
+                                 "FortTheo\n"
+                                 "Baconsizzles_\n"
+                                 "RKGGame\n\n"
                                  "Special Thanks:\n"
                                  "Nintendo EAD/EPD for creating the game.\n"
                                  "Members of the ZeldaMods Discord server for oead help.\n"
-                                 "Members of the 3D World Modding Community Discord server for general help.\n"
-                                 "All testers.")
+                                 "Members of the 3D World Modding Community Discord server for general help.\n\n"
+                                 "SM3DW-BF-Randomizer is licensed under GPL-v2.0.\n"
+                                 "Copyright (c) 2024 Toby Bailey")
         with dpg.window(label="Finished!", modal=True, tag="popup", show=False, autosize=True):
             dpg.add_text("Randomization complete!")
             dpg.add_text("", tag='popupSeed')
@@ -2870,7 +2877,9 @@ def main():
                 [os.path.join('StageData', 'ArrangeHexScrollStage.szs'), '6afac4848b5eeab1a05d5d569049823d'],
                 [os.path.join('StageData', 'ArrangeNeedleBridgeStage.szs'), '94d4f54b266a69c9abb3d5e048f001a3'],
                 [os.path.join('StageData', 'ArrangeBossParadeStage.szs'), '9fdaca7ff79141026f303011434ddd56'],
-                [os.path.join('StageData', 'ChampionshipGoalZone.szs'), '4e32514bf17a4d2627c3119382910454']]
+                [os.path.join('StageData', 'ChampionshipGoalZone.szs'), '4e32514bf17a4d2627c3119382910454'],
+                [os.path.join('StageData', 'CastleGoalZone.szs'), '92370bd36a2da3eda344cbf4592d5835'],
+                [os.path.join('StageData', 'GKCastleGoalZone.szs'), '7caea9de120c2dadf5ead05f08a0a1aa']]
 
     if os.path.isfile('settings.json'):
         with open('settings.json', 'r') as s:
