@@ -249,7 +249,7 @@ def randomizer():
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 4] = '    GreenStarLock: 0'
         currentGreenStars += int(StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 5][-2:])
 
-        if ('クッパ城' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] or '�N�b�p��' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10]) and stageNo != 113:
+        if 'クッパ城' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] and stageNo != 113:
             print('Reached castle slot! Copying original StageType of this slot.')
             StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = StageListOld[(StageListOld.index('  - CourseId: ' + str(stageNo))) + 10]  # Makes sure all castle slots are the same slots when the levels are randomized.
         else:
@@ -440,9 +440,9 @@ def randomizer():
 
     # For seed history and non-spoiler text file
     if len(str(dpg.get_value('seed'))) == 0:
-        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
+        stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
     else:
-        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
+        stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
     stageID_Name.append('Settings:\n')
     stageID_Name.append('Speedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n')
     stageID_Name.append('Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n')
@@ -496,6 +496,7 @@ def randomizer():
     saveSettings()
     checkDirectory()
 
+    dpg.set_value('romfsVersion', 'RomFS version: ' + str(romfsVersion))
     if len(str(dpg.get_value('seed'))) == 0:
         dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')')
     else:
@@ -2164,9 +2165,9 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
     overallIndex = 1
     overallIndex2 = 1
     if len(str(dpg.get_value('seed'))) == 0:
-        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
+        stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
     else:
-        stageID_Name = ['Seed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
+        stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
     stageID_Name.append('Settings:\n')
     stageID_Name.append('Speedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n')
     stageID_Name.append('Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n')
@@ -2545,6 +2546,7 @@ def rdirectory(sender, app_data):
 
 # Check if selected directories are valid
 def checkDirectory():
+    global romfsVersion
     valid = True
 
     if len(str(dpg.get_value("seed"))) == 0:
@@ -2566,22 +2568,24 @@ def checkDirectory():
             verHash = hashlib.md5(ver.read())
             if len(hashDict) == 100:  # If it has not been appended to yet.
                 if verHash.hexdigest() == '426587d8d4f6353f2ae31b31f9b8bc43':  # v1.1.0
-                    print('v1.1.0 RomFS selected.')
                     hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), '7b49f92b6d7cfc114caa7328a09a157f'])
                     hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'fbdb7032420186a14491643ac46591f0'])
+                    romfsVersion = 'v1.1.0'
                 else:  # v1.0.0
-                    print('v1.0.0 RomFS selected')
                     hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), 'b64dd19b581055fcc8e9a05b457deac8'])
                     hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'c70160743002c8736c6ba6537bdbba98'])
+                    romfsVersion = 'v1.0.0'
+                print(str(romfsVersion) + ' RomFS selected')
             else:
                 if verHash.hexdigest() == '426587d8d4f6353f2ae31b31f9b8bc43':
-                    print('v1.1.0 RomFS selected.')
                     hashDict[-2][1] = '7b49f92b6d7cfc114caa7328a09a157f'
                     hashDict[-1][1] = 'fbdb7032420186a14491643ac46591f0'
+                    romfsVersion = 'v1.1.0'
                 else:
-                    print('v1.0.0 RomFS selected')
                     hashDict[-2][1] = 'b64dd19b581055fcc8e9a05b457deac8'
                     hashDict[-1][1] = 'c70160743002c8736c6ba6537bdbba98'
+                    romfsVersion = 'v1.0.0'
+                print(str(romfsVersion) + ' RomFS selected')
     else:
         valid = False
 
@@ -2754,13 +2758,16 @@ class GUI:
                 showSlider()
                 speedrunner()
                 with dpg.tab(tag="t3", label="Credits"):  # Credits tab
-                    dpg.add_text("Super Mario 3D World Randomizer credits:\n\n"
+                    dpg.add_text("SM3DW-BF-Randomizer is licensed under GPL-v2.0.\n"
+                                 "Copyright (c) 2024 Toby Bailey\n\n"
+                                 "Super Mario 3D World Randomizer credits:\n\n"
                                  "Executable built using Nuitka.\n\n"
                                  "Developer:\n"
                                  "Skipper93653 (Toby Bailey)\n\n"
                                  "Module Credits:\n"
                                  "ZeldaMods for oead. oead is licensed under GPL-v2.0. Copyright (c) 2024 ZeldaMods\n"
                                  "Jonathan Hoffstadt for Dear PyGUI. Dear PyGUI is licensed under MIT. Copyright (c) 2024 Dear PyGui, LLC\n"
+                                 "numpy for numpy. Copyright (c) 2005 - 2024 NumPy Developers\n"
                                  "Built-in Python modules.\n"
                                  "...And all of their contributors.\n\n"
                                  "Testers:\n"
@@ -2772,11 +2779,10 @@ class GUI:
                                  "Special Thanks:\n"
                                  "Nintendo EAD/EPD for creating the game.\n"
                                  "Members of the ZeldaMods Discord server for oead help.\n"
-                                 "Members of the 3D World Modding Community Discord server for general help.\n\n"
-                                 "SM3DW-BF-Randomizer is licensed under GPL-v2.0.\n"
-                                 "Copyright (c) 2024 Toby Bailey")
+                                 "Members of the 3D World Modding Community Discord server for general help.")
         with dpg.window(label="Finished!", modal=True, tag="popup", show=False, autosize=True):
             dpg.add_text("Randomization complete!")
+            dpg.add_text("", tag='romfsVersion')
             dpg.add_text("", tag='popupSeed')
             dpg.add_text("Settings:")
             dpg.add_text('Speedrunner mode: '+str(dpg.get_value('speedrun')), tag='popupSpeedrun')
