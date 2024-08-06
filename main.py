@@ -2,7 +2,7 @@
 
 """
 Super Mario 3D World (+ Bowser's Fury) Randomizer - A stage randomizer for Super Mario 3D World (Switch).
-Copyright (C) 2024  Toby Bailey
+Copyright (C) 2024 Toby Bailey
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -57,6 +57,8 @@ def randomizer():
                     seedRNG *= ord(i)
     rng = np.random.default_rng(seedRNG)
 
+    print('Seed: ' + str(seedRNG))
+
     # SystemData Path
     oPath = os.path.join(user_data[0], 'SystemData')  # Original game path
 
@@ -70,7 +72,7 @@ def randomizer():
     StageListOld = StageListNew.copy()
     print('Opened StageList.szs')
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     # StageData Path
     sPath = os.path.join(user_data[0], 'StageData')
@@ -79,7 +81,7 @@ def randomizer():
     os.makedirs(rPath)
     os.makedirs(srPath)
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     worlds = [['CourseSelectW1Zone.szs', ['DofParam_obj10.bagldof',
                                           'DofParam_obj9.bagldof',
@@ -172,7 +174,7 @@ def randomizer():
         mapYMLs[-1].pop()
         print('Opened ' + i[0])
         bar += 1
-        dpg.configure_item("progress", default_value=bar / 172)
+        dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     # Creating base variables to be used and iterated on in the randomizer loop
     worldNo = 1
@@ -183,24 +185,12 @@ def randomizer():
 
     # 154 different stages in total. The next two code blocks are making several checks to make sure nothing gets
     # broken in the actual stage shuffling process
-    stageID_order = []
-    for i in range(1, 34):
-        stageID_order.append(i)
-    for i in range(35, 62):
-        stageID_order.append(i)
-    for i in range(67, 81):
-        stageID_order.append(i)
-    for i in range(82, 97):
-        stageID_order.append(i)
-    for i in range(98, 115):
-        stageID_order.append(i)
-    for i in range(116, 155):
-        stageID_order.append(i)
+    stageID_order = list(range(1, 34)) + list(range(35, 62)) + list(range(67, 81)) + list(range(82, 97)) + list(range(98, 115)) + list(range(116, 155))
     print(stageID_order)
     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
     ready = False
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     # This loop happens when stageID generates a special level when stageNo is currently a castle stage and forces
     # stageID to randomize again until it's not a special level (basically until it gives you a stage where it's
@@ -219,7 +209,7 @@ def randomizer():
                     rstageID_order = rng.choice(stageID_order, size=len(stageID_order), replace=False)
                     ready = False
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     print('Random stage order:', rstageID_order)
 
@@ -402,7 +392,7 @@ def randomizer():
             print('Skipped due to stack overflow.')
 
         bar += 1
-        dpg.configure_item("progress", default_value=bar / 172)
+        dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     print('Total Green Star Count: ' + str(currentGreenStars))
     print('Randomized stages!')
@@ -418,7 +408,7 @@ def randomizer():
         randoSZS.write(yaz0.compress(data[1]))  # Compress with YAZ0 and write to the SZS.
     print('Written StageList.szs')
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     print('Writing world files:')
 
@@ -437,16 +427,16 @@ def randomizer():
             f.write(yaz0.compress(data[1]))
         print('Written ' + i[0])
         bar += 1
-        dpg.configure_item("progress", default_value=bar / 172)
+        dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     print('Finished writing world files.')
 
     musicRandomizer(rng, seedRNG, user_data)
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
     langRandomizer(rng, seedRNG, user_data)
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     # For seed history and non-spoiler text file
     if len(str(dpg.get_value('seed'))) == 0:
@@ -481,7 +471,7 @@ def randomizer():
             s.write(''.join(stageID_Name)[:-1])
 
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     with open('seedHistory.txt', 'a+') as h:
         # Seed History file
@@ -494,9 +484,9 @@ def randomizer():
             h.write(''.join(stageID_Name)[:-1])
 
     bar += 1
-    dpg.configure_item("progress", default_value=bar / 172)
+    dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
-    dpg.configure_item("progress", default_value=1)
+    dpg.configure_item("progress", default_value=1, overlay='100%')
     dpg.configure_item('dirbutt', enabled=True)
     dpg.configure_item('rdirbutt', enabled=True)
     dpg.configure_item('seed', enabled=True)
@@ -2576,16 +2566,20 @@ def checkDirectory():
             verHash = hashlib.md5(ver.read())
             if len(hashDict) == 100:  # If it has not been appended to yet.
                 if verHash.hexdigest() == '426587d8d4f6353f2ae31b31f9b8bc43':  # v1.1.0
+                    print('v1.1.0 RomFS selected.')
                     hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), '7b49f92b6d7cfc114caa7328a09a157f'])
                     hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'fbdb7032420186a14491643ac46591f0'])
                 else:  # v1.0.0
+                    print('v1.0.0 RomFS selected')
                     hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), 'b64dd19b581055fcc8e9a05b457deac8'])
                     hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'c70160743002c8736c6ba6537bdbba98'])
             else:
                 if verHash.hexdigest() == '426587d8d4f6353f2ae31b31f9b8bc43':
+                    print('v1.1.0 RomFS selected.')
                     hashDict[-2][1] = '7b49f92b6d7cfc114caa7328a09a157f'
                     hashDict[-1][1] = 'fbdb7032420186a14491643ac46591f0'
                 else:
+                    print('v1.0.0 RomFS selected')
                     hashDict[-2][1] = 'b64dd19b581055fcc8e9a05b457deac8'
                     hashDict[-1][1] = 'c70160743002c8736c6ba6537bdbba98'
     else:
@@ -2629,9 +2623,13 @@ def showSlider():
     if dpg.get_value('star') == 'Fully random':
         dpg.show_item('pslider')
         dpg.show_item('sslider')
+        dpg.show_item('ptooltip')
+        dpg.show_item('stooltip')
     else:
         dpg.hide_item('pslider')
         dpg.hide_item('sslider')
+        dpg.hide_item('ptooltip')
+        dpg.hide_item('stooltip')
 
 
 # Save settings to json
@@ -2649,29 +2647,27 @@ def saveSettings():
     with open('settings.json', 'w') as s:
         s.write(json.dumps(settings))
 
+    print('Saved settings.')
+
 
 # Speedrunner mode locking settings
 def speedrunner():
     if dpg.get_value('speedrun'):
         dpg.set_value('spoil', False)
         dpg.configure_item('spoil', enabled=False)
-        dpg.set_value('music', False)
-        dpg.configure_item('music', enabled=False)
-        dpg.set_value('lang', False)
-        dpg.configure_item('lang', enabled=False)
         dpg.set_value('star', 'Fully random')
         dpg.configure_item('star', enabled=False)
         dpg.set_value('pslider', 0.15000000596046448)
         dpg.configure_item('pslider', enabled=False, show=True)
         dpg.set_value('sslider', 0.606080949306488)
         dpg.configure_item('sslider', enabled=False, show=True)
+        print('Speedrunner mode selected. Locked the green star lock settings.')
     else:
         dpg.configure_item('spoil', enabled=True)
-        dpg.configure_item('music', enabled=True)
-        dpg.configure_item('lang', enabled=True)
         dpg.configure_item('star', enabled=True)
         dpg.configure_item('pslider', enabled=True)
         dpg.configure_item('sslider', enabled=True)
+        print('Speedrunner mode not selected. Unlocking the green star lock settings.')
 
 
 # Render DearPyGUI
@@ -2702,9 +2698,9 @@ class GUI:
                     dpg.add_text(tag="rdirtext", default_value=str(p_settings['rdir']))  # Selected Directory
                     dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=str(dpg.get_value('rdirtext')))  # Directory Selector
                     self.rdir = dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
-                    self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory)  # Seed Input Text
+                    self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory, hint='Enter a seed.')  # Seed Input Text
                     self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
-                    dpg.add_progress_bar(tag="progress", label="progress", default_value=0)
+                    dpg.add_progress_bar(tag="progress", label="progress", default_value=0, overlay='0.0%')
                     dpg.add_text("This randomizer only effects Super Mario 3D World (Switch), not Bowser's Fury.")
                     self.test = dpg.add_button(tag="test", label="test", callback=lambda: dpg.configure_item("progress", default_value=1), show=False)
                     with dpg.tooltip("dirbutt"):
@@ -2733,7 +2729,7 @@ class GUI:
                     self.sslider = dpg.add_slider_float(tag='sslider', label='Green star lock strictness', default_value=float(p_settings['sslider']), min_value=0, max_value=1, show=True, clamped=True)
                     self.save = dpg.add_button(tag='save', label='Save Settings', callback=saveSettings)
                     with dpg.tooltip('speedrun'):
-                        dpg.add_text('Lock the settings to be compatible with the official speedrun leaderboards.')
+                        dpg.add_text('Lock the green star settings to be compatible with the official speedrun leaderboards.')
                     with dpg.tooltip('spoil'):
                         dpg.add_text('Generate a text file which contains the full list of levels and what they have\n'
                                      'been randomized to, along with any green star lock values.')
@@ -2751,10 +2747,10 @@ class GUI:
                     with dpg.tooltip('pslider'):
                         dpg.add_text('CTRL+Left Click to enter a specific value.\n'
                                      'Control how often green star locks should appear.\n'
-                                     'Setting the slider to 1 (maximum) will not make every level have a star lock to avoid softlocks.')
+                                     'Setting the slider to 1 (maximum) will not make every level have a star lock to avoid softlocks.', tag='ptooltip')
                     with dpg.tooltip('sslider'):
                         dpg.add_text('CTRL+Left Click to enter a specific value.\n'
-                                     'Control the strictness for how many green stars you need to have to open the green star locks.')
+                                     'Control the strictness for how many green stars you need to have to open the green star locks.', tag='stooltip')
                 showSlider()
                 speedrunner()
                 with dpg.tab(tag="t3", label="Credits"):  # Credits tab

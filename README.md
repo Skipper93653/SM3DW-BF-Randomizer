@@ -12,35 +12,37 @@ You can also run from source if you are using macOS or Linux by opening [this pr
 
 Select a valid unmodified RomFS dump (the root of the RomFS directory - contains folders such as `StageData`, `SystemData`, etc.) of Super Mario 3D World + Bowser's Fury (either v1.0.0 or v1.1.0), enable any additional options and then hit the 'Randomize!' button and wait for the pop-up window to tell you the process has finished, this should generate a folder called `SM3DWR-<seed>` (with 'seed' being the seed used by the random number generator).
 
-Playing with a mismatched version (e.g. v1.0.0 RomFS randomizer base with the game on v1.1.0 or vice versa) may have unintended consequences.
-
 ### Playing with the newly generated files
 
-Note: enable with other mods at your own risk, as this mod is only designed to be compatible with the vanilla game.
+#### Console
 
-### Console
-
-#### [Atmosphere](https://github.com/Atmosphere-NX/Atmosphere)
+##### [Atmosphere](https://github.com/Atmosphere-NX/Atmosphere)
 
 With Atmosphere - on the root of your microSD card, go to `atmosphere/contents/010028600EBDA000` (create these folders if they don't exist, remove any existing files within this location after safely backing up whatever was there to avoid possible conflicts) and copy the `romfs` folder from inside the newly generated `SM3DW-<seed>` folder to this location, then you're free to play!
 
-#### Atmosphere and [SimpleModManager](https://github.com/nadrino/SimpleModManager)
+##### Atmosphere and [SimpleModManager](https://github.com/nadrino/SimpleModManager)
 
 With Atmosphere and SimpleModManager - on the root of your microSD card, go to `mods/Super Mario 3D World + Bowser's Fury/<name of your choice>/contents/010028600EBDA000` (create these folders if they don't exist, it is recommended that you have a unique name for each seed on your microSD card to avoid possible conflicts) and copy the `romfs` folder from inside the newly generated `SM3DW-<seed>` folder to this location. Then, on console, make your way to SimpleModManager and enable the mod, then you're free to play!
 
 Make sure that if you have multiple seeds present in your mods folder, have only **one** activated at a time.
 
-### Emulator
+#### Emulator
 
-#### [Ryujinx](https://ryujinx.org)
+##### [Ryujinx](https://ryujinx.org)
 
 With Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-<seed>` folder into said mod folder (if you didn't select here as the output directory already). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury and click 'Manage Mods' and enable the mod folder if it isn't already, then you're free to play!
 
 Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if you want to use an emulator.
 
+#### Note:
+
+Playing with a mismatched version (e.g. v1.0.0 RomFS randomizer base with the game on v1.1.0 or vice versa) may have unintended consequences.
+
+Enable with other mods at your own risk, as this mod is only designed to be compatible with the vanilla game.
+
 ## Known Issues
 
-* The screen wipe effects for Toad Houses, Lucky Houses, etc. may not be correct
+* The screen wipe effects for Lucky Houses and the Coin Express may not be correct under some circumstances.
 * Stamps do not randomize with stage so the stamp screen is not fully functional. Stamps retain their original stage slot and do not follow the stage they were present in before randomization e.g. Super Bell Hill's stamp will stay at World 1-1 even if Super Bell Hill has been randomized to any other stage. For stage slots that didn't originally contain stamps but do after randomization, the collected stamp does not get added to the stamp screen but still contributes to the stamp counter.
 * The course list may crash the game due to the modified StageList.byml.
 * Some stage numbers are glitched due to the modified StageList.byml.
