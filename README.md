@@ -51,7 +51,6 @@ Enable with other mods at your own risk, as this mod is only designed to be comp
 * Lucky Houses and the Coin Express may not disappear after use, but they correctly cannot be re-entered due under some circumstances as they may use the Toad House StageType to fix potential softlocks. However, this means their world map path will be undone when any of the conditions for respawning Toad Houses are met, at which point you can re-enter the Lucky House or Coin Express.
 * If a non-boss blockade is locked behind a Bowser statue, the music does not play after you enter it.
 * The music may stop playing after dying on the Coin Express until reaching the roulette at the end of the stage under some circumstances.
-* The Goal Poles for 'Super Bell Hill', 'Snowball Park', 'Pretty Plaza Panic', 'The Bullet Bill Express', 'Sprawling Savanna', 'Bob-ombs Below', 'Cookie Cogworks', 'The Bowser Express', and 'Sprawling Savanna Rabbit Run' can never change due to stack overflow errors due to how oead parses their map files as they contain recursive nodes.
 * The Goal Poles for 'The Great Goal Pole' and 'Back to Hands-on Hall' can never be changed due to the runaway Goal Pole not being able to change its appearance to the castle Goal Pole or the ending Goal Pole.
 
 ## Potential future features in no particular order
@@ -68,9 +67,9 @@ Enable with other mods at your own risk, as this mod is only designed to be comp
 To build this software, open [this project](https://github.com/Skipper93653/SM3DW-BF-Randomizer) in PyCharm using your own Python environment (virtual is recommended) after cloning the repository to a suitable directory and run `pip install -r requirements.txt` in the built-in terminal.
 
 Then run in the same terminal:
-* `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --windows-icon-from-ico=ico.ico` for Windows.
-* `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico --macos-create-app-bundle --macos-app-icon=ico.ico` for macOS.
-* `python -m nuitka main.py --standalone --include-data-files=ico.ico=ico.ico` for Linux.
+* `python -m nuitka main.py --standalone --include-data-dir=maps=maps --include-data-files=ico.ico=ico.ico --windows-icon-from-ico=ico.ico` for Windows.
+* `python -m nuitka main.py --standalone --include-data-dir=maps=maps --include-data-files=ico.ico=ico.ico --macos-create-app-bundle --macos-app-icon=ico.ico` for macOS.
+* `python -m nuitka main.py --standalone --include-data-dir=maps=maps --include-data-files=ico.ico=ico.ico` for Linux.
  
 The resulting output will be in a folder called `main.dist`.
 

@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 
 """
-Super Mario 3D World (+ Bowser's Fury) Randomizer - A stage randomizer for Super Mario 3D World (Switch).
-Copyright (C) 2024 Toby Bailey
+    Super Mario 3D World (+ Bowser's Fury) Randomizer - A stage randomizer for Super Mario 3D World (Switch).
+    Copyright (C) 2024 Toby Bailey
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import os  # For OS files
@@ -24,6 +23,7 @@ import shutil  # For OS files
 import time  # For time calculations
 import json  # For saving settings
 import hashlib  # For file verification
+import ips  # For BYML patching in special cases
 import dearpygui.dearpygui as dpg  # User interface
 import numpy as np  # Random number generation
 from datetime import datetime  # For seed history
@@ -384,13 +384,10 @@ def randomizer():
         else:
             changeFrom = 'GoalPole'
 
-        if StageName[StageName.index(':') + 2:] not in ['EnterCatMarioStage', 'SnowBallParkStage', 'ShortGardenStage', 'KillerExpressStage', 'SavannaRockStage', 'BombCaveStage', 'GearSweetsStage', 'EnemyExpressStage', 'ArrangeSavannaRockStage']:  # These stages are avoided as opening them causes a stack error due to recursive loops within the map BYML
-            if changeFrom != changeTo:
-                goalPoleChanges(changeTo, changeFrom, StageName[StageName.index(':') + 2:], sPath, srPath, endianness)  # Correct the Goal Pole at the end of the stages if possible.
-            else:
-                print('Goal Pole change unneeded.')
+        if changeFrom != changeTo:
+            goalPoleChanges(changeTo, changeFrom, StageName[StageName.index(':') + 2:], sPath, srPath, endianness)  # Correct the Goal Pole at the end of the stages if possible.
         else:
-            print('Skipped due to stack overflow.')
+            print('Goal Pole change unneeded.')
 
         bar += 1
         dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
@@ -1827,21 +1824,21 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                             'UnitPointIlluminant.baglcube',
                                                                             'GraphicsStress.baglstress']],
                   'ArrangeChorobonTowerStage': ['ArrangeChorobonTowerStage.szs', ['ArrangeChorobonTowerStageMap.byml',
-                                                                             'DofParam_obj24.bagldof',
-                                                                             'DofParam_obj25.bagldof',
-                                                                             'DirectionalLight.bagldirlit',
-                                                                             'DofParam_obj11.bagldof',
-                                                                             'ArrangeChorobonTowerStageDesign.byml',
-                                                                             'DefaultParam.baglblm',
-                                                                             'DefaultParam.baglexp',
-                                                                             'AreaParamList.baglapl',
-                                                                             'ArrangeChorobonTowerStageSound.byml',
-                                                                             'CubeMapMgr.baglcube',
-                                                                             'CategoryLightInfo.bagllitinfocharacter',
-                                                                             'CameraParam.byml',
-                                                                             'DepthShadow.bagldptsdw',
-                                                                             'CategoryLightInfo.bagllitinfostandard',
-                                                                             'UnitPointIlluminant.baglcube']],
+                                                                                  'DofParam_obj24.bagldof',
+                                                                                  'DofParam_obj25.bagldof',
+                                                                                  'DirectionalLight.bagldirlit',
+                                                                                  'DofParam_obj11.bagldof',
+                                                                                  'ArrangeChorobonTowerStageDesign.byml',
+                                                                                  'DefaultParam.baglblm',
+                                                                                  'DefaultParam.baglexp',
+                                                                                  'AreaParamList.baglapl',
+                                                                                  'ArrangeChorobonTowerStageSound.byml',
+                                                                                  'CubeMapMgr.baglcube',
+                                                                                  'CategoryLightInfo.bagllitinfocharacter',
+                                                                                  'CameraParam.byml',
+                                                                                  'DepthShadow.bagldptsdw',
+                                                                                  'CategoryLightInfo.bagllitinfostandard',
+                                                                                  'UnitPointIlluminant.baglcube']],
                   'ArrangePipePackunDenStage': ['ArrangePipePackunDenGoalZone.szs', ['ArrangePipePackunDenGoalZoneDesign.byml',
                                                                                      'DofParam_obj1.bagldof',
                                                                                      'DirectionalLight.bagldirlit',
@@ -1999,95 +1996,150 @@ def goalPoleChanges(changeTo, changeFrom, StageName, sPath, srPath, endianness):
                                                                      'CameraParam.byml',
                                                                      'ChampionshipGoalZoneDesign.byml']]
                   }
-
-        print('Opening ' + stages[StageName][0])
-        with open(os.path.join(sPath, stages[StageName][0]), 'rb') as f:
-            archive = Sarc(yaz0.decompress(f.read()))
-        mapYML = byml.to_text(byml.from_binary(archive.get_file(stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml').data)).split('\n')  # Stack Overflow occurs with some files when running byml.from_binary(<file>), hence the affected stages are blocked from using this function.
-        mapYML.pop()
-        print('Opened ' + stages[StageName][0])
-
-        # Loop through the YML to find and replace the proper Goal Pole
-        if StageName in ['KoopaChaseLv1Stage', 'KillerTankStage', 'KillerExpressStage', 'GateKeeperTentackLv1Stage', 'BossGorobonStage', 'BossWackunFortressStage', 'BombTankStage', 'GateKeeperBossBunretsuLv1Stage', 'KoopaChaseLv2Stage', 'EnemyExpressStage', 'GateKeeperBossBunretsuLv2Stage', 'GateKeeperTentackLv2Stage', 'ArrangeBossParadeStage']:
-            # Stages which share goal zones
-            shared = {'CastleGoalZone': ['CastleGoalZone.szs', ['DofParam_obj0.bagldof',
-                                                                'CastleGoalZoneDesign.byml',
+        # Stages which share goal zones
+        shared = {'CastleGoalZone': ['CastleGoalZone.szs', ['DofParam_obj0.bagldof',
+                                                            'CastleGoalZoneDesign.byml',
+                                                            'DofParam_obj1.bagldof',
+                                                            'DofParam_obj2.bagldof',
+                                                            'CameraParam.byml',
+                                                            'CastleGoalZoneMap.byml']],
+                  'GKCastleGoalZone': ['GKCastleGoalZone.szs', ['DofParam_obj0.bagldof',
                                                                 'DofParam_obj1.bagldof',
+                                                                'GKCastleGoalZoneMap.byml',
                                                                 'DofParam_obj2.bagldof',
                                                                 'CameraParam.byml',
-                                                                'CastleGoalZoneMap.byml']],
-                      'GKCastleGoalZone': ['GKCastleGoalZone.szs', ['DofParam_obj0.bagldof',
-                                                                    'DofParam_obj1.bagldof',
-                                                                    'GKCastleGoalZoneMap.byml',
-                                                                    'DofParam_obj2.bagldof',
-                                                                    'CameraParam.byml',
-                                                                    'GKCastleGoalZoneDesign.byml']]
-                      }
-            if 'GateKeeper' in StageName:
-                zone = 'GKCastleGoalZone'
-            else:
-                zone = 'CastleGoalZone'
-            zoneName = zone[:-8] + changeTo + 'Zone'
-            if not os.path.isfile(os.path.join(srPath, zoneName + '.szs')):
-                print('Opening ' + shared[zone][0])
-                with open(os.path.join(sPath, shared[zone][0]), 'rb') as f:
-                    archive1 = Sarc(yaz0.decompress(f.read()))
-                zoneYML = byml.to_text(byml.from_binary(archive1.get_file(shared[zone][0][:shared[zone][0].index('.')] + 'Map.byml').data)).split('\n')
-                zoneYML.pop()
-                print('Opened ' + shared[zone][0])
+                                                                'GKCastleGoalZoneDesign.byml']]
+                  }
 
-                for line in zoneYML:
-                    if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
-                        zoneYML[zoneYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
-                        print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
-                print(str(zone) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
+        if StageName not in ['EnterCatMarioStage', 'SnowBallParkStage', 'ShortGardenStage', 'KillerExpressStage', 'SavannaRockStage', 'BombCaveStage', 'GearSweetsStage', 'EnemyExpressStage', 'ArrangeSavannaRockStage']:
+            print('Opening ' + stages[StageName][0])
+            with open(os.path.join(sPath, stages[StageName][0]), 'rb') as f:
+                archive = Sarc(yaz0.decompress(f.read()))
+            mapYML = byml.to_text(byml.from_binary(archive.get_file(stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml').data)).split('\n')  # Stack Overflow occurs with some files when running byml.from_binary(<file>), hence the affected stages are blocked from using this function.
+            mapYML.pop()
+            print('Opened ' + stages[StageName][0])
 
-                print('Writing ' + zoneName + '.szs')
-                writer = SarcWriter()
-                writer.set_endianness(endianness)
-                for i in shared[zone][1]:
-                    if zone in i:
-                        if 'Map' in i:
-                            writer.files[zoneName + i[len(zone):]] = byml.to_binary(byml.from_text('\n'.join(zoneYML)), False, 2)
+            # Loop through the YML to find and replace the proper Goal Pole
+            if StageName in ['KoopaChaseLv1Stage', 'KillerTankStage', 'KillerExpressStage', 'GateKeeperTentackLv1Stage', 'BossGorobonStage', 'BossWackunFortressStage', 'BombTankStage', 'GateKeeperBossBunretsuLv1Stage', 'KoopaChaseLv2Stage', 'EnemyExpressStage', 'GateKeeperBossBunretsuLv2Stage', 'GateKeeperTentackLv2Stage', 'ArrangeBossParadeStage']:
+                # If it is a stage which shares its goal zone with other stages
+                if 'GateKeeper' in StageName:
+                    zone = 'GKCastleGoalZone'
+                else:
+                    zone = 'CastleGoalZone'
+                zoneName = zone[:-8] + changeTo + 'Zone'
+                if not os.path.isfile(os.path.join(srPath, zoneName + '.szs')):
+                    print('Opening ' + shared[zone][0])
+                    with open(os.path.join(sPath, shared[zone][0]), 'rb') as f:
+                        archive1 = Sarc(yaz0.decompress(f.read()))
+                    zoneYML = byml.to_text(byml.from_binary(archive1.get_file(shared[zone][0][:shared[zone][0].index('.')] + 'Map.byml').data)).split('\n')
+                    zoneYML.pop()
+                    print('Opened ' + shared[zone][0])
+
+                    for line in zoneYML:
+                        if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
+                            zoneYML[zoneYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
+                            print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
+                    print(str(zone) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
+
+                    print('Writing ' + zoneName + '.szs')
+                    writer = SarcWriter()
+                    writer.set_endianness(endianness)
+                    for i in shared[zone][1]:
+                        if zone in i:
+                            if 'Map' in i:
+                                writer.files[zoneName + i[len(zone):]] = byml.to_binary(byml.from_text('\n'.join(zoneYML)), False, 2)
+                            else:
+                                writer.files[zoneName + i[len(zone):]] = Bytes(archive1.get_file(i).data)
                         else:
-                            writer.files[zoneName + i[len(zone):]] = Bytes(archive1.get_file(i).data)
-                    else:
-                        writer.files[i] = Bytes(archive1.get_file(i).data)
-                data = writer.write()
+                            writer.files[i] = Bytes(archive1.get_file(i).data)
+                    data = writer.write()
 
-                with open(os.path.join(srPath, zoneName + '.szs'), 'wb') as f:
-                    f.write(yaz0.compress(data[1]))
-                print('Written ' + zoneName + '.szs')
+                    with open(os.path.join(srPath, zoneName + '.szs'), 'wb') as f:
+                        f.write(yaz0.compress(data[1]))
+                    print('Written ' + zoneName + '.szs')
+                else:
+                    print('New zone file already exists.')
+
+                for line in mapYML:
+                    if line[line.index(':') + 2:] == str(zone) and 'UnitConfigName: ' in line:
+                        mapYML[mapYML.index(line)] = line[:line.index(':') + 2] + str(zoneName)
+                        print(str(StageName) + ': Changing from ' + str(zone) + ' to ' + str(zoneName))
+                print(str(StageName) + ': Changed from ' + str(zone) + ' to ' + str(zoneName))
+
             else:
-                print('New zone file already exists.')
+                # All other stages
+                for line in mapYML:
+                    if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
+                        mapYML[mapYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
+                        print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
+                print(str(StageName) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
 
-            for line in mapYML:
-                if line[line.index(':') + 2:] == str(zone) and 'UnitConfigName: ' in line:
-                    mapYML[mapYML.index(line)] = line[:line.index(':') + 2] + str(zoneName)
-                    print(str(StageName) + ': Changing from ' + str(zone) + ' to ' + str(zoneName))
-            print(str(StageName) + ': Changed from ' + str(zone) + ' to ' + str(zoneName))
+            print('Writing ' + stages[StageName][0])
+            writer = SarcWriter()
+            writer.set_endianness(endianness)
+            for i in stages[StageName][1]:
+                if i == stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml':
+                    writer.files[i] = byml.to_binary(byml.from_text('\n'.join(mapYML)), False, 2)
+                else:
+                    writer.files[i] = Bytes(archive.get_file(i).data)
+            data = writer.write()
 
+            with open(os.path.join(srPath, stages[StageName][0]), 'wb') as f:
+                f.write(yaz0.compress(data[1]))
+            print('Written ' + stages[StageName][0])
         else:
-            # All other stages
-            for line in mapYML:
-                if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
-                    mapYML[mapYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
-                    print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
-            print(str(StageName) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
-
-        print('Writing ' + stages[StageName][0])
-        writer = SarcWriter()
-        writer.set_endianness(endianness)
-        for i in stages[StageName][1]:
-            if i == stages[StageName][0][:stages[StageName][0].index('.')] + 'Map.byml':
-                writer.files[i] = byml.to_binary(byml.from_text('\n'.join(mapYML)), False, 2)
+            # The stages that produce a stack overflow when using byml.from_binary(<file>) use pre-made ips patches to change the Goal Pole
+            print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
+            print('Loading ' + stages[StageName][0] + '.ips')
+            if StageName == 'EnemyExpressStage':
+                with open(os.path.join(os.getcwd(), 'maps', StageName, changeTo, romfsVersion, stages[StageName][0] + '.ips'), 'rb') as f:
+                    patch = ips.Patch.load(f)
             else:
-                writer.files[i] = Bytes(archive.get_file(i).data)
-        data = writer.write()
+                with open(os.path.join(os.getcwd(), 'maps', StageName, changeTo, stages[StageName][0] + '.ips'), 'rb') as f:
+                    patch = ips.Patch.load(f)
+            print('Loaded ' + stages[StageName][0] + '.ips')
 
-        with open(os.path.join(srPath, stages[StageName][0]), 'wb') as f:
-            f.write(yaz0.compress(data[1]))
-        print('Written ' + stages[StageName][0])
+            if StageName in ['EnemyExpressStage', 'KillerExpressStage']:
+                zone = 'CastleGoalZone'
+                zoneName = zone[:-8] + changeTo + 'Zone'
+                if not os.path.isfile(os.path.join(srPath, zoneName + '.szs')):
+                    print('Opening ' + shared[zone][0])
+                    with open(os.path.join(sPath, shared[zone][0]), 'rb') as f:
+                        archive1 = Sarc(yaz0.decompress(f.read()))
+                    zoneYML = byml.to_text(byml.from_binary(archive1.get_file(shared[zone][0][:shared[zone][0].index('.')] + 'Map.byml').data)).split('\n')
+                    zoneYML.pop()
+                    print('Opened ' + shared[zone][0])
+
+                    for line in zoneYML:
+                        if line[line.index(':') + 2:] == str(changeFrom) and 'UnitConfigName: ' in line:
+                            zoneYML[zoneYML.index(line)] = line[:line.index(':') + 2] + str(changeTo)
+                            print(str(StageName) + ': Changing from ' + str(changeFrom) + ' to ' + str(changeTo))
+                    print(str(zone) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
+
+                    print('Writing ' + zoneName + '.szs')
+                    writer = SarcWriter()
+                    writer.set_endianness(endianness)
+                    for i in shared[zone][1]:
+                        if zone in i:
+                            if 'Map' in i:
+                                writer.files[zoneName + i[len(zone):]] = byml.to_binary(byml.from_text('\n'.join(zoneYML)), False, 2)
+                            else:
+                                writer.files[zoneName + i[len(zone):]] = Bytes(archive1.get_file(i).data)
+                        else:
+                            writer.files[i] = Bytes(archive1.get_file(i).data)
+                    data = writer.write()
+
+                    with open(os.path.join(srPath, zoneName + '.szs'), 'wb') as f:
+                        f.write(yaz0.compress(data[1]))
+                    print('Written ' + zoneName + '.szs')
+                else:
+                    print('New zone file already exists.')
+
+            print('Writing ' + stages[StageName][0] + ' with ips patch')
+            with open(os.path.join(sPath, stages[StageName][0]), 'rb') as old, open(os.path.join(srPath, stages[StageName][0]), 'wb') as new:
+                patch.apply(old, new)
+            print(str(StageName) + ': Changed from ' + str(changeFrom) + ' to ' + str(changeTo))
+            print('Written ' + stages[StageName][0] + ' with ips patch')
     except KeyError:
         print('No Goal Pole present.')
 
@@ -2579,7 +2631,7 @@ class GUI:
                     self.save = dpg.add_button(tag='save', label='Save Settings', callback=saveSettings)
                     with dpg.tooltip('speedrun'):
                         dpg.add_text('Do not generate the spoiler file and lock the green star settings to be compatible\n'
-                                     'with the official speedrun leaderboards.')
+                                     'with the official randomizer speedrun leaderboards.')
                     with dpg.tooltip('spoil'):
                         dpg.add_text('Generate a text file which contains the full list of levels and what they have\n'
                                      'been randomized to, along with any green star lock values.')
@@ -2604,16 +2656,16 @@ class GUI:
                 showSlider()
                 speedrunner()
                 with dpg.tab(tag="t3", label="Credits"):  # Credits tab
-                    dpg.add_text("SM3DW-BF-Randomizer is licensed under GPL-v2.0.\n"
-                                 "Copyright (c) 2024 Toby Bailey\n\n"
+                    dpg.add_text("SM3DW-BF-Randomizer is licensed under GPL-v3.0. Copyright (C) 2024 Toby Bailey\n\n"
                                  "Super Mario 3D World Randomizer credits:\n\n"
                                  "Executable built using Nuitka.\n\n"
                                  "Developer:\n"
                                  "Skipper93653 (Toby Bailey)\n\n"
                                  "Module Credits:\n"
-                                 "ZeldaMods for oead. oead is licensed under GPL-v2.0. Copyright (c) 2024 ZeldaMods\n"
-                                 "Jonathan Hoffstadt for Dear PyGUI. Dear PyGUI is licensed under MIT. Copyright (c) 2024 Dear PyGui, LLC\n"
-                                 "numpy for numpy. Copyright (c) 2005 - 2024 NumPy Developers\n"
+                                 "ZeldaMods for oead. oead is licensed under GPL-v2.0. Copyright (C) 2024 ZeldaMods\n"
+                                 "friedkeenan for ips.py. ips.py is licensed under GPL-v3.0. Copyright (C) 2024 friedkeenan\n"
+                                 "Jonathan Hoffstadt for Dear PyGUI. Dear PyGUI is licensed under MIT. Copyright (C) 2024 Dear PyGui, LLC\n"
+                                 "numpy for numpy. Copyright (C) 2024 NumPy Developers\n"
                                  "Built-in Python modules.\n"
                                  "...And all of their contributors.\n\n"
                                  "Testers:\n"

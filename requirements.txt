@@ -2,3 +2,4 @@ dearpygui==1.11.1
 numpy==2.0.1
 oead==1.2.9.post4
 Nuitka==2.4.5
+ips.py==0.1.2
