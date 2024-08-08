@@ -440,7 +440,7 @@ def randomizer():
     if len(str(dpg.get_value('seed'))) == 0:
         stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
     else:
-        stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
+        stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(dpg.get_value('seed')) + ' (Set seed, ' + version + ')\n\n']
     stageID_Name.append('Settings:\n')
     stageID_Name.append('Speedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n')
     stageID_Name.append('Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n')
@@ -499,7 +499,7 @@ def randomizer():
     if len(str(dpg.get_value('seed'))) == 0:
         dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Random seed, ' + version + ')')
     else:
-        dpg.set_value('popupSeed', 'Seed: ' + str(seedRNG) + ' (Set seed, ' + version + ')')
+        dpg.set_value('popupSeed', 'Seed: ' + str(dpg.get_value('seed')) + ' (Set seed, ' + version + ')')
     dpg.set_value('popupSpeedrun', 'Speedrunner mode: ' + str(dpg.get_value('speedrun')))
     dpg.set_value('popupSpoil', "Generate spoiler file?: " + str(dpg.get_value('spoil')))
     dpg.set_value('popupMusic', "Randomize music?: " + str(dpg.get_value('music')))
@@ -2362,7 +2362,7 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
     if len(str(dpg.get_value('seed'))) == 0:
         stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(seedRNG) + ' (Random seed, ' + version + ')\n\n']
     else:
-        stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(seedRNG) + ' (Set seed, ' + version + ')\n\n']
+        stageID_Name = ['RomFS version: ' + str(romfsVersion) + '\nSeed: ' + str(dpg.get_value('seed')) + ' (Set seed, ' + version + ')\n\n']
     stageID_Name.append('Settings:\n')
     stageID_Name.append('Speedrunner mode: ' + str(dpg.get_value('speedrun')) + '\n')
     stageID_Name.append('Generate spoiler file?: ' + str(dpg.get_value('spoil')) + '\n')
