@@ -32,6 +32,7 @@ from oead import *  # For common Nintendo EAD/EPD file formats
 
 # Level randomizer
 def randomizer():
+    global outputPath
     bar = 0  # Progress bar progress
     dpg.configure_item("randoinit", enabled=False, label="Randomizing...")
     dpg.configure_item('seed', enabled=False)
@@ -75,10 +76,16 @@ def randomizer():
     bar += 1
     dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
+    # Base output folder
+    if len(str(dpg.get_value("seed"))) == 0:
+        outputPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG))
+    else:
+        outputPath = os.path.join(user_data[1], 'SM3DWR-' + str(dpg.get_value('seed')))
+
     # StageData Path
     sPath = os.path.join(user_data[0], 'StageData')
-    rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'SystemData')  # Randomizer path
-    srPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'StageData')
+    rPath = os.path.join(outputPath, 'romfs', 'SystemData')  # Randomizer path
+    srPath = os.path.join(outputPath, 'romfs', 'StageData')
     os.makedirs(rPath)
     os.makedirs(srPath)
     bar += 1
@@ -454,7 +461,7 @@ def randomizer():
         stageID_Name.append('Green star locks?: ' + str(dpg.get_value('star')) + '\n\n')
     for i in hashDict:
         try:
-            with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
+            with open(os.path.join(outputPath, 'romfs', i[0]), 'rb') as f:
                 hash_object = hashlib.md5(f.read())
                 stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
         except FileNotFoundError:
@@ -463,10 +470,14 @@ def randomizer():
     if dpg.get_value("spoil"):
         spoilerFile(StageListNew, seedRNG, dict(GreenStarLockHistory), GreenStarLockHistory2, user_data)
     else:
+        # Creating a new spoiler text file.
         print('Not generating spoiler file, only generating seed/settings/hash text file.')
-        with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), str(seedRNG)+'.txt'), 'w', encoding='utf-8') as s:
-            # Creating a new spoiler text file.
-            s.write(''.join(stageID_Name)[:-1])
+        if len(str(dpg.get_value("seed"))) == 0:
+            with open(os.path.join(outputPath, str(seedRNG) + '.txt'), 'w', encoding='utf-8') as s:
+                s.write(''.join(stageID_Name)[:-1])
+        else:
+            with open(os.path.join(outputPath, str(dpg.get_value('seed')) + '.txt'), 'w', encoding='utf-8') as s:
+                s.write(''.join(stageID_Name)[:-1])
 
     bar += 1
     dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
@@ -2150,11 +2161,11 @@ def musicRandomizer(rng, seedRNG, user_data):
 
     # Creating variables for the directories we are working with.
     mPath = os.path.join(user_data[0], 'SoundData', 'stream')
-    rPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'SoundData', 'stream')
+    rPath = os.path.join(outputPath, 'romfs', 'SoundData', 'stream')
     os.makedirs(rPath)
     if os.path.isdir(os.path.join(user_data[0], 'SoundData', 'streamSe')):
         mPath2 = os.path.join(user_data[0], 'SoundData', 'streamSe')
-        rPath2 = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'SoundData', 'streamSe')
+        rPath2 = os.path.join(outputPath, 'romfs', 'SoundData', 'streamSe')
         os.makedirs(rPath2)
         # Making a list comprising the names of every file in the directory
         musicRando_order = os.listdir(mPath) + os.listdir(mPath2)
@@ -2193,7 +2204,7 @@ def langRandomizer(rng, seedRNG, user_data):
     print('Randomizing language...')
 
     lPath = os.path.join(user_data[0], 'LocalizedData')
-    rlPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', 'LocalizedData')
+    rlPath = os.path.join(outputPath, 'romfs', 'LocalizedData')
     os.makedirs(rlPath)
 
     Lang_order = os.listdir(lPath)
@@ -2413,7 +2424,7 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
     stageID_Name[-1] = stageID_Name[-1] + '\n\n'
     for i in hashDict:
         try:
-            with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'romfs', i[0]), 'rb') as f:
+            with open(os.path.join(outputPath, 'romfs', i[0]), 'rb') as f:
                 hash_object = hashlib.md5(f.read())
                 stageID_Name.append(i[0] + ' - ' + hash_object.hexdigest() + '\n')
         except FileNotFoundError:
@@ -2423,8 +2434,13 @@ def spoilerFile(StageListNew, seedRNG, GreenStarLockHistory, GreenStarLockHistor
     # Making sure levels have the correct names.
     rep = spoiler.replace('Crown-1', 'Crown-Crown').replace('1-9', '1-Castle').replace('4-9', '4-Castle').replace('5-12', '5-Castle').replace('Castle-11', 'Castle-Castle').replace('Bowser-13', 'Bowser-Castle').replace('2-9', '2-Tank').replace('6-11', '6-Tank').replace('3-11', '3-Train').replace('Bowser-12', 'Bowser-Train').replace('1-6', '1-Toad House 1').replace('1-7', '1-Toad House 2').replace('2-6', '2-Toad House').replace('3-8', '3-Toad House').replace('4-6', '4-Toad House').replace('5-9', '5-Toad House').replace('6-8', '6-Toad House').replace('Castle-8', 'Castle-Toad House').replace('Bowser-8', 'Bowser-Toad House 1').replace('Bowser-9', 'Bowser-Toad House 2').replace('2-7', '2-Sprixie House').replace('3-9', '3-Sprixie House').replace('4-7', '4-Sprixie House').replace('5-10', '5-Sprixie House').replace('6-9', '6-Sprixie House').replace('Castle-9', 'Castle-Sprixie House').replace('Bowser-10', 'Bowser-Sprixie House').replace('Star-10', 'Star-Sprixie House').replace('Crown-2', 'Crown-Sprixie House').replace('1-8', '1-Captain Toad').replace('3-10', '3-Captain Toad').replace('5-11', '5-Captain Toad').replace('Castle-10', 'Castle-Captain Toad').replace('Star-11', 'Star-Captain Toad').replace('Crown-3', 'Crown-Captain Toad').replace('1-10', '1-Lucky House').replace('2-10', '2-Lucky House').replace('3-13', '3-Lucky House').replace('4-10', '4-Lucky House').replace('5-18', '5-Lucky House').replace('6-13', '6-Lucky House').replace('Castle-13', 'Castle-Lucky House').replace('Bowser-15', 'Bowser-Lucky House').replace('Star-12', 'Star-Lucky House').replace('1-11', '1-A').replace('2-11', '2-A').replace('3-14', '3-A').replace('4-11', '4-A').replace('5-19', '5-A').replace('6-14', '6-A').replace('Castle-14', 'Castle-A').replace('Bowser-16', 'Bowser-A').replace('3-15', '3-B').replace('4-12', '4-B').replace('5-20', '5-B').replace('6-15', '6-B').replace('Castle-15', 'Castle-B').replace('Bowser-17', 'Bowser-B').replace('6-16', '6-C').replace('Castle-16', 'Castle-C').replace('5-8', 'Coin Express').replace('2-8', '2-Mystery House').replace('4-8', '4-Mystery House').replace('6-10', '6-Mystery House').replace('Bowser-11', 'Bowser-Mystery House').replace('Mushroom-8', 'Mushroom-Mystery House').replace('Crown-4', 'Crown-Mystery House')
 
-    with open(os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), str(seedRNG) + '-spoiler.txt'), 'w', encoding='utf-8') as s:
-        s.write(rep)  # Writing the corrected level slots back to the file.
+    # Writing the corrected level slots back to the file.
+    if len(str(dpg.get_value("seed"))) == 0:
+        with open(os.path.join(outputPath, str(seedRNG) + '-spoiler.txt'), 'w', encoding='utf-8') as s:
+            s.write(rep)
+    else:
+        with open(os.path.join(outputPath, str(dpg.get_value('seed')) + '-spoiler.txt'), 'w', encoding='utf-8') as s:
+            s.write(rep)
 
     print('Generated spoiler file!')
 
@@ -2445,19 +2461,6 @@ def rdirectory(sender, app_data):
 def checkDirectory():
     global romfsVersion
     valid = True
-
-    if len(str(dpg.get_value("seed"))) == 0:
-        seedRNG = time.time_ns()  # If no seed is entered, then it defaults to time since epoch.
-    else:
-        try:
-            seedRNG = int(dpg.get_value("seed"))  # Try to cast the input as an integer.
-        except ValueError:
-            seedRNG = 0
-            for i in str(dpg.get_value("seed")):
-                if seedRNG == 0:
-                    seedRNG += ord(i)
-                else:
-                    seedRNG *= ord(i)
 
     # Use BuildInfo.txt to determine version.
     if os.path.isfile(os.path.join(dpg.get_value('dirtext'), 'DebugData', 'BuildInfo.txt')):
@@ -2503,13 +2506,22 @@ def checkDirectory():
             dpg.configure_item('dirtext', color=(255, 0, 0, 255))
             valid = False
 
-    if os.path.isdir(dpg.get_value('rdirtext')) and not os.path.isdir(os.path.join(dpg.get_value('rdirtext'), 'SM3DWR-' + str(seedRNG))):
-        dpg.configure_item('rdirbutt', label='Valid Output Directory Loaded!')
-        dpg.configure_item('rdirtext', color=(0, 255, 0, 255))
+    if len(str(dpg.get_value("seed"))) > 0:
+        if os.path.isdir(dpg.get_value('rdirtext')) and not os.path.isdir(os.path.join(dpg.get_value('rdirtext'), 'SM3DWR-' + str(dpg.get_value('seed')))):
+            dpg.configure_item('rdirbutt', label='Valid Output Directory Loaded!')
+            dpg.configure_item('rdirtext', color=(0, 255, 0, 255))
+        else:
+            dpg.configure_item("rdirbutt", label="Load Output Directory")
+            dpg.configure_item('rdirtext', color=(255, 0, 0, 255))
+            valid = False
     else:
-        dpg.configure_item("rdirbutt", label="Load Output Directory")
-        dpg.configure_item('rdirtext', color=(255, 0, 0, 255))
-        valid = False
+        if os.path.isdir(dpg.get_value('rdirtext')) and not os.path.isdir(os.path.join(dpg.get_value('rdirtext'), 'SM3DWR-' + str(time.time_ns()))):
+            dpg.configure_item('rdirbutt', label='Valid Output Directory Loaded!')
+            dpg.configure_item('rdirtext', color=(0, 255, 0, 255))
+        else:
+            dpg.configure_item("rdirbutt", label="Load Output Directory")
+            dpg.configure_item('rdirtext', color=(255, 0, 0, 255))
+            valid = False
 
     if valid:
         dpg.configure_item('randoinit', enabled=True)
