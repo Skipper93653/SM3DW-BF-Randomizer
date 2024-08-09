@@ -14,23 +14,25 @@ Select a valid unmodified RomFS dump (the root of the RomFS directory - contains
 
 ### Playing with the newly generated files
 
+Go to the relevant section based on what option you selected for 'Output directory structure' in the settings (Console or Emulator).
+
 #### Console
+
+##### Atmosphere and [SimpleModManager](https://github.com/nadrino/SimpleModManager) (Recommended)
+
+With Atmosphere and SimpleModManager - on the root of your microSD card, go to `mods/Super Mario 3D World + Bowser's Fury` (create these folders if they don't exist) and copy the newly generated `SM3DW-<seed>` folder to this location. Then, on console, make your way to SimpleModManager and enable the mod, then you're free to play!
+
+Make sure that if you have multiple seeds present in your mods folder, have only **one** activated at a time.
 
 ##### [Atmosphere](https://github.com/Atmosphere-NX/Atmosphere)
 
-With Atmosphere - on the root of your microSD card, go to `atmosphere/contents/010028600EBDA000` (create these folders if they don't exist, remove any existing files within this location after safely backing up whatever was there to avoid possible conflicts) and copy the `romfs` folder from inside the newly generated `SM3DW-<seed>` folder to this location, then you're free to play!
-
-##### Atmosphere and [SimpleModManager](https://github.com/nadrino/SimpleModManager)
-
-With Atmosphere and SimpleModManager - on the root of your microSD card, go to `mods/Super Mario 3D World + Bowser's Fury/<name of your choice>/contents/010028600EBDA000` (create these folders if they don't exist, it is recommended that you have a unique name for each seed on your microSD card to avoid possible conflicts) and copy the `romfs` folder from inside the newly generated `SM3DW-<seed>` folder to this location. Then, on console, make your way to SimpleModManager and enable the mod, then you're free to play!
-
-Make sure that if you have multiple seeds present in your mods folder, have only **one** activated at a time.
+With Atmosphere - on the root of your microSD card, go to `atmosphere` (remove any existing mods for Super Mario 3D World + Bowser's Fury within this location after safely backing up whatever was there to avoid possible conflicts) and copy the `contents` folder from inside the newly generated `SM3DW-<seed>` folder to this location (`contents` is only created when the 'Console' output directory structure option is selected), then you're free to play!
 
 #### Emulator
 
 ##### [Ryujinx](https://ryujinx.org)
 
-With Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-<seed>` folder into said mod folder (if you didn't select here as the output directory already). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury and click 'Manage Mods' and enable the mod folder if it isn't already, then you're free to play!
+With Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-<seed>` folder into said mod folder (if you didn't select here as the output directory already with the 'Emulator' output directory structure option is selected). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury and click 'Manage Mods' and enable the mod folder if it isn't already, then you're free to play!
 
 Note: Yuzu is not directly supported, so it is recommended to go with Ryujinx if you want to use an emulator.
 
@@ -48,7 +50,7 @@ Enable with other mods at your own risk, as this mod is only designed to be comp
 * Some stage numbers are glitched due to the modified StageList.byml.
 * The World Warp Pipes which should take you to the next world do not work and just kick you out of the stage if the stages containing them are not on World 1-2 or World 4-2.
 * Sometimes, with randomized music, the music may sometimes cut out abruptly.
-* Lucky Houses and the Coin Express may not disappear after use, but they correctly cannot be re-entered due under some circumstances as they may use the Toad House StageType to fix potential softlocks. However, this means their world map path will be undone when any of the conditions for respawning Toad Houses are met, at which point you can re-enter the Lucky House or Coin Express.
+* Lucky Houses and the Coin Express may not disappear after use, but they correctly cannot be re-entered due under some circumstances as they may use the Toad House StageType to fix potential softlocks. However, this means their world map path will be undone when any of the conditions for respawning Toad Houses are met (game overs, etc.), at which point you can re-enter the Lucky House or Coin Express to redo the world map path at that section.
 * If a non-boss blockade is locked behind a Bowser statue, the music does not play after you enter it.
 * The music may stop playing after dying on the Coin Express until reaching the roulette at the end of the stage under some circumstances.
 * The Goal Poles for 'The Great Goal Pole' and 'Back to Hands-on Hall' can never be changed due to the runaway Goal Pole not being able to change its appearance to the castle Goal Pole or the ending Goal Pole.

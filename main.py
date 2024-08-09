@@ -77,10 +77,16 @@ def randomizer():
     dpg.configure_item("progress", default_value=bar / 172, overlay=str(round(100 * bar / 172, 1)) + '%')
 
     # Base output folder
-    if len(str(dpg.get_value("seed"))) == 0:
-        outputPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG))
+    if str(dpg.get_value('output')) == 'Emulator':
+        if len(str(dpg.get_value("seed"))) == 0:
+            outputPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG))
+        else:
+            outputPath = os.path.join(user_data[1], 'SM3DWR-' + str(dpg.get_value('seed')))
     else:
-        outputPath = os.path.join(user_data[1], 'SM3DWR-' + str(dpg.get_value('seed')))
+        if len(str(dpg.get_value("seed"))) == 0:
+            outputPath = os.path.join(user_data[1], 'SM3DWR-' + str(seedRNG), 'contents', '010028600EBDA000')
+        else:
+            outputPath = os.path.join(user_data[1], 'SM3DWR-' + str(dpg.get_value('seed')), 'contents', '010028600EBDA000')
 
     # StageData Path
     sPath = os.path.join(user_data[0], 'StageData')
@@ -2555,7 +2561,8 @@ def saveSettings():
                      'lang': bool(dpg.get_value('lang')),
                      'star': str(dpg.get_value('star')),
                      'pslider': float(dpg.get_value('pslider')),
-                     'sslider': float(dpg.get_value('sslider'))})
+                     'sslider': float(dpg.get_value('sslider')),
+                     'output': str(dpg.get_value('output'))})
 
     with open('settings.json', 'w') as s:
         s.write(json.dumps(settings))
@@ -2607,40 +2614,43 @@ class GUI:
                     dpg.add_text("Hello, welcome to the Super Mario 3D World Randomizer!")
                     dpg.add_text(tag="dirtext", default_value=str(p_settings['dir']))  # Selected Directory
                     dpg.add_file_dialog(directory_selector=True, show=False, tag="dir", width=600, height=600, callback=directory, default_path=str(dpg.get_value('dirtext')))  # Directory Selector
-                    self.dir = dpg.add_button(tag="dirbutt", label="Load Input Directory", callback=lambda: dpg.show_item("dir"))  # Load Directory Button
+                    dpg.add_button(tag="dirbutt", label="Load Input Directory", callback=lambda: dpg.show_item("dir"))  # Load Directory Button
                     dpg.add_text(tag="rdirtext", default_value=str(p_settings['rdir']))  # Selected Directory
                     dpg.add_file_dialog(directory_selector=True, show=False, tag="rdir", width=600, height=600, callback=rdirectory, default_path=str(dpg.get_value('rdirtext')))  # Directory Selector
-                    self.rdir = dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
-                    self.seed = dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory, hint='Enter a seed.')  # Seed Input Text
-                    self.rando = dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
+                    dpg.add_button(tag="rdirbutt", label="Load Output Directory", callback=lambda: dpg.show_item("rdir"))  # Load Directory Button
+                    dpg.add_input_text(tag="seed", label="Seed", default_value="", callback=checkDirectory, hint='Enter a seed.')  # Seed Input Text
+                    dpg.add_button(tag="randoinit", label="Randomize!", enabled=False, callback=randomizer)  # Randomize Button
                     dpg.add_progress_bar(tag="progress", label="progress", default_value=0, overlay='0.0%')
                     dpg.add_text("This randomizer only effects Super Mario 3D World (Switch), not Bowser's Fury.")
-                    self.test = dpg.add_button(tag="test", label="test", callback=lambda: dpg.configure_item("progress", default_value=1), show=False)
+                    dpg.add_button(tag="test", label="test", callback=lambda: dpg.configure_item("progress", default_value=1), show=False)  # Test
                     with dpg.tooltip("dirbutt"):
-                        dpg.add_text("The directory selected must be the root directory of an unmodified dump of the game:\n" +
+                        dpg.add_text("The directory selected must be the root directory of an unmodified dump of the game:\n"
                                      "\"" + os.path.join("010028600EBDA000", "romfs") + "\" - Super Mario 3D World + Bowser's Fury")
                     with dpg.tooltip("rdirbutt"):
-                        dpg.add_text("Select your desired output folder of choice. The recommended output folder would "
-                                     "be your mods folder:\n" +
-                                     "\"" + os.path.join("sd:", "atmosphere", "contents", "010028600EBDA000") + "\"* - Atmosphere (Switch)\n"
-                                     "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury", "<name of your choice>", "contents", "010028600EBDA000") + "\"* - SMM (Switch)\n"
+                        dpg.add_text("Select your desired output folder. Below describes where to place the outputted files for use.\n"
+                                     "If you selected 'Emulator' in the settings for the output directory structure:\n"
                                      "\"" + os.path.join("Ryujinx", "mods", "contents", "010028600EBDA000") + "\" - Ryujinx (Switch)\n\n"
-                                     "*The \"romfs\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
-                                     "specified Atmosphere or SimpleModManager (SMM) folder.\n\n"
-                                     "Note: Yuzu is not officially supported and you may encounter issues if you use it.")
+                                     "Yuzu is not officially supported, you may encounter issues if you use it.\n\n"
+                                     "If you selected 'Console' in settings for the output directory structure:\n"
+                                     "\"" + os.path.join("sd:", "atmosphere") + "\"* - Atmosphere (Switch)\n"
+                                     "\"" + os.path.join("sd:", "mods", "Super Mario 3D World + Bowser's Fury") + "\" - SimpleModManager (Switch)\n\n"
+                                     "*The \"contents\" folder inside the generated \"SM3DWR-<seed>\" folder should be taken out and placed into the\n"
+                                     "specified Atmosphere folder.")
                     with dpg.tooltip('randoinit', tag='randoinittip'):
                         dpg.add_text('To be able to start the randomizer, select a valid input directory.', tag='randotip')
                 checkDirectory()
                 with dpg.tab(tag="t2", label="Misc. Settings"):  # Settings tab
-                    self.speedrun = dpg.add_checkbox(tag='speedrun', label='Speedrunner mode', default_value=bool(p_settings['speedrun']), callback=speedrunner)
-                    self.spoil = dpg.add_checkbox(tag="spoil", label="Generate spoiler file?", default_value=bool(p_settings['spoil']))
-                    self.music = dpg.add_checkbox(tag="music", label="Randomize music?", default_value=bool(p_settings['music']))
-                    self.lang = dpg.add_checkbox(tag="lang", label="Randomize language?", default_value=bool(p_settings['lang']))
+                    dpg.add_checkbox(tag='speedrun', label='Speedrunner mode', default_value=bool(p_settings['speedrun']), callback=speedrunner)
+                    dpg.add_checkbox(tag="spoil", label="Generate spoiler file?", default_value=bool(p_settings['spoil']))
+                    dpg.add_checkbox(tag="music", label="Randomize music?", default_value=bool(p_settings['music']))
+                    dpg.add_checkbox(tag="lang", label="Randomize language?", default_value=bool(p_settings['lang']))
                     dpg.add_text('Green star locks:')
-                    self.star = dpg.add_radio_button(('Fully random', 'Random values', 'Disabled'), tag='star', horizontal=True, default_value=str(p_settings['star']), callback=showSlider)
-                    self.pslider = dpg.add_slider_float(tag='pslider', label='Green star lock probability', default_value=float(p_settings['pslider']), min_value=0, max_value=1, show=True, clamped=True)
-                    self.sslider = dpg.add_slider_float(tag='sslider', label='Green star lock strictness', default_value=float(p_settings['sslider']), min_value=0, max_value=1, show=True, clamped=True)
-                    self.save = dpg.add_button(tag='save', label='Save Settings', callback=saveSettings)
+                    dpg.add_radio_button(('Fully random', 'Random values', 'Disabled'), tag='star', horizontal=True, default_value=str(p_settings['star']), callback=showSlider)
+                    dpg.add_slider_float(tag='pslider', label='Green star lock probability', default_value=float(p_settings['pslider']), min_value=0, max_value=1, show=True, clamped=True)
+                    dpg.add_slider_float(tag='sslider', label='Green star lock strictness', default_value=float(p_settings['sslider']), min_value=0, max_value=1, show=True, clamped=True)
+                    dpg.add_text('Output directory structure:')
+                    dpg.add_radio_button(('Console', 'Emulator'), tag='output', horizontal=True, default_value=str(p_settings['output']))
+                    dpg.add_button(tag='save', label='Save Settings', callback=saveSettings)
                     with dpg.tooltip('speedrun'):
                         dpg.add_text('Do not generate the spoiler file and lock the green star settings to be compatible\n'
                                      'with the official randomizer speedrun leaderboards.')
@@ -2665,6 +2675,9 @@ class GUI:
                     with dpg.tooltip('sslider'):
                         dpg.add_text('CTRL+Left Click to enter a specific value.\n'
                                      'Control the strictness for how many green stars you need to have to open the green star locks.', tag='stooltip')
+                    with dpg.tooltip('output'):
+                        dpg.add_text('Console: Include the "' + os.path.join('contents', '010028600EBDA000') + '" folders.\n'
+                                     'Emulator: Don\'t include the "' + os.path.join('contents', '010028600EBDA000') + '" folders.\n')
                 showSlider()
                 speedrunner()
                 with dpg.tab(tag="t3", label="Credits"):  # Credits tab
@@ -2825,7 +2838,8 @@ def main():
                         'lang': False,
                         'star': 'Fully random',
                         'pslider': 0.15000000596046448,
-                        'sslider': 0.606080949306488}   # 0.6060809576 is the average
+                        'sslider': 0.606080949306488,  # 0.6060809576 is the average
+                        'output': 'Console'}
             s.write(json.dumps(settings))
     try:
         if float(settings['pslider']) < 0 or float(settings['pslider']) > 1:
@@ -2834,6 +2848,8 @@ def main():
             settings.update({'sslider': 0.606080949306488})
         if str(settings['star']) != 'Fully random' and str(settings['star']) != 'Random values' and str(settings['star']) != 'Disabled':
             settings.update({'star': 'Fully random'})
+        if str(settings['output']) != 'Console' and str(settings['output']) != 'Emulator':
+            settings.update({'output': 'Console'})
         bool(settings['speedrun'])
         bool(settings['spoil'])
         bool(settings['music'])
@@ -2848,7 +2864,8 @@ def main():
                         'lang': False,
                         'star': 'Fully random',
                         'pslider': 0.15000000596046448,
-                        'sslider': 0.606080949306488}
+                        'sslider': 0.606080949306488,
+                        'output': 'Console'}
             s.write(json.dumps(settings))
     interface = GUI('Super Mario 3D World Randomizer', (800, 800), settings)  # Initialise the main window
     show()  # Show the main window
