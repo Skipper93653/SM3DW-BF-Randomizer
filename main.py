@@ -278,9 +278,9 @@ def randomizer():
                 print('Stamp House StageType fixed!')
                 StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: 妖精の家'  # StageType for Stamp Houses.
             elif 'RouletteRoomZone' in StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 8]:
-                # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType.
+                # Making sure a roulette being randomized onto a roulette slot keeps the roulette StageType (and if it isn't green star locked).
                 if (stageNo == 10 or stageNo == 21 or stageNo == 35 or stageNo == 47 or stageNo == 67 or stageNo == 82 or stageNo == 98 or stageNo == 116 or stageNo == 130) and ((GreenStarLockHistory[-1][1] == 0 and dpg.get_value('star') == 'Random values') or (((GreenStarLockHistory2[-1][1] == 0 and GreenStarLockHistory2[-1][0]) or not GreenStarLockHistory2[-1][0]) and dpg.get_value('star') == 'Fully random')):
-                    print('Roulette StageType fixed with Roulette StageType!')
+                    print('Roulette StageType fixed!')
                     StageListNew[(StageListNew.index('  - CourseId: ' + str(stageNo))) + 10] = '    StageType: カジノ部屋'  # StageType for Roulettes.
                 # A lucky house where the golden express usually is gets it the golden express stage type.
                 elif stageNo == 57:
