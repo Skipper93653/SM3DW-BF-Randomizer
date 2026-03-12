@@ -30,7 +30,7 @@ With Atmosphere - on the root of your microSD card, go to `atmosphere` (remove a
 
 #### Emulator
 
-##### [Ryujinx](https://ryujinx.org)
+##### [Ryujinx](https://ryujinx.app/)
 
 With Ryujinx - open Ryujinx, right click 'Super Mario 3D World + Bowser's Fury' and click on 'Open Mods Directory', this should open a new window within the mod folder. From there, copy the newly generated `SM3DWR-<seed>` folder into said mod folder (if you didn't select here as the output directory already with the 'Emulator' output directory structure option is selected). To check whether it is enabled, right click 'Super Mario 3D World + Bowser's Fury and click 'Manage Mods' and enable the mod folder if it isn't already, then you're free to play!
 

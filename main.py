@@ -2468,29 +2468,33 @@ def checkDirectory():
     global romfsVersion
     valid = True
 
-    # Use BuildInfo.txt to determine version.
-    if os.path.isfile(os.path.join(dpg.get_value('dirtext'), 'DebugData', 'BuildInfo.txt')):
-        with open(os.path.join(dpg.get_value('dirtext'), 'DebugData', 'BuildInfo.txt'), 'rb') as ver:
+    # Use BuildInfo.txt to determine version. (older versions, now check KillerTankStage.szs for compatibility with newer versions)
+    if os.path.isfile(os.path.join(dpg.get_value('dirtext'), 'StageData', 'KillerTankStage.szs')):
+        with open(os.path.join(dpg.get_value('dirtext'), 'StageData', 'KillerTankStage.szs'), 'rb') as ver:
             verHash = hashlib.md5(ver.read())
             if len(hashDict) == 100:  # If it has not been appended to yet.
-                if verHash.hexdigest() == '426587d8d4f6353f2ae31b31f9b8bc43':  # v1.1.0
+                if verHash.hexdigest() == '7b49f92b6d7cfc114caa7328a09a157f':  # >= v1.1.0
                     hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), '7b49f92b6d7cfc114caa7328a09a157f'])
                     hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'fbdb7032420186a14491643ac46591f0'])
-                    romfsVersion = 'v1.1.0'
-                else:  # v1.0.0
+                    romfsVersion = '>= v1.1.0'
+                elif verHash.hexdigest() == 'b64dd19b581055fcc8e9a05b457deac8':  # v1.0.0
                     hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), 'b64dd19b581055fcc8e9a05b457deac8'])
                     hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'c70160743002c8736c6ba6537bdbba98'])
                     romfsVersion = 'v1.0.0'
+                else:
+                    valid = False
                 print(str(romfsVersion) + ' RomFS selected')
             else:
-                if verHash.hexdigest() == '426587d8d4f6353f2ae31b31f9b8bc43':
+                if verHash.hexdigest() == '7b49f92b6d7cfc114caa7328a09a157f':
                     hashDict[-2][1] = '7b49f92b6d7cfc114caa7328a09a157f'
                     hashDict[-1][1] = 'fbdb7032420186a14491643ac46591f0'
                     romfsVersion = 'v1.1.0'
-                else:
+                elif verHash.hexdigest() == 'b64dd19b581055fcc8e9a05b457deac8':
                     hashDict[-2][1] = 'b64dd19b581055fcc8e9a05b457deac8'
                     hashDict[-1][1] = 'c70160743002c8736c6ba6537bdbba98'
                     romfsVersion = 'v1.0.0'
+                else:
+                    valid = False
                 print(str(romfsVersion) + ' RomFS selected')
     else:
         valid = False
@@ -2721,7 +2725,7 @@ class GUI:
 # Main program
 def main():
     global settings, interface, version, hashDict
-    version = 'v3.0.0'
+    version = 'v3.0.1'
 
     # MD5 hash 2D array for file verification, only Switch version at the moment.
     hashDict = [[os.path.join('SystemData', 'StageList.szs'), 'e267c452769c2cc45670b58234fbc3e5'],

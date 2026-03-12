@@ -1,5 +1,5 @@
-dearpygui==1.11.1
-numpy==2.0.1
+dearpygui==2.2
+numpy==2.4.3
 oead==1.2.9.post4
-Nuitka==2.4.5
+Nuitka==4.0.5
 ips.py==0.1.2
