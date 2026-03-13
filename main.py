@@ -2476,7 +2476,7 @@ def checkDirectory():
                 if verHash.hexdigest() == '7b49f92b6d7cfc114caa7328a09a157f':  # >= v1.1.0
                     hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), '7b49f92b6d7cfc114caa7328a09a157f'])
                     hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'fbdb7032420186a14491643ac46591f0'])
-                    romfsVersion = '>= v1.1.0'
+                    romfsVersion = 'v1.1.0'
                 elif verHash.hexdigest() == 'b64dd19b581055fcc8e9a05b457deac8':  # v1.0.0
                     hashDict.append([os.path.join('StageData', 'KillerTankStage.szs'), 'b64dd19b581055fcc8e9a05b457deac8'])
                     hashDict.append([os.path.join('StageData', 'EnemyExpressStage.szs'), 'c70160743002c8736c6ba6537bdbba98'])
